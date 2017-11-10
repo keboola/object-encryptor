@@ -11,8 +11,8 @@
     ],
     "autoload": {
         "psr-4": {
-            "Keboola\\Json\\": "src",
-            "Keboola\\Json\\Tests\\": "tests"
+            "Keboola\\ObjectEncryptor\\": "src",
+            "Keboola\\ObjectEncryptor\\Tests\\": "tests"
         }
     },
     "repositories": [
@@ -23,6 +23,7 @@
     ],
     "require": {
         "keboola-legacy/php-encryption": "^0.0",
+		"keboola/php-encryption": "~0.2",
         "defuse/php-encryption": "^2.1",
         "php": ">=5.6"
     },
