@@ -2,8 +2,8 @@
 
 namespace Keboola\ObjectEncryptor\Tests;
 
-use Keboola\ObjectEncryptor\Wrapper\JsonWrapper;
 use Keboola\ObjectEncryptor\Wrapper\StackWrapper;
+use Keboola\ObjectEncryptor\Wrapper\Stack2Wrapper;
 
 class StackWrapperTest extends \PHPUnit_Framework_TestCase
 {
@@ -11,8 +11,8 @@ class StackWrapperTest extends \PHPUnit_Framework_TestCase
     {
         $stackKey = substr(hash('sha256', uniqid()), 0, 16);
         $generalKey = substr(hash('sha256', uniqid()), 0, 16);
-        $stackWrapper = new StackWrapper($generalKey, "my-stack", $stackKey);
-        $jsonWrapper = new JsonWrapper($generalKey);
+        $stackWrapper = new Stack2Wrapper($generalKey, "my-stack", $stackKey);
+        $jsonWrapper = new StackWrapper($generalKey);
 
         $encrypted = $stackWrapper->encrypt("mySecretValue");
         $this->assertEquals("mySecretValue", $stackWrapper->decrypt($encrypted));
@@ -26,8 +26,8 @@ class StackWrapperTest extends \PHPUnit_Framework_TestCase
     {
         $stackKey = substr(hash('sha256', uniqid()), 0, 16);
         $generalKey = substr(hash('sha256', uniqid()), 0, 16);
-        $stackWrapper = new StackWrapper($generalKey, "my-stack", $stackKey);
-        $jsonWrapper = new JsonWrapper($generalKey);
+        $stackWrapper = new Stack2Wrapper($generalKey, "my-stack", $stackKey);
+        $jsonWrapper = new StackWrapper($generalKey);
 
         $encrypted = $jsonWrapper->encrypt(
             [
@@ -44,8 +44,8 @@ class StackWrapperTest extends \PHPUnit_Framework_TestCase
     {
         $stackKey = substr(hash('sha256', uniqid()), 0, 16);
         $generalKey = substr(hash('sha256', uniqid()), 0, 16);
-        $stackWrapper = new StackWrapper($generalKey, "my-stack", $stackKey);
-        $jsonWrapper = new JsonWrapper($generalKey);
+        $stackWrapper = new Stack2Wrapper($generalKey, "my-stack", $stackKey);
+        $jsonWrapper = new StackWrapper($generalKey);
 
         $encrypted = $jsonWrapper->encrypt(
             [
@@ -65,9 +65,9 @@ class StackWrapperTest extends \PHPUnit_Framework_TestCase
         $stack1Key = substr(hash('sha256', uniqid()), 0, 16);
         $stack2Key = substr(hash('sha256', uniqid()), 0, 16);
         $generalKey = substr(hash('sha256', uniqid()), 0, 16);
-        $stack1Wrapper = new StackWrapper($generalKey, "my-stack-1", $stack1Key);
-        $stack2Wrapper = new StackWrapper($generalKey, "my-stack-2", $stack2Key);
-        $jsonWrapper = new JsonWrapper($generalKey);
+        $stack1Wrapper = new Stack2Wrapper($generalKey, "my-stack-1", $stack1Key);
+        $stack2Wrapper = new Stack2Wrapper($generalKey, "my-stack-2", $stack2Key);
+        $jsonWrapper = new StackWrapper($generalKey);
 
         $encrypted = $stack1Wrapper->encrypt("whatever1");
         $encrypted = $stack2Wrapper->add("whatever2", $encrypted);
@@ -84,8 +84,8 @@ class StackWrapperTest extends \PHPUnit_Framework_TestCase
     {
         $stack2Key = substr(hash('sha256', uniqid()), 0, 16);
         $generalKey = substr(hash('sha256', uniqid()), 0, 16);
-        $stack2Wrapper = new StackWrapper($generalKey, "my-stack-2", $stack2Key);
-        $jsonWrapper = new JsonWrapper($generalKey);
+        $stack2Wrapper = new Stack2Wrapper($generalKey, "my-stack-2", $stack2Key);
+        $jsonWrapper = new StackWrapper($generalKey);
 
         $this->expectException("Keboola\\DockerBundle\\Exception\\StackDataEncryptionException");
         $this->expectExceptionMessageRegExp("/Stacks not found./");

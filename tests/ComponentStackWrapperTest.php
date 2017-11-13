@@ -4,7 +4,7 @@ namespace Keboola\ObjectEncryptor\Tests;
 
 use Keboola\ObjectEncryptor\Exception\ComponentDataEncryptionException;
 use Keboola\ObjectEncryptor\Wrapper\ComponentStackWrapper;
-use Keboola\ObjectEncryptor\Wrapper\JsonWrapper;
+use Keboola\ObjectEncryptor\Wrapper\StackWrapper;
 
 class ComponentStackWrapperTest extends \PHPUnit_Framework_TestCase
 {
@@ -14,7 +14,7 @@ class ComponentStackWrapperTest extends \PHPUnit_Framework_TestCase
         $generalKey = substr(hash('sha256', uniqid()), 0, 16);
         $componentStackWrapper = new ComponentStackWrapper($generalKey, "my-stack", $stackKey);
         $componentStackWrapper->setComponent("vendor.my-component");
-        $jsonWrapper = new JsonWrapper($generalKey);
+        $jsonWrapper = new StackWrapper($generalKey);
 
         $encrypted = $componentStackWrapper->encrypt("mySecretValue");
         $this->assertEquals("mySecretValue", $componentStackWrapper->decrypt($encrypted));
@@ -30,7 +30,7 @@ class ComponentStackWrapperTest extends \PHPUnit_Framework_TestCase
         $generalKey = substr(hash('sha256', uniqid()), 0, 16);
         $componentStackWrapper = new ComponentStackWrapper($generalKey, "my-stack", $stackKey);
         $componentStackWrapper->setComponent("vendor.my-component");
-        $jsonWrapper = new JsonWrapper($generalKey);
+        $jsonWrapper = new StackWrapper($generalKey);
 
         $encrypted = $jsonWrapper->encrypt(
             [
@@ -49,7 +49,7 @@ class ComponentStackWrapperTest extends \PHPUnit_Framework_TestCase
         $generalKey = substr(hash('sha256', uniqid()), 0, 16);
         $componentStackWrapper = new ComponentStackWrapper($generalKey, "my-stack", $stackKey);
         $componentStackWrapper->setComponent("vendor.my-component");
-        $jsonWrapper = new JsonWrapper($generalKey);
+        $jsonWrapper = new StackWrapper($generalKey);
 
         $encrypted = $jsonWrapper->encrypt(
             [
@@ -71,7 +71,7 @@ class ComponentStackWrapperTest extends \PHPUnit_Framework_TestCase
         $componentStack1Wrapper->setComponent("vendor.my-component");
         $componentStack2Wrapper = new ComponentStackWrapper($generalKey, "my-stack-2", $stack2Key);
         $componentStack2Wrapper->setComponent("vendor.my-component");
-        $jsonWrapper = new JsonWrapper($generalKey);
+        $jsonWrapper = new StackWrapper($generalKey);
 
         $encrypted = $componentStack1Wrapper->encrypt("whatever1");
         $encrypted = $componentStack2Wrapper->add("whatever2", $encrypted);
@@ -89,7 +89,7 @@ class ComponentStackWrapperTest extends \PHPUnit_Framework_TestCase
         $stack2Key = substr(hash('sha256', uniqid()), 0, 16);
         $generalKey = substr(hash('sha256', uniqid()), 0, 16);
         $stack2Wrapper = new ComponentStackWrapper($generalKey, "my-stack-2", $stack2Key);
-        $jsonWrapper = new JsonWrapper($generalKey);
+        $jsonWrapper = new StackWrapper($generalKey);
 
         $this->expectException("Keboola\\DockerBundle\\Exception\\ComponentDataEncryptionException");
         $this->expectExceptionMessageRegExp("/Component mismatch./");
@@ -106,7 +106,7 @@ class ComponentStackWrapperTest extends \PHPUnit_Framework_TestCase
         $componentStack1Wrapper->setComponent("vendor.my-component");
         $componentStack2Wrapper = new ComponentStackWrapper($generalKey, "my-stack-2", $stack2Key);
         $componentStack2Wrapper->setComponent("vendor.my-component");
-        $jsonWrapper = new JsonWrapper($generalKey);
+        $jsonWrapper = new StackWrapper($generalKey);
         $attackerStack1Wrapper = new ComponentStackWrapper($generalKey, "my-stack-1", $stack1Key);
         $attackerStack1Wrapper->setComponent("attacker.my-malicious-app");
         $attackerStack2Wrapper = new ComponentStackWrapper($generalKey, "my-stack-2", $stack2Key);

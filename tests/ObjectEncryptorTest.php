@@ -2,13 +2,34 @@
 
 namespace Keboola\ObjectEncryptor\Tests;
 
+use Defuse\Crypto\Key;
 use Keboola\ObjectEncryptor\Exception\ApplicationException;
 use Keboola\ObjectEncryptor\Exception\UserException;
 use Keboola\ObjectEncryptor\ObjectEncryptor;
+use Keboola\ObjectEncryptor\ObjectEncryptorFactory;
+use Keboola\ObjectEncryptor\Wrapper\StackWrapper;
 use PHPUnit\Framework\TestCase;
 
 class ObjectEncryptorTest extends TestCase
 {
+    public function testPOC()
+    {
+        $globalKey = Key::createNewRandomKey()->saveToAsciiSafeString();
+        $stackKey = Key::createNewRandomKey()->saveToAsciiSafeString();
+        $legacyKey = '1234567890123456';
+        $aesKey = '123456789012345678901234567890ab';
+        $stack = 'us-east-1';
+        $componentId = 'keboola.docker-demo';
+        $configurationId = '123456';
+        $projectId = '572';
+        $factory = new ObjectEncryptorFactory($globalKey, $legacyKey, $aesKey, $stackKey, $stack, $projectId, $componentId, $configurationId);
+        $encryptor = $factory->getEncryptor();
+        $originalText = 'secret';
+        $encrypted = $encryptor->encrypt($originalText, StackWrapper::class);
+        $this->assertEquals("KBC::SecureV3", substr($encrypted, 0, 13));
+        $this->assertEquals($originalText, $encryptor->decrypt($encrypted));
+    }
+
 
     public function testEncryptorScalar()
     {

@@ -3,7 +3,7 @@
 namespace Keboola\ObjectEncryptor\Tests;
 
 use Keboola\ObjectEncryptor\Wrapper\BaseWrapper;
-use Keboola\ObjectEncryptor\Wrapper\JsonWrapper;
+use Keboola\ObjectEncryptor\Wrapper\StackWrapper;
 
 class JsonWrapperTest extends \PHPUnit_Framework_TestCase
 {
@@ -11,7 +11,7 @@ class JsonWrapperTest extends \PHPUnit_Framework_TestCase
     public function testEncrypt()
     {
         $generalKey = substr(hash('sha256', uniqid()), 0, 16);
-        $jsonWrapper = new JsonWrapper($generalKey);
+        $jsonWrapper = new StackWrapper($generalKey);
 
         $encrypted = $jsonWrapper->encrypt(["key" => "value"]);
         $this->assertEquals(["key" => "value"], $jsonWrapper->decrypt($encrypted));
@@ -20,7 +20,7 @@ class JsonWrapperTest extends \PHPUnit_Framework_TestCase
     public function testSerializationFailure()
     {
         $generalKey = substr(hash('sha256', uniqid()), 0, 16);
-        $jsonWrapper = new JsonWrapper($generalKey);
+        $jsonWrapper = new StackWrapper($generalKey);
         $this->expectException("Keboola\\DockerBundle\\Exception\\EncryptionException");
 
         $this->expectExceptionMessageRegExp("/Serialization of encrypted data failed/");
@@ -30,7 +30,7 @@ class JsonWrapperTest extends \PHPUnit_Framework_TestCase
     public function testDeserializationFailure()
     {
         $generalKey = substr(hash('sha256', uniqid()), 0, 16);
-        $jsonWrapper = new JsonWrapper($generalKey);
+        $jsonWrapper = new StackWrapper($generalKey);
         $baseWrapper = new BaseWrapper($generalKey);
 
         $encryptedString = $baseWrapper->encrypt("string");

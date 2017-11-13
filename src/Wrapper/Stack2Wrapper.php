@@ -2,15 +2,12 @@
 
 namespace Keboola\ObjectEncryptor\Wrapper;
 
-class ComponentStackWrapper extends StackWrapper
+class Stack2Wrapper extends StackWrapper
 {
     use StackDataTrait;
-    use ComponentDataTrait;
 
     /**
-     * ComponentStackWrapper constructor.
-     *
-     * TODO Maybe put also component here?
+     * Stack2Wrapper constructor.
      *
      * @param $key
      * @param $stack
@@ -30,10 +27,8 @@ class ComponentStackWrapper extends StackWrapper
     public function decrypt($encryptedData)
     {
         $data = parent::decrypt($encryptedData);
-        $this->validateComponent($data);
         $this->validateStack($data);
         $baseWrapper = new BaseWrapper($this->getStackKey());
-
         return $baseWrapper->decrypt($data["stacks"][$this->getStack()]);
     }
 
@@ -46,12 +41,10 @@ class ComponentStackWrapper extends StackWrapper
         $baseWrapper = new BaseWrapper($this->getStackKey());
         $encryptedData = $baseWrapper->encrypt($data);
         $encapsulatedData = [
-            "component" => $this->getComponent(),
             "stacks" => [
                 $this->getStack() => $encryptedData
             ]
         ];
-
         return parent::encrypt($encapsulatedData);
     }
 
@@ -63,7 +56,6 @@ class ComponentStackWrapper extends StackWrapper
     public function add($data, $encrypted)
     {
         $decrypted = parent::decrypt($encrypted);
-        $this->validateComponent($decrypted);
         $this->validateStackKey($decrypted);
         $baseWrapper = new BaseWrapper($this->getStackKey());
         $decrypted["stacks"][$this->getStack()] = $baseWrapper->encrypt($data);
@@ -75,6 +67,6 @@ class ComponentStackWrapper extends StackWrapper
      */
     public function getPrefix()
     {
-        return "KBC::ComponentStackEncrypted==";
+        return "KBC::StackEncrypted==";
     }
 }

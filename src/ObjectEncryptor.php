@@ -5,7 +5,7 @@ namespace Keboola\ObjectEncryptor;
 use Keboola\ObjectEncryptor\Exception\ApplicationException;
 use Keboola\ObjectEncryptor\Exception\UserException;
 use Keboola\ObjectEncryptor\Legacy\Encryptor;
-use Keboola\ObjectEncryptor\Wrapper\BaseWrapper;
+use Keboola\ObjectEncryptor\Legacy\Wrapper\BaseWrapper;
 use Keboola\ObjectEncryptor\Wrapper\CryptoWrapperInterface;
 
 class ObjectEncryptor
@@ -36,6 +36,7 @@ class ObjectEncryptor
      * @param string|array|\stdClass $data Data to encrypt
      * @param string $wrapperName Class name of encryptor wrapper
      * @return mixed
+     * @throws ApplicationException
      */
     public function encrypt($data, $wrapperName = BaseWrapper::class)
     {
@@ -64,6 +65,8 @@ class ObjectEncryptor
     /**
      * @param mixed $data
      * @return mixed
+     * @throws ApplicationException
+     * @throws UserException
      */
     public function decrypt($data)
     {
@@ -87,6 +90,7 @@ class ObjectEncryptor
      * Manually add a known crypto wrapper. Generally, wrappers should be added to services.yml with tag
      * 'syrup.encryption.wrapper' - that way, they will be added automatically.
      * @param CryptoWrapperInterface $wrapper
+     * @throws ApplicationException
      */
     public function pushWrapper(CryptoWrapperInterface $wrapper)
     {
@@ -100,6 +104,7 @@ class ObjectEncryptor
      * Find a wrapper to decrypt a given cipher.
      * @param string $value Cipher text
      * @return CryptoWrapperInterface|null
+     * @throws ApplicationException
      */
     protected function findWrapper($value)
     {
@@ -118,6 +123,7 @@ class ObjectEncryptor
     /**
      * @param $value
      * @return string
+     * @throws ApplicationException
      * @throws \InvalidCiphertextException
      */
     protected function decryptValue($value)
@@ -151,7 +157,8 @@ class ObjectEncryptor
      * @param $key
      * @param $value
      * @param CryptoWrapperInterface $wrapper
-     * @return array|string|void
+     * @return array|string
+     * @throws ApplicationException
      */
     protected function encryptItem($key, $value, CryptoWrapperInterface $wrapper)
     {
@@ -187,6 +194,7 @@ class ObjectEncryptor
      * @param string $value
      * @param CryptoWrapperInterface $wrapper
      * @return string
+     * @throws ApplicationException
      */
     protected function encryptValue($value, CryptoWrapperInterface $wrapper)
     {
@@ -233,7 +241,9 @@ class ObjectEncryptor
     /**
      * @param $key
      * @param $value
-     * @return array|string|void
+     * @return array|string
+     * @throws ApplicationException
+     * @throws UserException
      */
     protected function decryptItem($key, $value)
     {
