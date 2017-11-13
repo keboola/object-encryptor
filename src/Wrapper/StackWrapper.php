@@ -4,24 +4,20 @@ namespace Keboola\ObjectEncryptor\Wrapper;
 
 use Defuse\Crypto\Crypto;
 use Defuse\Crypto\Key;
+use Keboola\ObjectEncryptor\Exception\ApplicationException;
 use Keboola\ObjectEncryptor\Exception\EncryptionException;
 
 class StackWrapper implements CryptoWrapperInterface
 {
     /**
-     * @var Crypto
-     */
-    private $encryptor;
-
-    /**
-     * @var Key
+     * @var string
      */
     private $stackKey;
 
     /**
-     * @var Key
+     * @var string
      */
-    private $globalKey;
+    private $generalKey;
 
     /**
      * @var string
@@ -44,11 +40,20 @@ class StackWrapper implements CryptoWrapperInterface
     private $configurationId = null;
 
     /**
+     * @var Key
+     */
+    private $keyStackKey;
+
+    /**
+     * @var Key
+     */
+    private $keyGeneralKey;
+
+    /**
      * BaseWrapper constructor.
      */
     public function __construct()
     {
-        $this->encryptor = new Crypto();
     }
 
     /**
@@ -56,15 +61,15 @@ class StackWrapper implements CryptoWrapperInterface
      */
     public function setStackKey($key)
     {
-        $this->stackKey = Key::loadFromAsciiSafeString($key);
+        $this->stackKey = $key;
     }
 
     /**
      * @param string $key
      */
-    public function setGlobalKey($key)
+    public function setGeneralKey($key)
     {
-        $this->globalKey = Key::loadFromAsciiSafeString($key);
+        $this->generalKey = $key;
     }
 
     /**
@@ -100,16 +105,71 @@ class StackWrapper implements CryptoWrapperInterface
     }
 
     /**
+     * @throws ApplicationException
+     */
+    private function validateState()
+    {
+        if (empty($this->stackId) || empty($this->stackKey) || empty($this->generalKey)) {
+            throw new ApplicationException("Bad init");
+        }
+        if (!is_string($this->stackId)) {
+            throw new ApplicationException("Invalid Stack");
+        }
+        if (!is_null($this->projectId) && !is_string($this->projectId)) {
+            throw new ApplicationException("Invalid Project Id.");
+        }
+        if (!is_null($this->componentId) && !is_string($this->componentId)) {
+            throw new ApplicationException("Invalid Component Id.");
+        }
+        if (!is_null($this->configurationId) && !is_string($this->configurationId)) {
+            throw new ApplicationException("Invalid Configuration Id.");
+        }
+        try {
+            $this->keyStackKey = Key::loadFromAsciiSafeString($this->stackKey);
+            $this->keyGeneralKey = Key::loadFromAsciiSafeString($this->generalKey);
+        } catch (\Exception $e) {
+            throw new ApplicationException("Invalid Key");
+        }
+    }
+
+    private function addPrefix($value) {
+        $result = '';
+        if ($this->componentId) {
+            $result .= 'C';
+        }
+        if ($this->projectId) {
+            $result .= 'P';
+        }
+        if ($this->configurationId) {
+            $result .= 'F';
+        }
+        $result .= '::' . $value;
+        return $result;
+    }
+
+    private function stripPrefix($value)
+    {
+        $pos = strpos($value, '::');
+        if ($pos !== false) {
+            return substr($value, $pos + 2);
+        } else {
+            return $value;
+        }
+    }
+
+    /**
      * @param $encryptedData string
      * @return string decrypted data
      * @throws EncryptionException
      */
     public function decrypt($encryptedData)
     {
-        if (empty($this->stackId) || empty($this->stackKey) || empty($this->globalKey)) {
-            throw new EncryptionException("Bad init");
+        $this->validateState();
+        try {
+            $jsonString = Crypto::Decrypt(base64_decode($this->stripPrefix($encryptedData)), $this->keyGeneralKey);
+        } catch (\Exception $e) {
+            throw new EncryptionException("Invalid cipher");
         }
-        $jsonString = $this->encryptor->Decrypt(base64_decode($encryptedData), $this->globalKey);
         $data = json_decode($jsonString, true);
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new EncryptionException("Deserialization of decrypted data failed: " . json_last_error_msg());
@@ -126,7 +186,11 @@ class StackWrapper implements CryptoWrapperInterface
         if (empty($data['stacks'][$this->stackId])) {
             throw new EncryptionException("Invalid stack");
         }
-        return $this->encryptor->Decrypt($data['stacks'][$this->stackId], $this->stackKey);
+        try {
+            return Crypto::Decrypt($data['stacks'][$this->stackId], $this->keyStackKey);
+        } catch (\Exception $e) {
+            throw new EncryptionException("Invalid cipher");
+        }
     }
 
     /**
@@ -136,10 +200,8 @@ class StackWrapper implements CryptoWrapperInterface
      */
     public function encrypt($data)
     {
-        if (empty($this->stackId) || empty($this->stackKey) || empty($this->globalKey)) {
-            throw new EncryptionException("Bad init");
-        }
-        $encrypted = $this->encryptor->Encrypt($data, $this->stackKey);
+        $this->validateState();
+        $encrypted = Crypto::Encrypt($data, $this->keyStackKey);
         $result = [];
         if ($this->configurationId) {
             $result['cfg'] = $this->configurationId;
@@ -155,7 +217,7 @@ class StackWrapper implements CryptoWrapperInterface
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new EncryptionException("Serialization of encrypted data failed: " . json_last_error_msg());
         }
-        return base64_encode($this->encryptor->Encrypt($jsonString, $this->globalKey));
+        return $this->addPrefix(base64_encode(Crypto::Encrypt($jsonString, $this->keyGeneralKey)));
     }
 
     /**
@@ -163,6 +225,6 @@ class StackWrapper implements CryptoWrapperInterface
      */
     public function getPrefix()
     {
-        return "KBC::SecureV3==";
+        return "KBC::SecureV3::";
     }
 }

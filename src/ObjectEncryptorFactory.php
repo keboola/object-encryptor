@@ -2,7 +2,7 @@
 
 namespace Keboola\ObjectEncryptor;
 
-use Keboola\ObjectEncryptor\Exception\EncryptionException;
+use Keboola\ObjectEncryptor\Exception\ApplicationException;
 use Keboola\ObjectEncryptor\Legacy\Encryptor;
 use Keboola\ObjectEncryptor\Legacy\Wrapper\BaseWrapper;
 use Keboola\ObjectEncryptor\Legacy\Wrapper\ComponentProjectWrapper;
@@ -64,7 +64,7 @@ class ObjectEncryptorFactory
      */
     public function __construct($keyVersion2, $keyVersion1, $keyVersion0, $stackKeyVersion2, $stackId, $projectId, $componentId, $configurationId)
     {
-        // No logic here, this ctor must be exception-less so as not to leak keys in stack trace
+        // No logic here, this ctor is exception-less so as not to leak keys in stack trace
         $this->keyVersion2 = $keyVersion2;
         $this->keyVersion1 = $keyVersion1;
         $this->keyVersion0 = $keyVersion0;
@@ -76,15 +76,40 @@ class ObjectEncryptorFactory
     }
 
     /**
+     * @throws ApplicationException
+     */
+    private function validateState()
+    {
+        if (!is_null($this->keyVersion0) && !is_string($this->keyVersion0)) {
+            throw new ApplicationException("Invalid key0.");
+        }
+        if (!is_null($this->keyVersion1) && !is_string($this->keyVersion1)) {
+            throw new ApplicationException("Invalid key1.");
+        }
+        if (!is_null($this->keyVersion2) && !is_string($this->keyVersion2)) {
+            throw new ApplicationException("Invalid key2.");
+        }
+        if (!is_null($this->stackKeyVersion2) && !is_string($this->stackKeyVersion2)) {
+            throw new ApplicationException("Invalid stack key.");
+        }
+        if (!is_null($this->projectId) && !is_string($this->projectId)) {
+            throw new ApplicationException("Invalid Project Id.");
+        }
+        if (!is_null($this->componentId) && !is_string($this->componentId)) {
+            throw new ApplicationException("Invalid Component Id.");
+        }
+        if (!is_null($this->configurationId) && !is_string($this->configurationId)) {
+            throw new ApplicationException("Invalid Configuration Id.");
+        }
+
+    }
+
+    /**
      * @return ObjectEncryptor Object encryptor instance.
      */
     public function getEncryptor()
     {
-        if (!is_null($this->keyVersion0) && !is_string($this->keyVersion0)) {
-            // todo dalsi kontroly
-            throw new EncryptionException("Invalid key");
-        }
-
+        $this->validateState();
         if ($this->keyVersion0) {
             $legacyEncryptor = new Encryptor($this->keyVersion0);
         } else {
@@ -112,7 +137,7 @@ class ObjectEncryptorFactory
         if ($this->keyVersion2 && $this->stackKeyVersion2 && $this->stackId) {
             $wrapper = new StackWrapper();
             $wrapper->setStackKey($this->keyVersion2);
-            $wrapper->setGlobalKey($this->stackKeyVersion2);
+            $wrapper->setGeneralKey($this->stackKeyVersion2);
             $wrapper->setStackId($this->stackId);
             $wrapper->setComponentId($this->componentId);
             $wrapper->setProjectId($this->projectId);
