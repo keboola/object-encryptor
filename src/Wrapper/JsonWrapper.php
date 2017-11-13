@@ -2,11 +2,8 @@
 
 namespace Keboola\ObjectEncryptor\Wrapper;
 
-use Keboola\DockerBundle\Exception\EncryptionException;
-use Keboola\Syrup\Encryption\BaseWrapper;
-use Symfony\Component\Serializer\Encoder\JsonDecode;
-use Symfony\Component\Serializer\Encoder\JsonEncode;
-use Symfony\Component\Serializer\Exception\UnexpectedValueException;
+
+use Keboola\ObjectEncryptor\Exception\EncryptionException;
 
 class JsonWrapper extends BaseWrapper
 {

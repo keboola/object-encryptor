@@ -2,10 +2,9 @@
 
 namespace Keboola\ObjectEncryptor\Tests;
 
-use Keboola\Syrup\Encryption\BaseWrapper;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Framework\TestCase;
 
-class BaseWrapperTest extends KernelTestCase
+class BaseWrapperTest extends TestCase
 {
     public function setUp()
     {

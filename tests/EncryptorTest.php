@@ -2,9 +2,9 @@
 
 namespace Keboola\ObjectEncryptor\Tests;
 
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use PHPUnit\Framework\TestCase;
 
-class EncryptorTest extends WebTestCase
+class EncryptorTest extends TestCase
 {
     public function testEncryptor()
     {

@@ -2,14 +2,12 @@
 
 namespace Keboola\ObjectEncryptor\Tests;
 
-use Keboola\Syrup\Exception\ApplicationException;
-use Keboola\Syrup\Exception\UserException;
-use Keboola\Syrup\Service\ObjectEncryptor;
-use Keboola\Syrup\Test\AnotherCryptoWrapper;
-use Keboola\Syrup\Test\MockCryptoWrapper;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Keboola\ObjectEncryptor\Exception\ApplicationException;
+use Keboola\ObjectEncryptor\Exception\UserException;
+use Keboola\ObjectEncryptor\ObjectEncryptor;
+use PHPUnit\Framework\TestCase;
 
-class ObjectEncryptorTest extends WebTestCase
+class ObjectEncryptorTest extends TestCase
 {
 
     public function testEncryptorScalar()

@@ -2,8 +2,6 @@
 
 namespace Keboola\ObjectEncryptor\Wrapper;
 
-use Keboola\Syrup\Encryption\BaseWrapper;
-
 class StackWrapper extends JsonWrapper
 {
     use StackDataTrait;

@@ -2,8 +2,8 @@
 
 namespace Keboola\ObjectEncryptor\Tests;
 
-use Keboola\DockerBundle\Encryption\JsonWrapper;
-use Keboola\DockerBundle\Encryption\StackWrapper;
+use Keboola\ObjectEncryptor\Wrapper\JsonWrapper;
+use Keboola\ObjectEncryptor\Wrapper\StackWrapper;
 
 class StackWrapperTest extends \PHPUnit_Framework_TestCase
 {

@@ -2,9 +2,9 @@
 
 namespace Keboola\ObjectEncryptor\Tests;
 
-use Keboola\DockerBundle\Encryption\ComponentStackWrapper;
-use Keboola\DockerBundle\Encryption\JsonWrapper;
-use Keboola\DockerBundle\Exception\ComponentDataEncryptionException;
+use Keboola\ObjectEncryptor\Exception\ComponentDataEncryptionException;
+use Keboola\ObjectEncryptor\Wrapper\ComponentStackWrapper;
+use Keboola\ObjectEncryptor\Wrapper\JsonWrapper;
 
 class ComponentStackWrapperTest extends \PHPUnit_Framework_TestCase
 {

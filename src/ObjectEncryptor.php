@@ -2,11 +2,11 @@
 
 namespace Keboola\ObjectEncryptor;
 
-use Keboola\Syrup\Encryption\BaseWrapper;
-use Keboola\Syrup\Encryption\CryptoWrapperInterface;
-use Keboola\Syrup\Encryption\Encryptor;
-use Keboola\Syrup\Exception\ApplicationException;
-use Keboola\Syrup\Exception\UserException;
+use Keboola\ObjectEncryptor\Exception\ApplicationException;
+use Keboola\ObjectEncryptor\Exception\UserException;
+use Keboola\ObjectEncryptor\Legacy\Encryptor;
+use Keboola\ObjectEncryptor\Wrapper\BaseWrapper;
+use Keboola\ObjectEncryptor\Wrapper\CryptoWrapperInterface;
 
 class ObjectEncryptor
 {

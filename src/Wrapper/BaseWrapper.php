@@ -2,7 +2,7 @@
 
 namespace Keboola\ObjectEncryptor\Wrapper;
 
-use Keboola\Syrup\Exception\ApplicationException;
+use Keboola\ObjectEncryptor\Exception\ApplicationException;
 
 class BaseWrapper implements CryptoWrapperInterface
 {
