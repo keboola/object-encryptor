@@ -2,9 +2,7 @@
 
 namespace Keboola\ObjectEncryptor\Tests;
 
-use Defuse\Crypto\Crypto;
 use Defuse\Crypto\Key;
-use Keboola\ObjectEncryptor\Exception\EncryptionException;
 use Keboola\ObjectEncryptor\Wrapper\StackWrapper;
 
 class StackWrapperTest extends \PHPUnit_Framework_TestCase
@@ -185,6 +183,7 @@ class StackWrapperTest extends \PHPUnit_Framework_TestCase
     public function testInvalidValue2()
     {
         $stackWrapper = new StackWrapper();
+        /** @noinspection PhpParamsInspection */
         $stackWrapper->setGeneralKey(["a" => "b"]);
         $stackWrapper->setStackKey(Key::createNewRandomKey()->saveToAsciiSafeString());
         $stackWrapper->setStackId('my-stack');
@@ -272,102 +271,8 @@ class StackWrapperTest extends \PHPUnit_Framework_TestCase
         $stackWrapper->encrypt("mySecretValue");
     }
 
-    /**
-     * @expectedException \Keboola\ObjectEncryptor\Exception\EncryptionException
-     * @expectedExceptionMessage Invalid cipher
-     */
-    public function testDecryptInvalidKey()
-    {
-        $keyGeneral = Key::createNewRandomKey()->saveToAsciiSafeString();
-        $keyStack = Key::createNewRandomKey()->saveToAsciiSafeString();
-        $encrypted = base64_encode(Crypto::encrypt('fooBar', Key::loadFromAsciiSafeString($keyGeneral)));
-        $stackWrapper = new StackWrapper();
-        $stackWrapper->setGeneralKey(Key::createNewRandomKey()->saveToAsciiSafeString());
-        $stackWrapper->setStackKey($keyStack);
-        $stackWrapper->setStackId('my-stack');
-        $stackWrapper->decrypt($encrypted);
-    }
 
-    /**
-     * @expectedException \Keboola\ObjectEncryptor\Exception\EncryptionException
-     * @expectedExceptionMessage Deserialization of decrypted data failed: Syntax error
-     */
-    public function testDecryptInvalidJson()
-    {
-        $keyGeneral = Key::createNewRandomKey()->saveToAsciiSafeString();
-        $keyStack = Key::createNewRandomKey()->saveToAsciiSafeString();
-        $encrypted = base64_encode(Crypto::encrypt('fooBar', Key::loadFromAsciiSafeString($keyGeneral)));
-        $stackWrapper = new StackWrapper();
-        $stackWrapper->setGeneralKey($keyGeneral);
-        $stackWrapper->setStackKey($keyStack);
-        $stackWrapper->setStackId('my-stack');
-        $stackWrapper->decrypt($encrypted);
-    }
-
-    /**
-     * @expectedException \Keboola\ObjectEncryptor\Exception\EncryptionException
-     * @expectedExceptionMessage Invalid stack
-     */
-    public function testDecryptInvalidJson2()
-    {
-        $keyGeneral = Key::createNewRandomKey()->saveToAsciiSafeString();
-        $keyStack = Key::createNewRandomKey()->saveToAsciiSafeString();
-        $encrypted = base64_encode(Crypto::encrypt(json_encode(['foo' => 'bar']), Key::loadFromAsciiSafeString($keyGeneral)));
-        $stackWrapper = new StackWrapper();
-        $stackWrapper->setGeneralKey($keyGeneral);
-        $stackWrapper->setStackKey($keyStack);
-        $stackWrapper->setStackId('my-stack');
-        $stackWrapper->decrypt($encrypted);
-    }
-
-    /**
-     * @expectedException \Keboola\ObjectEncryptor\Exception\EncryptionException
-     * @expectedExceptionMessage Invalid cipher
-     */
-    public function testDecryptInvalidJson3()
-    {
-        $keyGeneral = Key::createNewRandomKey()->saveToAsciiSafeString();
-        $keyStack = Key::createNewRandomKey()->saveToAsciiSafeString();
-        $encrypted = base64_encode(Crypto::encrypt(json_encode(['stacks' => ['my-stack' => 'foo']]), Key::loadFromAsciiSafeString($keyGeneral)));
-        $stackWrapper = new StackWrapper();
-        $stackWrapper->setGeneralKey($keyGeneral);
-        $stackWrapper->setStackKey($keyStack);
-        $stackWrapper->setStackId('my-stack');
-        $stackWrapper->decrypt($encrypted);
-    }
-
-    public function testDecryptValidJson()
-    {
-        $keyGeneral = Key::createNewRandomKey()->saveToAsciiSafeString();
-        $keyStack = Key::createNewRandomKey()->saveToAsciiSafeString();
-        $inCipher = Crypto::encrypt('fooBar', Key::loadFromAsciiSafeString($keyStack));
-        $encrypted = base64_encode(Crypto::encrypt(json_encode(['stacks' => ['my-stack' => $inCipher]]), Key::loadFromAsciiSafeString($keyGeneral)));
-        $stackWrapper = new StackWrapper();
-        $stackWrapper->setGeneralKey($keyGeneral);
-        $stackWrapper->setStackKey($keyStack);
-        $stackWrapper->setStackId('my-stack');
-        $decrypted = $stackWrapper->decrypt($encrypted);
-        self::assertEquals('fooBar', $decrypted);
-    }
-
-    /**
-     * @expectedException \Keboola\ObjectEncryptor\Exception\EncryptionException
-     * @expectedExceptionMessage Invalid cipher
-     */
-    public function testDecryptValidJson5()
-    {
-        $keyGeneral = Key::createNewRandomKey()->saveToAsciiSafeString();
-        $keyStack = Key::createNewRandomKey()->saveToAsciiSafeString();
-        $inCipher = Crypto::encrypt('fooBar', Key::createNewRandomKey());
-        $encrypted = base64_encode(Crypto::encrypt(json_encode(['stacks' => ['my-stack' => $inCipher]]), Key::loadFromAsciiSafeString($keyGeneral)));
-        $stackWrapper = new StackWrapper();
-        $stackWrapper->setGeneralKey($keyGeneral);
-        $stackWrapper->setStackKey($keyStack);
-        $stackWrapper->setStackId('my-stack');
-        $stackWrapper->decrypt($encrypted);
-    }
-
-      
+//ruzny kombinace component id a project id
     public function testMissingStacks()
     {
         $stackKey = substr(hash('sha256', uniqid()), 0, 16);

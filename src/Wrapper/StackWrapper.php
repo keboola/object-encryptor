@@ -174,13 +174,13 @@ class StackWrapper implements CryptoWrapperInterface
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new EncryptionException("Deserialization of decrypted data failed: " . json_last_error_msg());
         }
-        if ($this->configurationId && ($data['cfg'] !== $this->configurationId)) {
+        if (!empty($data['cfg']) && (empty($this->configurationId) || ($data['cfg'] !== $this->configurationId))) {
             throw new EncryptionException("Invalid configuration");
         }
-        if ($this->componentId && ($data['cmp'] !== $this->componentId)) {
+        if (!empty($data['cmp']) && (empty($this->componentId) || ($data['cmp'] !== $this->componentId))) {
             throw new EncryptionException("Invalid component");
         }
-        if ($this->projectId && ($data['prj'] !== $this->projectId)) {
+        if (!empty($data['prj']) && (empty($this->projectId) || ($data['prj'] !== $this->projectId))) {
             throw new EncryptionException("Invalid project");
         }
         if (empty($data['stacks'][$this->stackId])) {
