@@ -271,6 +271,31 @@ class StackWrapperTest extends \PHPUnit_Framework_TestCase
         $stackWrapper->encrypt("mySecretValue");
     }
 
+    public function testAdd()
+    {
+        $generalKey = Key::createNewRandomKey()->saveToAsciiSafeString();
+        $stackWrapper = new StackWrapper();
+        $stackWrapper->setGeneralKey($generalKey);
+        $stackWrapper->setStackKey(Key::createNewRandomKey()->saveToAsciiSafeString());
+        $stackWrapper->setStackId('my-stack');
+        $stackWrapper->setComponentId('keboola.docker-demo');
+        $stackWrapper->setConfigurationId('123456');
+        $stackWrapper->setProjectId('123');
+        $encrypted = $stackWrapper->encrypt("mySecretValue");
+        self::assertStringStartsWith('CPF::', $encrypted);
+        $stackWrapper2 = new StackWrapper();
+        $stackWrapper2->setGeneralKey($generalKey);
+        $stackWrapper2->setStackKey(Key::createNewRandomKey()->saveToAsciiSafeString());
+        $stackWrapper2->setStackId('another-stack');
+        $stackWrapper2->setComponentId('keboola.docker-demo');
+        $stackWrapper2->setConfigurationId('123456');
+        $stackWrapper2->setProjectId('123');
+        $encrypted = $stackWrapper2->add($encrypted, "anotherSecretValue");
+        self::assertEquals("mySecretValue", $stackWrapper->decrypt($encrypted));
+        self::assertEquals("anotherSecretValue", $stackWrapper2->decrypt($encrypted));
+    }
+
+
 
 //ruzny kombinace component id a project id
     public function testMissingStacks()
@@ -311,7 +336,7 @@ class StackWrapperTest extends \PHPUnit_Framework_TestCase
         $stackWrapper->decrypt($encrypted);
     }
 
-    public function testAdd()
+    public function testAdde()
     {
         $stack1Key = substr(hash('sha256', uniqid()), 0, 16);
         $stack2Key = substr(hash('sha256', uniqid()), 0, 16);

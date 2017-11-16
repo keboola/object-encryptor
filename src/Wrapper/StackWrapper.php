@@ -158,13 +158,12 @@ class StackWrapper implements CryptoWrapperInterface
     }
 
     /**
-     * @param $encryptedData string
-     * @return string decrypted data
+     * @param string $encryptedData
+     * @return array Cipher structure
      * @throws EncryptionException
      */
-    public function decrypt($encryptedData)
+    private function generalDecipher($encryptedData)
     {
-        $this->validateState();
         try {
             $jsonString = Crypto::Decrypt(base64_decode($this->stripPrefix($encryptedData)), $this->keyGeneralKey);
         } catch (\Exception $e) {
@@ -183,6 +182,32 @@ class StackWrapper implements CryptoWrapperInterface
         if (!empty($data['prj']) && (empty($this->projectId) || ($data['prj'] !== $this->projectId))) {
             throw new EncryptionException("Invalid project");
         }
+        return $data;
+    }
+
+    /**
+     * @param array $data Cipher data.
+     * @return string Encrypted string.
+     * @throws EncryptionException
+     */
+    private function generalCipher($data)
+    {
+        $jsonString = json_encode($data);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new EncryptionException("Serialization of encrypted data failed: " . json_last_error_msg());
+        }
+        return $this->addPrefix(base64_encode(Crypto::Encrypt($jsonString, $this->keyGeneralKey)));
+    }
+
+    /**
+     * @param $encryptedData string
+     * @return string decrypted data
+     * @throws EncryptionException
+     */
+    public function decrypt($encryptedData)
+    {
+        $this->validateState();
+        $data = $this->generalDecipher($encryptedData);
         if (empty($data['stacks'][$this->stackId])) {
             throw new EncryptionException("Invalid stack");
         }
@@ -213,11 +238,26 @@ class StackWrapper implements CryptoWrapperInterface
             $result['prj'] = $this->projectId;
         }
         $result['stacks'][$this->stackId] = $encrypted;
-        $jsonString = json_encode($result);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new EncryptionException("Serialization of encrypted data failed: " . json_last_error_msg());
+        return $this->generalCipher($result);
+    }
+
+    /**
+     * Add a new stack data to cipher.
+     * @param string $encryptedData Encrypted data.
+     * @param string $newData New encrypted data.
+     * @return string
+     * @throws EncryptionException
+     */
+    public function add($encryptedData, $newData)
+    {
+        $this->validateState();
+        $data = $this->generalDecipher($encryptedData);
+        if (isset($data['stacks'][$this->stackId])) {
+            throw new EncryptionException("Stack is already used");
         }
-        return $this->addPrefix(base64_encode(Crypto::Encrypt($jsonString, $this->keyGeneralKey)));
+        $encrypted = Crypto::Encrypt($newData, $this->keyStackKey);
+        $data['stacks'][$this->stackId] = $encrypted;
+        return $this->generalCipher($data);
     }
 
     /**

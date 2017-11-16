@@ -59,11 +59,10 @@ class ObjectEncryptorTest extends TestCase
         $encryptor = $this->factory->getEncryptor();
         try {
             $encryptor->encrypt('secret', 'fooBar');
-            $this->fail("Invalid crypto wrapper must throw exception");
+            self::fail("Invalid crypto wrapper must throw exception");
         } catch (ApplicationException $e) {
         }
     }
-
 
     public function testEncryptorUnsupportedInput()
     {
@@ -75,7 +74,7 @@ class ObjectEncryptorTest extends TestCase
         $unsupportedInput = $invalidClass;
         try {
             $encryptor->encrypt($unsupportedInput);
-            $this->fail("Encryption of invalid data should fail.");
+            self::fail("Encryption of invalid data should fail.");
         } catch (ApplicationException $e) {
         }
 
@@ -85,7 +84,7 @@ class ObjectEncryptorTest extends TestCase
         ];
         try {
             $encryptor->encrypt($unsupportedInput);
-            $this->fail("Encryption of invalid data should fail.");
+            self::fail("Encryption of invalid data should fail.");
         } catch (ApplicationException $e) {
         }
 
@@ -95,7 +94,7 @@ class ObjectEncryptorTest extends TestCase
         ];
         try {
             $encryptor->encrypt($unsupportedInput);
-            $this->fail("Encryption of invalid data should fail.");
+            self::fail("Encryption of invalid data should fail.");
         } catch (ApplicationException $e) {
         }
     }
@@ -110,7 +109,7 @@ class ObjectEncryptorTest extends TestCase
         $unsupportedInput = $invalidClass;
         try {
             $encryptor->decrypt($unsupportedInput);
-            $this->fail("Encryption of invalid data should fail.");
+            self::fail("Encryption of invalid data should fail.");
         } catch (ApplicationException $e) {
         }
 
@@ -120,7 +119,7 @@ class ObjectEncryptorTest extends TestCase
         ];
         try {
             $encryptor->decrypt($unsupportedInput);
-            $this->fail("Encryption of invalid data should fail.");
+            self::fail("Encryption of invalid data should fail.");
         } catch (ApplicationException $e) {
         }
 
@@ -130,7 +129,7 @@ class ObjectEncryptorTest extends TestCase
         ];
         try {
             $encryptor->decrypt($unsupportedInput);
-            $this->fail("Encryption of invalid data should fail.");
+            self::fail("Encryption of invalid data should fail.");
         } catch (ApplicationException $e) {
         }
     }
@@ -140,10 +139,10 @@ class ObjectEncryptorTest extends TestCase
         $encryptor = $this->factory->getEncryptor();
         $encrypted = 'KBC::Encrypted==yI0sawothis is not a valid cipher but it looks like one N2Jg==';
         try {
-            $this->assertEquals($encrypted, $encryptor->decrypt($encrypted));
-            $this->fail("Invalid cipher text must raise exception");
+            self::assertEquals($encrypted, $encryptor->decrypt($encrypted));
+            self::fail("Invalid cipher text must raise exception");
         } catch (UserException $e) {
-            $this->assertContains('KBC::Encrypted==yI0sawothis', $e->getMessage());
+            self::assertContains('KBC::Encrypted==yI0sawothis', $e->getMessage());
         }
     }
 
@@ -153,10 +152,10 @@ class ObjectEncryptorTest extends TestCase
         $encryptor = $this->factory->getEncryptor();
         $encrypted = 'this does not even look like a cipher text';
         try {
-            $this->assertEquals($encrypted, $encryptor->decrypt($encrypted));
-            $this->fail("Invalid cipher text must raise exception");
+            self::assertEquals($encrypted, $encryptor->decrypt($encrypted));
+            self::fail("Invalid cipher text must raise exception");
         } catch (UserException $e) {
-            $this->assertNotContains('this does not even look like a cipher text', $e->getMessage());
+            self::assertNotContains('this does not even look like a cipher text', $e->getMessage());
         }
     }
 
@@ -171,11 +170,11 @@ class ObjectEncryptorTest extends TestCase
             ]
         ];
         try {
-            $this->assertEquals($encrypted, $encryptor->decrypt($encrypted));
-            $this->fail("Invalid cipher text must raise exception");
+            self::assertEquals($encrypted, $encryptor->decrypt($encrypted));
+            self::fail("Invalid cipher text must raise exception");
         } catch (UserException $e) {
-            $this->assertContains('KBC::Encrypted==yI0sawothis', $e->getMessage());
-            $this->assertContains('#anotherKey', $e->getMessage());
+            self::assertContains('KBC::Encrypted==yI0sawothis', $e->getMessage());
+            self::assertContains('#anotherKey', $e->getMessage());
         }
     }
 
@@ -190,11 +189,11 @@ class ObjectEncryptorTest extends TestCase
             ]
         ];
         try {
-            $this->assertEquals($encrypted, $encryptor->decrypt($encrypted));
-            $this->fail("Invalid cipher text must raise exception");
+            self::assertEquals($encrypted, $encryptor->decrypt($encrypted));
+            self::fail("Invalid cipher text must raise exception");
         } catch (UserException $e) {
-            $this->assertNotContains('this does not even look like a cipher text', $e->getMessage());
-            $this->assertContains('#anotherKey', $e->getMessage());
+            self::assertNotContains('this does not even look like a cipher text', $e->getMessage());
+            self::assertContains('#anotherKey', $e->getMessage());
         }
     }
 
@@ -205,8 +204,8 @@ class ObjectEncryptorTest extends TestCase
         $encryptedValue = $encryptor->encrypt("test");
 
         $encrypted = $encryptor->encrypt($encryptedValue);
-        $this->assertEquals("KBC::Encrypted==", substr($encrypted, 0, 16));
-        $this->assertEquals("test", $encryptor->decrypt($encrypted));
+        self::assertEquals("KBC::Encrypted==", substr($encrypted, 0, 16));
+        self::assertEquals("test", $encryptor->decrypt($encrypted));
     }
 
     public function testEncryptorAlreadyEncryptedWrapper()
@@ -217,11 +216,11 @@ class ObjectEncryptorTest extends TestCase
 
         $secret = 'secret';
         $encryptedValue = $encryptor->encrypt($secret, MockCryptoWrapper::class);
-        $this->assertEquals("KBC::MockCryptoWrapper==" . $secret, $encryptedValue);
+        self::assertEquals("KBC::MockCryptoWrapper==" . $secret, $encryptedValue);
 
         $encryptedSecond = $encryptor->encrypt($encryptedValue);
-        $this->assertEquals("KBC::MockCryptoWrapper==" . $secret, $encryptedSecond);
-        $this->assertEquals($secret, $encryptor->decrypt($encryptedSecond));
+        self::assertEquals("KBC::MockCryptoWrapper==" . $secret, $encryptedSecond);
+        self::assertEquals($secret, $encryptor->decrypt($encryptedSecond));
     }
 
     public function testInvalidWrapper()
@@ -231,7 +230,7 @@ class ObjectEncryptorTest extends TestCase
         $encryptor->pushWrapper($wrapper);
         try {
             $encryptor->pushWrapper($wrapper);
-            $this->fail("Adding crypto wrapper with same prefix must fail.");
+            self::fail("Adding crypto wrapper with same prefix must fail.");
         } catch (ApplicationException $e) {
         }
     }
@@ -244,16 +243,16 @@ class ObjectEncryptorTest extends TestCase
             "#key2" => "value2"
         ];
         $result = $encryptor->encrypt($array);
-        $this->assertArrayHasKey("key1", $result);
-        $this->assertArrayHasKey("#key2", $result);
-        $this->assertEquals("value1", $result["key1"]);
-        $this->assertEquals("KBC::Encrypted==", substr($result["#key2"], 0, 16));
+        self::assertArrayHasKey("key1", $result);
+        self::assertArrayHasKey("#key2", $result);
+        self::assertEquals("value1", $result["key1"]);
+        self::assertEquals("KBC::Encrypted==", substr($result["#key2"], 0, 16));
 
         $decrypted = $encryptor->decrypt($result);
-        $this->assertArrayHasKey("key1", $decrypted);
-        $this->assertArrayHasKey("#key2", $decrypted);
-        $this->assertEquals("value1", $decrypted["key1"]);
-        $this->assertEquals("value2", $decrypted["#key2"]);
+        self::assertArrayHasKey("key1", $decrypted);
+        self::assertArrayHasKey("#key2", $decrypted);
+        self::assertEquals("value1", $decrypted["key1"]);
+        self::assertEquals("value2", $decrypted["#key2"]);
     }
 
     public function testEncryptorSimpleObject()
@@ -264,16 +263,16 @@ class ObjectEncryptorTest extends TestCase
         $object->{"#key2"} = "value2";
 
         $result = $encryptor->encrypt($object);
-        $this->assertObjectHasAttribute("key1", $result);
-        $this->assertObjectHasAttribute("#key2", $result);
-        $this->assertEquals("value1", $result->key1);
-        $this->assertEquals("KBC::Encrypted==", substr($result->{"#key2"}, 0, 16));
+        self::assertObjectHasAttribute("key1", $result);
+        self::assertObjectHasAttribute("#key2", $result);
+        self::assertEquals("value1", $result->key1);
+        self::assertEquals("KBC::Encrypted==", substr($result->{"#key2"}, 0, 16));
 
         $decrypted = $encryptor->decrypt($result);
-        $this->assertObjectHasAttribute("key1", $decrypted);
-        $this->assertObjectHasAttribute("#key2", $decrypted);
-        $this->assertEquals("value1", $decrypted->key1);
-        $this->assertEquals("value2", $decrypted->{"#key2"});
+        self::assertObjectHasAttribute("key1", $decrypted);
+        self::assertObjectHasAttribute("#key2", $decrypted);
+        self::assertEquals("value1", $decrypted->key1);
+        self::assertEquals("value2", $decrypted->{"#key2"});
     }
 
     public function testEncryptorSimpleArrayScalars()
@@ -289,25 +288,25 @@ class ObjectEncryptorTest extends TestCase
             "key7" => null
         ];
         $result = $encryptor->encrypt($array);
-        $this->assertArrayHasKey("key1", $result);
-        $this->assertArrayHasKey("#key2", $result);
-        $this->assertEquals("value1", $result["key1"]);
-        $this->assertEquals("KBC::Encrypted==", substr($result["#key2"], 0, 16));
-        $this->assertEquals("KBC::Encrypted==", substr($result["#key3"], 0, 16));
-        $this->assertEquals("KBC::Encrypted==", substr($result["#key4"], 0, 16));
-        $this->assertEquals("KBC::Encrypted==", substr($result["#key5"], 0, 16));
-        $this->assertEquals("KBC::Encrypted==", substr($result["#key6"], 0, 16));
+        self::assertArrayHasKey("key1", $result);
+        self::assertArrayHasKey("#key2", $result);
+        self::assertEquals("value1", $result["key1"]);
+        self::assertEquals("KBC::Encrypted==", substr($result["#key2"], 0, 16));
+        self::assertEquals("KBC::Encrypted==", substr($result["#key3"], 0, 16));
+        self::assertEquals("KBC::Encrypted==", substr($result["#key4"], 0, 16));
+        self::assertEquals("KBC::Encrypted==", substr($result["#key5"], 0, 16));
+        self::assertEquals("KBC::Encrypted==", substr($result["#key6"], 0, 16));
 
         $decrypted = $encryptor->decrypt($result);
-        $this->assertArrayHasKey("key1", $decrypted);
-        $this->assertArrayHasKey("#key2", $decrypted);
-        $this->assertEquals("value1", $decrypted["key1"]);
-        $this->assertEquals("value2", $decrypted["#key2"]);
-        $this->assertEquals(true, $decrypted["#key3"]);
-        $this->assertEquals(1, $decrypted["#key4"]);
-        $this->assertEquals(1.5, $decrypted["#key5"]);
-        $this->assertEquals(null, $decrypted["#key6"]);
-        $this->assertEquals(null, $decrypted["key7"]);
+        self::assertArrayHasKey("key1", $decrypted);
+        self::assertArrayHasKey("#key2", $decrypted);
+        self::assertEquals("value1", $decrypted["key1"]);
+        self::assertEquals("value2", $decrypted["#key2"]);
+        self::assertEquals(true, $decrypted["#key3"]);
+        self::assertEquals(1, $decrypted["#key4"]);
+        self::assertEquals(1.5, $decrypted["#key5"]);
+        self::assertEquals(null, $decrypted["#key6"]);
+        self::assertEquals(null, $decrypted["key7"]);
     }
 
     public function testEncryptorSimpleObjectScalars()
@@ -323,25 +322,25 @@ class ObjectEncryptorTest extends TestCase
         $object->key7 = null;
 
         $result = $encryptor->encrypt($object);
-        $this->assertObjectHasAttribute("key1", $result);
-        $this->assertObjectHasAttribute("#key2", $result);
-        $this->assertEquals("value1", $result->key1);
-        $this->assertEquals("KBC::Encrypted==", substr($result->{"#key2"}, 0, 16));
-        $this->assertEquals("KBC::Encrypted==", substr($result->{"#key3"}, 0, 16));
-        $this->assertEquals("KBC::Encrypted==", substr($result->{"#key4"}, 0, 16));
-        $this->assertEquals("KBC::Encrypted==", substr($result->{"#key5"}, 0, 16));
-        $this->assertEquals("KBC::Encrypted==", substr($result->{"#key6"}, 0, 16));
+        self::assertObjectHasAttribute("key1", $result);
+        self::assertObjectHasAttribute("#key2", $result);
+        self::assertEquals("value1", $result->key1);
+        self::assertEquals("KBC::Encrypted==", substr($result->{"#key2"}, 0, 16));
+        self::assertEquals("KBC::Encrypted==", substr($result->{"#key3"}, 0, 16));
+        self::assertEquals("KBC::Encrypted==", substr($result->{"#key4"}, 0, 16));
+        self::assertEquals("KBC::Encrypted==", substr($result->{"#key5"}, 0, 16));
+        self::assertEquals("KBC::Encrypted==", substr($result->{"#key6"}, 0, 16));
 
         $decrypted = $encryptor->decrypt($result);
-        $this->assertObjectHasAttribute("key1", $decrypted);
-        $this->assertObjectHasAttribute("#key2", $decrypted);
-        $this->assertEquals("value1", $decrypted->key1);
-        $this->assertEquals("value2", $decrypted->{"#key2"});
-        $this->assertEquals(true, $decrypted->{"#key3"});
-        $this->assertEquals(1, $decrypted->{"#key4"});
-        $this->assertEquals(1.5, $decrypted->{"#key5"});
-        $this->assertEquals(null, $decrypted->{"#key6"});
-        $this->assertEquals(null, $decrypted->{"key7"});
+        self::assertObjectHasAttribute("key1", $decrypted);
+        self::assertObjectHasAttribute("#key2", $decrypted);
+        self::assertEquals("value1", $decrypted->key1);
+        self::assertEquals("value2", $decrypted->{"#key2"});
+        self::assertEquals(true, $decrypted->{"#key3"});
+        self::assertEquals(1, $decrypted->{"#key4"});
+        self::assertEquals(1.5, $decrypted->{"#key5"});
+        self::assertEquals(null, $decrypted->{"#key6"});
+        self::assertEquals(null, $decrypted->{"key7"});
     }
 
     public function testEncryptorSimpleArrayEncrypted()
@@ -353,16 +352,16 @@ class ObjectEncryptorTest extends TestCase
             "#key2" => $encryptedValue
         ];
         $result = $encryptor->encrypt($array);
-        $this->assertArrayHasKey("key1", $result);
-        $this->assertArrayHasKey("#key2", $result);
-        $this->assertEquals("value1", $result["key1"]);
-        $this->assertEquals($encryptedValue, $result["#key2"]);
+        self::assertArrayHasKey("key1", $result);
+        self::assertArrayHasKey("#key2", $result);
+        self::assertEquals("value1", $result["key1"]);
+        self::assertEquals($encryptedValue, $result["#key2"]);
 
         $decrypted = $encryptor->decrypt($result);
-        $this->assertArrayHasKey("key1", $decrypted);
-        $this->assertArrayHasKey("#key2", $decrypted);
-        $this->assertEquals("value1", $decrypted["key1"]);
-        $this->assertEquals("test", $decrypted["#key2"]);
+        self::assertArrayHasKey("key1", $decrypted);
+        self::assertArrayHasKey("#key2", $decrypted);
+        self::assertEquals("value1", $decrypted["key1"]);
+        self::assertEquals("test", $decrypted["#key2"]);
     }
 
     public function testEncryptorSimpleObjectEncrypted()
@@ -374,16 +373,16 @@ class ObjectEncryptorTest extends TestCase
         $object->{'#key2'} = $encryptedValue;
 
         $result = $encryptor->encrypt($object);
-        $this->assertObjectHasAttribute("key1", $result);
-        $this->assertObjectHasAttribute("#key2", $result);
-        $this->assertEquals("value1", $result->key1);
-        $this->assertEquals($encryptedValue, $result->{"#key2"});
+        self::assertObjectHasAttribute("key1", $result);
+        self::assertObjectHasAttribute("#key2", $result);
+        self::assertEquals("value1", $result->key1);
+        self::assertEquals($encryptedValue, $result->{"#key2"});
 
         $decrypted = $encryptor->decrypt($result);
-        $this->assertObjectHasAttribute("key1", $decrypted);
-        $this->assertObjectHasAttribute("#key2", $decrypted);
-        $this->assertEquals("value1", $decrypted->key1);
-        $this->assertEquals("test", $decrypted->{"#key2"});
+        self::assertObjectHasAttribute("key1", $decrypted);
+        self::assertObjectHasAttribute("#key2", $decrypted);
+        self::assertEquals("value1", $decrypted->key1);
+        self::assertEquals("test", $decrypted->{"#key2"});
     }
 
 
@@ -400,24 +399,24 @@ class ObjectEncryptorTest extends TestCase
             ]
         ];
         $result = $encryptor->encrypt($array);
-        $this->assertArrayHasKey("key1", $result);
-        $this->assertArrayHasKey("key2", $result);
-        $this->assertArrayHasKey("nestedKey1", $result["key2"]);
-        $this->assertArrayHasKey("nestedKey2", $result["key2"]);
-        $this->assertArrayHasKey("#finalKey", $result["key2"]["nestedKey2"]);
-        $this->assertEquals("value1", $result["key1"]);
-        $this->assertEquals("value2", $result["key2"]["nestedKey1"]);
-        $this->assertEquals("KBC::Encrypted==", substr($result["key2"]["nestedKey2"]["#finalKey"], 0, 16));
+        self::assertArrayHasKey("key1", $result);
+        self::assertArrayHasKey("key2", $result);
+        self::assertArrayHasKey("nestedKey1", $result["key2"]);
+        self::assertArrayHasKey("nestedKey2", $result["key2"]);
+        self::assertArrayHasKey("#finalKey", $result["key2"]["nestedKey2"]);
+        self::assertEquals("value1", $result["key1"]);
+        self::assertEquals("value2", $result["key2"]["nestedKey1"]);
+        self::assertEquals("KBC::Encrypted==", substr($result["key2"]["nestedKey2"]["#finalKey"], 0, 16));
 
         $decrypted = $encryptor->decrypt($result);
-        $this->assertArrayHasKey("key1", $decrypted);
-        $this->assertArrayHasKey("key2", $decrypted);
-        $this->assertArrayHasKey("nestedKey1", $decrypted["key2"]);
-        $this->assertArrayHasKey("nestedKey2", $decrypted["key2"]);
-        $this->assertArrayHasKey("#finalKey", $decrypted["key2"]["nestedKey2"]);
-        $this->assertEquals("value1", $decrypted["key1"]);
-        $this->assertEquals("value2", $decrypted["key2"]["nestedKey1"]);
-        $this->assertEquals("value3", $decrypted["key2"]["nestedKey2"]["#finalKey"]);
+        self::assertArrayHasKey("key1", $decrypted);
+        self::assertArrayHasKey("key2", $decrypted);
+        self::assertArrayHasKey("nestedKey1", $decrypted["key2"]);
+        self::assertArrayHasKey("nestedKey2", $decrypted["key2"]);
+        self::assertArrayHasKey("#finalKey", $decrypted["key2"]["nestedKey2"]);
+        self::assertEquals("value1", $decrypted["key1"]);
+        self::assertEquals("value2", $decrypted["key2"]["nestedKey1"]);
+        self::assertEquals("value3", $decrypted["key2"]["nestedKey2"]["#finalKey"]);
     }
 
     public function testEncryptorNestedObject()
@@ -433,24 +432,24 @@ class ObjectEncryptorTest extends TestCase
         $object->key2 = $nested1;
 
         $result = $encryptor->encrypt($object);
-        $this->assertObjectHasAttribute("key1", $result);
-        $this->assertObjectHasAttribute("key2", $result);
-        $this->assertObjectHasAttribute("nestedKey1", $result->key2);
-        $this->assertObjectHasAttribute("nestedKey2", $result->key2);
-        $this->assertObjectHasAttribute("#finalKey", $result->key2->nestedKey2);
-        $this->assertEquals("value1", $result->key1);
-        $this->assertEquals("value2", $result->key2->nestedKey1);
-        $this->assertEquals("KBC::Encrypted==", substr($result->key2->nestedKey2->{"#finalKey"}, 0, 16));
+        self::assertObjectHasAttribute("key1", $result);
+        self::assertObjectHasAttribute("key2", $result);
+        self::assertObjectHasAttribute("nestedKey1", $result->key2);
+        self::assertObjectHasAttribute("nestedKey2", $result->key2);
+        self::assertObjectHasAttribute("#finalKey", $result->key2->nestedKey2);
+        self::assertEquals("value1", $result->key1);
+        self::assertEquals("value2", $result->key2->nestedKey1);
+        self::assertEquals("KBC::Encrypted==", substr($result->key2->nestedKey2->{"#finalKey"}, 0, 16));
 
         $decrypted = $encryptor->decrypt($result);
-        $this->assertObjectHasAttribute("key1", $decrypted);
-        $this->assertObjectHasAttribute("key2", $decrypted);
-        $this->assertObjectHasAttribute("nestedKey1", $decrypted->key2);
-        $this->assertObjectHasAttribute("nestedKey2", $decrypted->key2);
-        $this->assertObjectHasAttribute("#finalKey", $decrypted->key2->nestedKey2);
-        $this->assertEquals("value1", $decrypted->key1);
-        $this->assertEquals("value2", $decrypted->key2->nestedKey1);
-        $this->assertEquals("value3", $decrypted->key2->nestedKey2->{"#finalKey"});
+        self::assertObjectHasAttribute("key1", $decrypted);
+        self::assertObjectHasAttribute("key2", $decrypted);
+        self::assertObjectHasAttribute("nestedKey1", $decrypted->key2);
+        self::assertObjectHasAttribute("nestedKey2", $decrypted->key2);
+        self::assertObjectHasAttribute("#finalKey", $decrypted->key2->nestedKey2);
+        self::assertEquals("value1", $decrypted->key1);
+        self::assertEquals("value2", $decrypted->key2->nestedKey1);
+        self::assertEquals("value3", $decrypted->key2->nestedKey2->{"#finalKey"});
     }
 
     public function testEncryptorNestedArrayWithArrayKeyHashmark()
@@ -470,31 +469,31 @@ class ObjectEncryptorTest extends TestCase
             ]
         ];
         $result = $encryptor->encrypt($array);
-        $this->assertArrayHasKey("key1", $result);
-        $this->assertArrayHasKey("key2", $result);
-        $this->assertArrayHasKey("#key3", $result);
-        $this->assertArrayHasKey("nestedKey1", $result["key2"]);
-        $this->assertArrayHasKey("nestedKey2", $result["key2"]);
-        $this->assertArrayHasKey("#finalKey", $result["key2"]["nestedKey2"]);
-        $this->assertArrayHasKey("anotherNestedKey", $result["#key3"]);
-        $this->assertEquals("value1", $result["key1"]);
-        $this->assertEquals("value2", $result["key2"]["nestedKey1"]);
-        $this->assertEquals("someValue", $result["#key3"]["anotherNestedKey"]);
-        $this->assertEquals("KBC::Encrypted==", substr($result["#key3"]["#encryptedNestedKey"], 0, 16));
-        $this->assertEquals("KBC::Encrypted==", substr($result["key2"]["nestedKey2"]["#finalKey"], 0, 16));
+        self::assertArrayHasKey("key1", $result);
+        self::assertArrayHasKey("key2", $result);
+        self::assertArrayHasKey("#key3", $result);
+        self::assertArrayHasKey("nestedKey1", $result["key2"]);
+        self::assertArrayHasKey("nestedKey2", $result["key2"]);
+        self::assertArrayHasKey("#finalKey", $result["key2"]["nestedKey2"]);
+        self::assertArrayHasKey("anotherNestedKey", $result["#key3"]);
+        self::assertEquals("value1", $result["key1"]);
+        self::assertEquals("value2", $result["key2"]["nestedKey1"]);
+        self::assertEquals("someValue", $result["#key3"]["anotherNestedKey"]);
+        self::assertEquals("KBC::Encrypted==", substr($result["#key3"]["#encryptedNestedKey"], 0, 16));
+        self::assertEquals("KBC::Encrypted==", substr($result["key2"]["nestedKey2"]["#finalKey"], 0, 16));
 
         $decrypted = $encryptor->decrypt($result);
-        $this->assertArrayHasKey("key1", $decrypted);
-        $this->assertArrayHasKey("key2", $decrypted);
-        $this->assertArrayHasKey("#key3", $decrypted);
-        $this->assertArrayHasKey("nestedKey1", $decrypted["key2"]);
-        $this->assertArrayHasKey("nestedKey2", $decrypted["key2"]);
-        $this->assertArrayHasKey("#finalKey", $decrypted["key2"]["nestedKey2"]);
-        $this->assertEquals("value1", $decrypted["key1"]);
-        $this->assertEquals("value2", $decrypted["key2"]["nestedKey1"]);
-        $this->assertEquals("value3", $decrypted["key2"]["nestedKey2"]["#finalKey"]);
-        $this->assertEquals("someValue", $decrypted["#key3"]["anotherNestedKey"]);
-        $this->assertEquals("someValue2", $decrypted["#key3"]["#encryptedNestedKey"]);
+        self::assertArrayHasKey("key1", $decrypted);
+        self::assertArrayHasKey("key2", $decrypted);
+        self::assertArrayHasKey("#key3", $decrypted);
+        self::assertArrayHasKey("nestedKey1", $decrypted["key2"]);
+        self::assertArrayHasKey("nestedKey2", $decrypted["key2"]);
+        self::assertArrayHasKey("#finalKey", $decrypted["key2"]["nestedKey2"]);
+        self::assertEquals("value1", $decrypted["key1"]);
+        self::assertEquals("value2", $decrypted["key2"]["nestedKey1"]);
+        self::assertEquals("value3", $decrypted["key2"]["nestedKey2"]["#finalKey"]);
+        self::assertEquals("someValue", $decrypted["#key3"]["anotherNestedKey"]);
+        self::assertEquals("someValue2", $decrypted["#key3"]["#encryptedNestedKey"]);
     }
 
 
@@ -516,31 +515,31 @@ class ObjectEncryptorTest extends TestCase
 
 
         $result = $encryptor->encrypt($object);
-        $this->assertObjectHasAttribute("key1", $result);
-        $this->assertObjectHasAttribute("key2", $result);
-        $this->assertObjectHasAttribute("#key3", $result);
-        $this->assertObjectHasAttribute("nestedKey1", $result->key2);
-        $this->assertObjectHasAttribute("nestedKey2", $result->key2);
-        $this->assertObjectHasAttribute("#finalKey", $result->key2->nestedKey2);
-        $this->assertObjectHasAttribute("anotherNestedKey", $result->{"#key3"});
-        $this->assertEquals("value1", $result->key1);
-        $this->assertEquals("value2", $result->key2->nestedKey1);
-        $this->assertEquals("someValue", $result->{"#key3"}->anotherNestedKey);
-        $this->assertEquals("KBC::Encrypted==", substr($result->{"#key3"}->{"#encryptedNestedKey"}, 0, 16));
-        $this->assertEquals("KBC::Encrypted==", substr($result->key2->nestedKey2->{"#finalKey"}, 0, 16));
+        self::assertObjectHasAttribute("key1", $result);
+        self::assertObjectHasAttribute("key2", $result);
+        self::assertObjectHasAttribute("#key3", $result);
+        self::assertObjectHasAttribute("nestedKey1", $result->key2);
+        self::assertObjectHasAttribute("nestedKey2", $result->key2);
+        self::assertObjectHasAttribute("#finalKey", $result->key2->nestedKey2);
+        self::assertObjectHasAttribute("anotherNestedKey", $result->{"#key3"});
+        self::assertEquals("value1", $result->key1);
+        self::assertEquals("value2", $result->key2->nestedKey1);
+        self::assertEquals("someValue", $result->{"#key3"}->anotherNestedKey);
+        self::assertEquals("KBC::Encrypted==", substr($result->{"#key3"}->{"#encryptedNestedKey"}, 0, 16));
+        self::assertEquals("KBC::Encrypted==", substr($result->key2->nestedKey2->{"#finalKey"}, 0, 16));
 
         $decrypted = $encryptor->decrypt($result);
-        $this->assertObjectHasAttribute("key1", $decrypted);
-        $this->assertObjectHasAttribute("key2", $decrypted);
-        $this->assertObjectHasAttribute("#key3", $decrypted);
-        $this->assertObjectHasAttribute("nestedKey1", $decrypted->key2);
-        $this->assertObjectHasAttribute("nestedKey2", $decrypted->key2);
-        $this->assertObjectHasAttribute("#finalKey", $decrypted->key2->nestedKey2);
-        $this->assertEquals("value1", $decrypted->key1);
-        $this->assertEquals("value2", $decrypted->key2->nestedKey1);
-        $this->assertEquals("value3", $decrypted->key2->nestedKey2->{"#finalKey"});
-        $this->assertEquals("someValue", $decrypted->{"#key3"}->anotherNestedKey);
-        $this->assertEquals("someValue2", $decrypted->{"#key3"}->{"#encryptedNestedKey"});
+        self::assertObjectHasAttribute("key1", $decrypted);
+        self::assertObjectHasAttribute("key2", $decrypted);
+        self::assertObjectHasAttribute("#key3", $decrypted);
+        self::assertObjectHasAttribute("nestedKey1", $decrypted->key2);
+        self::assertObjectHasAttribute("nestedKey2", $decrypted->key2);
+        self::assertObjectHasAttribute("#finalKey", $decrypted->key2->nestedKey2);
+        self::assertEquals("value1", $decrypted->key1);
+        self::assertEquals("value2", $decrypted->key2->nestedKey1);
+        self::assertEquals("value3", $decrypted->key2->nestedKey2->{"#finalKey"});
+        self::assertEquals("someValue", $decrypted->{"#key3"}->anotherNestedKey);
+        self::assertEquals("someValue2", $decrypted->{"#key3"}->{"#encryptedNestedKey"});
     }
 
     public function testEncryptorNestedArrayEncrypted()
@@ -559,28 +558,28 @@ class ObjectEncryptorTest extends TestCase
         ];
 
         $result = $encryptor->encrypt($array);
-        $this->assertArrayHasKey("key1", $result);
-        $this->assertArrayHasKey("key2", $result);
-        $this->assertArrayHasKey("nestedKey1", $result["key2"]);
-        $this->assertArrayHasKey("nestedKey2", $result["key2"]);
-        $this->assertArrayHasKey("#finalKey", $result["key2"]["nestedKey2"]);
-        $this->assertArrayHasKey("#finalKeyEncrypted", $result["key2"]["nestedKey2"]);
-        $this->assertEquals("value1", $result["key1"]);
-        $this->assertEquals("value2", $result["key2"]["nestedKey1"]);
-        $this->assertEquals("KBC::Encrypted==", substr($result["key2"]["nestedKey2"]["#finalKey"], 0, 16));
-        $this->assertEquals($encryptedValue, $result["key2"]["nestedKey2"]["#finalKeyEncrypted"]);
+        self::assertArrayHasKey("key1", $result);
+        self::assertArrayHasKey("key2", $result);
+        self::assertArrayHasKey("nestedKey1", $result["key2"]);
+        self::assertArrayHasKey("nestedKey2", $result["key2"]);
+        self::assertArrayHasKey("#finalKey", $result["key2"]["nestedKey2"]);
+        self::assertArrayHasKey("#finalKeyEncrypted", $result["key2"]["nestedKey2"]);
+        self::assertEquals("value1", $result["key1"]);
+        self::assertEquals("value2", $result["key2"]["nestedKey1"]);
+        self::assertEquals("KBC::Encrypted==", substr($result["key2"]["nestedKey2"]["#finalKey"], 0, 16));
+        self::assertEquals($encryptedValue, $result["key2"]["nestedKey2"]["#finalKeyEncrypted"]);
 
         $decrypted = $encryptor->decrypt($result);
-        $this->assertArrayHasKey("key1", $decrypted);
-        $this->assertArrayHasKey("key2", $decrypted);
-        $this->assertArrayHasKey("nestedKey1", $decrypted["key2"]);
-        $this->assertArrayHasKey("nestedKey2", $decrypted["key2"]);
-        $this->assertArrayHasKey("#finalKey", $decrypted["key2"]["nestedKey2"]);
-        $this->assertArrayHasKey("#finalKeyEncrypted", $decrypted["key2"]["nestedKey2"]);
-        $this->assertEquals("value1", $decrypted["key1"]);
-        $this->assertEquals("value2", $decrypted["key2"]["nestedKey1"]);
-        $this->assertEquals("value3", $decrypted["key2"]["nestedKey2"]["#finalKey"]);
-        $this->assertEquals("test", $decrypted["key2"]["nestedKey2"]["#finalKeyEncrypted"]);
+        self::assertArrayHasKey("key1", $decrypted);
+        self::assertArrayHasKey("key2", $decrypted);
+        self::assertArrayHasKey("nestedKey1", $decrypted["key2"]);
+        self::assertArrayHasKey("nestedKey2", $decrypted["key2"]);
+        self::assertArrayHasKey("#finalKey", $decrypted["key2"]["nestedKey2"]);
+        self::assertArrayHasKey("#finalKeyEncrypted", $decrypted["key2"]["nestedKey2"]);
+        self::assertEquals("value1", $decrypted["key1"]);
+        self::assertEquals("value2", $decrypted["key2"]["nestedKey1"]);
+        self::assertEquals("value3", $decrypted["key2"]["nestedKey2"]["#finalKey"]);
+        self::assertEquals("test", $decrypted["key2"]["nestedKey2"]["#finalKeyEncrypted"]);
     }
 
 
@@ -600,28 +599,28 @@ class ObjectEncryptorTest extends TestCase
         $object->key2 = $nested1;
 
         $result = $encryptor->encrypt($object);
-        $this->assertObjectHasAttribute("key1", $result);
-        $this->assertObjectHasAttribute("key2", $result);
-        $this->assertObjectHasAttribute("nestedKey1", $result->key2);
-        $this->assertObjectHasAttribute("nestedKey2", $result->key2);
-        $this->assertObjectHasAttribute("#finalKey", $result->key2->nestedKey2);
-        $this->assertObjectHasAttribute("#finalKeyEncrypted", $result->key2->nestedKey2);
-        $this->assertEquals("value1", $result->key1);
-        $this->assertEquals("value2", $result->key2->nestedKey1);
-        $this->assertEquals("KBC::Encrypted==", substr($result->key2->nestedKey2->{"#finalKey"}, 0, 16));
-        $this->assertEquals($encryptedValue, $result->key2->nestedKey2->{"#finalKeyEncrypted"});
+        self::assertObjectHasAttribute("key1", $result);
+        self::assertObjectHasAttribute("key2", $result);
+        self::assertObjectHasAttribute("nestedKey1", $result->key2);
+        self::assertObjectHasAttribute("nestedKey2", $result->key2);
+        self::assertObjectHasAttribute("#finalKey", $result->key2->nestedKey2);
+        self::assertObjectHasAttribute("#finalKeyEncrypted", $result->key2->nestedKey2);
+        self::assertEquals("value1", $result->key1);
+        self::assertEquals("value2", $result->key2->nestedKey1);
+        self::assertEquals("KBC::Encrypted==", substr($result->key2->nestedKey2->{"#finalKey"}, 0, 16));
+        self::assertEquals($encryptedValue, $result->key2->nestedKey2->{"#finalKeyEncrypted"});
 
         $decrypted = $encryptor->decrypt($result);
-        $this->assertObjectHasAttribute("key1", $decrypted);
-        $this->assertObjectHasAttribute("key2", $decrypted);
-        $this->assertObjectHasAttribute("nestedKey1", $decrypted->key2);
-        $this->assertObjectHasAttribute("nestedKey2", $decrypted->key2);
-        $this->assertObjectHasAttribute("#finalKey", $decrypted->key2->nestedKey2);
-        $this->assertObjectHasAttribute("#finalKeyEncrypted", $decrypted->key2->nestedKey2);
-        $this->assertEquals("value1", $decrypted->key1);
-        $this->assertEquals("value2", $decrypted->key2->nestedKey1);
-        $this->assertEquals("value3", $decrypted->key2->nestedKey2->{"#finalKey"});
-        $this->assertEquals("test", $decrypted->key2->nestedKey2->{"#finalKeyEncrypted"});
+        self::assertObjectHasAttribute("key1", $decrypted);
+        self::assertObjectHasAttribute("key2", $decrypted);
+        self::assertObjectHasAttribute("nestedKey1", $decrypted->key2);
+        self::assertObjectHasAttribute("nestedKey2", $decrypted->key2);
+        self::assertObjectHasAttribute("#finalKey", $decrypted->key2->nestedKey2);
+        self::assertObjectHasAttribute("#finalKeyEncrypted", $decrypted->key2->nestedKey2);
+        self::assertEquals("value1", $decrypted->key1);
+        self::assertEquals("value2", $decrypted->key2->nestedKey1);
+        self::assertEquals("value3", $decrypted->key2->nestedKey2->{"#finalKey"});
+        self::assertEquals("test", $decrypted->key2->nestedKey2->{"#finalKeyEncrypted"});
     }
 
     public function testEncryptorNestedArrayWithArray()
@@ -635,26 +634,26 @@ class ObjectEncryptorTest extends TestCase
             ]
         ];
         $result = $encryptor->encrypt($array);
-        $this->assertArrayHasKey("key1", $result);
-        $this->assertArrayHasKey("key2", $result);
-        $this->assertCount(2, $result["key2"]);
-        $this->assertArrayHasKey("nestedKey1", $result["key2"][0]);
-        $this->assertArrayHasKey("nestedKey2", $result["key2"][1]);
-        $this->assertArrayHasKey("#finalKey", $result["key2"][1]["nestedKey2"]);
-        $this->assertEquals("value1", $result["key1"]);
-        $this->assertEquals("value2", $result["key2"][0]["nestedKey1"]);
-        $this->assertEquals("KBC::Encrypted==", substr($result["key2"][1]["nestedKey2"]["#finalKey"], 0, 16));
+        self::assertArrayHasKey("key1", $result);
+        self::assertArrayHasKey("key2", $result);
+        self::assertCount(2, $result["key2"]);
+        self::assertArrayHasKey("nestedKey1", $result["key2"][0]);
+        self::assertArrayHasKey("nestedKey2", $result["key2"][1]);
+        self::assertArrayHasKey("#finalKey", $result["key2"][1]["nestedKey2"]);
+        self::assertEquals("value1", $result["key1"]);
+        self::assertEquals("value2", $result["key2"][0]["nestedKey1"]);
+        self::assertEquals("KBC::Encrypted==", substr($result["key2"][1]["nestedKey2"]["#finalKey"], 0, 16));
 
         $decrypted = $encryptor->decrypt($result);
-        $this->assertArrayHasKey("key1", $decrypted);
-        $this->assertArrayHasKey("key2", $decrypted);
-        $this->assertCount(2, $result["key2"]);
-        $this->assertArrayHasKey("nestedKey1", $decrypted["key2"][0]);
-        $this->assertArrayHasKey("nestedKey2", $decrypted["key2"][1]);
-        $this->assertArrayHasKey("#finalKey", $decrypted["key2"][1]["nestedKey2"]);
-        $this->assertEquals("value1", $decrypted["key1"]);
-        $this->assertEquals("value2", $decrypted["key2"][0]["nestedKey1"]);
-        $this->assertEquals("value3", $decrypted["key2"][1]["nestedKey2"]["#finalKey"]);
+        self::assertArrayHasKey("key1", $decrypted);
+        self::assertArrayHasKey("key2", $decrypted);
+        self::assertCount(2, $result["key2"]);
+        self::assertArrayHasKey("nestedKey1", $decrypted["key2"][0]);
+        self::assertArrayHasKey("nestedKey2", $decrypted["key2"][1]);
+        self::assertArrayHasKey("#finalKey", $decrypted["key2"][1]["nestedKey2"]);
+        self::assertEquals("value1", $decrypted["key1"]);
+        self::assertEquals("value2", $decrypted["key2"][0]["nestedKey1"]);
+        self::assertEquals("value3", $decrypted["key2"][1]["nestedKey2"]["#finalKey"]);
     }
 
     public function testEncryptorNestedObjectWithArray()
@@ -674,26 +673,26 @@ class ObjectEncryptorTest extends TestCase
 
         $result = $encryptor->encrypt($object);
 
-        $this->assertObjectHasAttribute("key1", $result);
-        $this->assertObjectHasAttribute("key2", $result);
-        $this->assertCount(2, $result->key2);
-        $this->assertObjectHasAttribute("nestedKey1", $result->key2[0]);
-        $this->assertObjectHasAttribute("nestedKey2", $result->key2[1]);
-        $this->assertObjectHasAttribute("#finalKey", $result->key2[1]->nestedKey2);
-        $this->assertEquals("value1", $result->key1);
-        $this->assertEquals("value2", $result->key2[0]->nestedKey1);
-        $this->assertEquals("KBC::Encrypted==", substr($result->key2[1]->nestedKey2->{"#finalKey"}, 0, 16));
+        self::assertObjectHasAttribute("key1", $result);
+        self::assertObjectHasAttribute("key2", $result);
+        self::assertCount(2, $result->key2);
+        self::assertObjectHasAttribute("nestedKey1", $result->key2[0]);
+        self::assertObjectHasAttribute("nestedKey2", $result->key2[1]);
+        self::assertObjectHasAttribute("#finalKey", $result->key2[1]->nestedKey2);
+        self::assertEquals("value1", $result->key1);
+        self::assertEquals("value2", $result->key2[0]->nestedKey1);
+        self::assertEquals("KBC::Encrypted==", substr($result->key2[1]->nestedKey2->{"#finalKey"}, 0, 16));
 
         $decrypted = $encryptor->decrypt($result);
-        $this->assertObjectHasAttribute("key1", $decrypted);
-        $this->assertObjectHasAttribute("key2", $decrypted);
-        $this->assertCount(2, $result->key2);
-        $this->assertObjectHasAttribute("nestedKey1", $decrypted->key2[0]);
-        $this->assertObjectHasAttribute("nestedKey2", $decrypted->key2[1]);
-        $this->assertObjectHasAttribute("#finalKey", $decrypted->key2[1]->nestedKey2);
-        $this->assertEquals("value1", $decrypted->key1);
-        $this->assertEquals("value2", $decrypted->key2[0]->nestedKey1);
-        $this->assertEquals("value3", $decrypted->key2[1]->nestedKey2->{"#finalKey"});
+        self::assertObjectHasAttribute("key1", $decrypted);
+        self::assertObjectHasAttribute("key2", $decrypted);
+        self::assertCount(2, $result->key2);
+        self::assertObjectHasAttribute("nestedKey1", $decrypted->key2[0]);
+        self::assertObjectHasAttribute("nestedKey2", $decrypted->key2[1]);
+        self::assertObjectHasAttribute("#finalKey", $decrypted->key2[1]->nestedKey2);
+        self::assertEquals("value1", $decrypted->key1);
+        self::assertEquals("value2", $decrypted->key2[0]->nestedKey1);
+        self::assertEquals("value3", $decrypted->key2[1]->nestedKey2->{"#finalKey"});
     }
 
     public function testMixedCryptoWrappersDecryptArray()
@@ -707,15 +706,15 @@ class ObjectEncryptorTest extends TestCase
             "#key1" => $encryptor->encrypt("value1"),
             "#key2" => $encryptor->encrypt("value2", AnotherCryptoWrapper::class)
         ];
-        $this->assertEquals("KBC::Encrypted==", substr($array["#key1"], 0, 16));
-        $this->assertEquals("KBC::AnotherCryptoWrapper==", substr($array["#key2"], 0, 27));
+        self::assertEquals("KBC::Encrypted==", substr($array["#key1"], 0, 16));
+        self::assertEquals("KBC::AnotherCryptoWrapper==", substr($array["#key2"], 0, 27));
 
         $decrypted = $encryptor->decrypt($array);
-        $this->assertArrayHasKey("#key1", $decrypted);
-        $this->assertArrayHasKey("#key2", $decrypted);
-        $this->assertCount(2, $decrypted);
-        $this->assertEquals("value1", $decrypted["#key1"]);
-        $this->assertEquals("value2", $decrypted["#key2"]);
+        self::assertArrayHasKey("#key1", $decrypted);
+        self::assertArrayHasKey("#key2", $decrypted);
+        self::assertCount(2, $decrypted);
+        self::assertEquals("value1", $decrypted["#key1"]);
+        self::assertEquals("value2", $decrypted["#key2"]);
     }
 
     public function testMixedCryptoWrappersDecryptObject()
@@ -729,14 +728,14 @@ class ObjectEncryptorTest extends TestCase
         $object->{"#key1"} = $encryptor->encrypt("value1");
         $object->{"#key2"} = $encryptor->encrypt("value2", AnotherCryptoWrapper::class);
 
-        $this->assertEquals("KBC::Encrypted==", substr($object->{"#key1"}, 0, 16));
-        $this->assertEquals("KBC::AnotherCryptoWrapper==", substr($object->{"#key2"}, 0, 27));
+        self::assertEquals("KBC::Encrypted==", substr($object->{"#key1"}, 0, 16));
+        self::assertEquals("KBC::AnotherCryptoWrapper==", substr($object->{"#key2"}, 0, 27));
 
         $decrypted = $encryptor->decrypt($object);
-        $this->assertObjectHasAttribute("#key1", $decrypted);
-        $this->assertObjectHasAttribute("#key2", $decrypted);
-        $this->assertEquals("value1", $decrypted->{"#key1"});
-        $this->assertEquals("value2", $decrypted->{"#key2"});
+        self::assertObjectHasAttribute("#key1", $decrypted);
+        self::assertObjectHasAttribute("#key2", $decrypted);
+        self::assertEquals("value1", $decrypted->{"#key1"});
+        self::assertEquals("value2", $decrypted->{"#key2"});
     }
 
     public function testEncryptEmptyArray()
@@ -744,8 +743,8 @@ class ObjectEncryptorTest extends TestCase
         $encryptor = $this->factory->getEncryptor();
         $array = [];
         $encrypted = $encryptor->encrypt($array);
-        $this->assertEquals([], $encrypted);
-        $this->assertEquals([], $encryptor->decrypt($encrypted));
+        self::assertEquals([], $encrypted);
+        self::assertEquals([], $encryptor->decrypt($encrypted));
     }
 
     public function testEncryptEmptyObject()
@@ -753,8 +752,8 @@ class ObjectEncryptorTest extends TestCase
         $encryptor = $this->factory->getEncryptor();
         $object = new \stdClass();
         $encrypted = $encryptor->encrypt($object);
-        $this->assertEquals('stdClass', get_class($encrypted));
-        $this->assertEquals('stdClass', get_class($encryptor->decrypt($encrypted)));
+        self::assertEquals('stdClass', get_class($encrypted));
+        self::assertEquals('stdClass', get_class($encryptor->decrypt($encrypted)));
     }
 
     public function testEncryptorNoWrappers()
@@ -762,7 +761,7 @@ class ObjectEncryptorTest extends TestCase
         $encryptor = new ObjectEncryptor();
         try {
             $encryptor->encrypt("test");
-            $this->fail("Misconfigured object encryptor must raise exception.");
+            self::fail("Misconfigured object encryptor must raise exception.");
         } catch (ApplicationException $e) {
         }
     }
@@ -788,52 +787,52 @@ class ObjectEncryptorTest extends TestCase
         }');
 
         $result = $encryptor->encrypt(json_decode($json));
-        $this->assertTrue(is_object($result));
-        $this->assertObjectHasAttribute("key1", $result);
-        $this->assertObjectHasAttribute("key2", $result);
-        $this->assertObjectHasAttribute("#key3", $result);
-        $this->assertObjectHasAttribute("array", $result);
-        $this->assertObjectHasAttribute("emptyArray", $result);
-        $this->assertObjectHasAttribute("emptyObject", $result);
-        $this->assertObjectHasAttribute("nestedKey1", $result->key2);
-        $this->assertObjectHasAttribute("nestedKey2", $result->key2);
-        $this->assertObjectHasAttribute("#finalKey", $result->key2->nestedKey2);
-        $this->assertTrue(is_array($result->array));
-        $this->assertTrue(is_array($result->emptyArray));
-        $this->assertTrue(is_object($result->emptyObject));
-        $this->assertTrue(is_object($result->key2));
-        $this->assertObjectHasAttribute("anotherNestedKey", $result->{"#key3"});
-        $this->assertTrue(is_object($result->{"#key3"}));
-        $this->assertEquals("value1", $result->key1);
-        $this->assertEquals("value2", $result->key2->nestedKey1);
-        $this->assertEquals("someValue", $result->{"#key3"}->anotherNestedKey);
-        $this->assertEquals("KBC::Encrypted==", substr($result->{"#key3"}->{"#encryptedNestedKey"}, 0, 16));
-        $this->assertEquals("KBC::Encrypted==", substr($result->key2->nestedKey2->{"#finalKey"}, 0, 16));
+        self::assertTrue(is_object($result));
+        self::assertObjectHasAttribute("key1", $result);
+        self::assertObjectHasAttribute("key2", $result);
+        self::assertObjectHasAttribute("#key3", $result);
+        self::assertObjectHasAttribute("array", $result);
+        self::assertObjectHasAttribute("emptyArray", $result);
+        self::assertObjectHasAttribute("emptyObject", $result);
+        self::assertObjectHasAttribute("nestedKey1", $result->key2);
+        self::assertObjectHasAttribute("nestedKey2", $result->key2);
+        self::assertObjectHasAttribute("#finalKey", $result->key2->nestedKey2);
+        self::assertTrue(is_array($result->array));
+        self::assertTrue(is_array($result->emptyArray));
+        self::assertTrue(is_object($result->emptyObject));
+        self::assertTrue(is_object($result->key2));
+        self::assertObjectHasAttribute("anotherNestedKey", $result->{"#key3"});
+        self::assertTrue(is_object($result->{"#key3"}));
+        self::assertEquals("value1", $result->key1);
+        self::assertEquals("value2", $result->key2->nestedKey1);
+        self::assertEquals("someValue", $result->{"#key3"}->anotherNestedKey);
+        self::assertEquals("KBC::Encrypted==", substr($result->{"#key3"}->{"#encryptedNestedKey"}, 0, 16));
+        self::assertEquals("KBC::Encrypted==", substr($result->key2->nestedKey2->{"#finalKey"}, 0, 16));
 
         $decrypted = $encryptor->decrypt($result);
-        $this->assertTrue(is_object($decrypted));
-        $this->assertObjectHasAttribute("key1", $decrypted);
-        $this->assertObjectHasAttribute("key2", $decrypted);
-        $this->assertObjectHasAttribute("#key3", $decrypted);
-        $this->assertObjectHasAttribute("array", $decrypted);
-        $this->assertObjectHasAttribute("emptyArray", $decrypted);
-        $this->assertObjectHasAttribute("emptyObject", $decrypted);
-        $this->assertObjectHasAttribute("nestedKey1", $decrypted->key2);
-        $this->assertObjectHasAttribute("nestedKey2", $decrypted->key2);
-        $this->assertObjectHasAttribute("#finalKey", $decrypted->key2->nestedKey2);
-        $this->assertTrue(is_array($decrypted->array));
-        $this->assertTrue(is_array($decrypted->emptyArray));
-        $this->assertTrue(is_object($decrypted->emptyObject));
-        $this->assertTrue(is_object($decrypted->key2));
-        $this->assertObjectHasAttribute("anotherNestedKey", $decrypted->{"#key3"});
-        $this->assertTrue(is_object($decrypted->{"#key3"}));
-        $this->assertEquals("value1", $decrypted->key1);
-        $this->assertEquals("value2", $decrypted->key2->nestedKey1);
-        $this->assertEquals("someValue", $decrypted->{"#key3"}->anotherNestedKey);
-        $this->assertEquals("someValue2", $decrypted->{"#key3"}->{"#encryptedNestedKey"});
-        $this->assertEquals("value3", $decrypted->key2->nestedKey2->{"#finalKey"});
+        self::assertTrue(is_object($decrypted));
+        self::assertObjectHasAttribute("key1", $decrypted);
+        self::assertObjectHasAttribute("key2", $decrypted);
+        self::assertObjectHasAttribute("#key3", $decrypted);
+        self::assertObjectHasAttribute("array", $decrypted);
+        self::assertObjectHasAttribute("emptyArray", $decrypted);
+        self::assertObjectHasAttribute("emptyObject", $decrypted);
+        self::assertObjectHasAttribute("nestedKey1", $decrypted->key2);
+        self::assertObjectHasAttribute("nestedKey2", $decrypted->key2);
+        self::assertObjectHasAttribute("#finalKey", $decrypted->key2->nestedKey2);
+        self::assertTrue(is_array($decrypted->array));
+        self::assertTrue(is_array($decrypted->emptyArray));
+        self::assertTrue(is_object($decrypted->emptyObject));
+        self::assertTrue(is_object($decrypted->key2));
+        self::assertObjectHasAttribute("anotherNestedKey", $decrypted->{"#key3"});
+        self::assertTrue(is_object($decrypted->{"#key3"}));
+        self::assertEquals("value1", $decrypted->key1);
+        self::assertEquals("value2", $decrypted->key2->nestedKey1);
+        self::assertEquals("someValue", $decrypted->{"#key3"}->anotherNestedKey);
+        self::assertEquals("someValue2", $decrypted->{"#key3"}->{"#encryptedNestedKey"});
+        self::assertEquals("value3", $decrypted->key2->nestedKey2->{"#finalKey"});
 
-        $this->assertEquals(json_encode($decrypted), $json);
+        self::assertEquals(json_encode($decrypted), $json);
     }
 
     public function testEncryptorLegacy()
@@ -843,8 +842,8 @@ class ObjectEncryptorTest extends TestCase
 
         $originalText = 'secret';
         $encrypted = $legacyEncryptor->encrypt($originalText);
-        $this->assertNotEquals($originalText, $encrypted);
-        $this->assertEquals($originalText, $encryptor->decrypt($encrypted));
+        self::assertNotEquals($originalText, $encrypted);
+        self::assertEquals($originalText, $encryptor->decrypt($encrypted));
     }
 
     public function testEncryptorLegacyFail()
@@ -853,9 +852,11 @@ class ObjectEncryptorTest extends TestCase
         $originalText = 'test';
         try {
             $encryptor->decrypt($originalText);
-            $this->fail("Invalid cipher must fail.");
+            self::fail("Invalid cipher must fail.");
         } catch (UserException $e) {
-            $this->assertContains('is not an encrypted value', $e->getMessage());
+            self::assertContains('is not an encrypted value', $e->getMessage());
         }
     }
+
+
 }

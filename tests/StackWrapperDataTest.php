@@ -1,20 +1,6 @@
 <?php
 
 namespace Keboola\ObjectEncryptor\Tests;
-include "../vendor/defuse/php-encryption/src/Encoding.php";
-include "../vendor/defuse/php-encryption/src/Core.php";
-include "../vendor/defuse/php-encryption/src/Crypto.php";
-include "../vendor/defuse/php-encryption/src/KeyOrPassword.php";
-include "../vendor/defuse/php-encryption/src/RuntimeTests.php";
-include "../vendor/defuse/php-encryption/src/DerivedKeys.php";
-include "../vendor/defuse/php-encryption/src/Key.php";
-include "../vendor/defuse/php-encryption/src/Exception/CryptoException.php";
-include "../vendor/defuse/php-encryption/src/Exception/BadFormatException.php";
-include "../vendor/defuse/php-encryption/src/Exception/WrongKeyOrModifiedCiphertextException.php";
-include "../src/Exception/UserException.php";
-include "../src/Exception/EncryptionException.php";
-include "../src/Wrapper/CryptoWrapperInterface.php";
-include "../src/Wrapper/StackWrapper.php";
 
 use Defuse\Crypto\Crypto;
 use Defuse\Crypto\Key;
@@ -618,5 +604,83 @@ class StackWrapperDataTest extends TestCase
         $stackWrapper->setProjectId('123');
         $stackWrapper->setConfigurationId('54321');
         $stackWrapper->decrypt($encrypted);
+    }
+
+    /**
+     * @expectedException \Keboola\ObjectEncryptor\Exception\EncryptionException
+     * @expectedExceptionMessage Invalid component
+     */
+    public function testAddInvalidComponent()
+    {
+        $generalKey = Key::createNewRandomKey()->saveToAsciiSafeString();
+        $stackWrapper = new StackWrapper();
+        $stackWrapper->setGeneralKey($generalKey);
+        $stackWrapper->setStackKey(Key::createNewRandomKey()->saveToAsciiSafeString());
+        $stackWrapper->setStackId('my-stack');
+        $stackWrapper->setComponentId('keboola.docker-demo');
+        $stackWrapper->setConfigurationId('123456');
+        $stackWrapper->setProjectId('123');
+        $encrypted = $stackWrapper->encrypt("mySecretValue");
+        self::assertStringStartsWith('CPF::', $encrypted);
+        $stackWrapper2 = new StackWrapper();
+        $stackWrapper2->setGeneralKey($generalKey);
+        $stackWrapper2->setStackKey(Key::createNewRandomKey()->saveToAsciiSafeString());
+        $stackWrapper2->setStackId('another-stack');
+        $stackWrapper2->setComponentId('some-different-component');
+        $stackWrapper2->setConfigurationId('123456');
+        $stackWrapper2->setProjectId('123');
+        $stackWrapper2->add($encrypted, "anotherSecretValue");
+    }
+
+    /**
+     * @expectedException \Keboola\ObjectEncryptor\Exception\EncryptionException
+     * @expectedExceptionMessage Stack is already used
+     */
+    public function testAddInvalidOverwrite()
+    {
+        $generalKey = Key::createNewRandomKey()->saveToAsciiSafeString();
+        $stackWrapper = new StackWrapper();
+        $stackWrapper->setGeneralKey($generalKey);
+        $stackWrapper->setStackKey(Key::createNewRandomKey()->saveToAsciiSafeString());
+        $stackWrapper->setStackId('my-stack');
+        $stackWrapper->setComponentId('keboola.docker-demo');
+        $stackWrapper->setConfigurationId('123456');
+        $stackWrapper->setProjectId('123');
+        $encrypted = $stackWrapper->encrypt("mySecretValue");
+        self::assertStringStartsWith('CPF::', $encrypted);
+        $stackWrapper2 = new StackWrapper();
+        $stackWrapper2->setGeneralKey($generalKey);
+        $stackWrapper2->setStackKey(Key::createNewRandomKey()->saveToAsciiSafeString());
+        $stackWrapper2->setStackId('my-stack');
+        $stackWrapper2->setComponentId('keboola.docker-demo');
+        $stackWrapper2->setConfigurationId('123456');
+        $stackWrapper2->setProjectId('123');
+        $stackWrapper2->add($encrypted, "anotherSecretValue");
+    }
+
+    /**
+     * @expectedException \Keboola\ObjectEncryptor\Exception\EncryptionException
+     * @expectedExceptionMessage Invalid cipher
+     */
+    public function testAddInvalidKey()
+    {
+        $generalKey = Key::createNewRandomKey()->saveToAsciiSafeString();
+        $stackWrapper = new StackWrapper();
+        $stackWrapper->setGeneralKey($generalKey);
+        $stackWrapper->setStackKey(Key::createNewRandomKey()->saveToAsciiSafeString());
+        $stackWrapper->setStackId('my-stack');
+        $stackWrapper->setComponentId('keboola.docker-demo');
+        $stackWrapper->setConfigurationId('123456');
+        $stackWrapper->setProjectId('123');
+        $encrypted = $stackWrapper->encrypt("mySecretValue");
+        self::assertStringStartsWith('CPF::', $encrypted);
+        $stackWrapper2 = new StackWrapper();
+        $stackWrapper2->setGeneralKey(Key::createNewRandomKey()->saveToAsciiSafeString());
+        $stackWrapper2->setStackKey(Key::createNewRandomKey()->saveToAsciiSafeString());
+        $stackWrapper2->setStackId('another-stack');
+        $stackWrapper2->setComponentId('keboola.docker-demo');
+        $stackWrapper2->setConfigurationId('123456');
+        $stackWrapper2->setProjectId('123');
+        $stackWrapper2->add($encrypted, "anotherSecretValue");
     }
 }
