@@ -149,7 +149,7 @@ class ObjectEncryptor
             throw new \InvalidCiphertextException("Value $value is not an encrypted value.");
         } catch (\Exception $e) {
             // decryption failed for more serious reasons
-            throw new ApplicationException("Decryption failed: " . $e->getMessage(), $e, ["value" => $value]);
+            throw new ApplicationException("Decryption failed: " . $e->getMessage(), 0, $e);
         }
     }
 
@@ -206,7 +206,7 @@ class ObjectEncryptor
         try {
             return $wrapper->getPrefix() . $wrapper->encrypt($value);
         } catch (\Exception $e) {
-            throw new ApplicationException("Encryption failed: " . $e->getMessage(), $e, ["value" => $value]);
+            throw new ApplicationException("Encryption failed: " . $e->getMessage(), 0, $e);
         }
     }
 
