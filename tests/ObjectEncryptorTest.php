@@ -857,6 +857,4 @@ class ObjectEncryptorTest extends TestCase
             self::assertContains('is not an encrypted value', $e->getMessage());
         }
     }
-
-
 }

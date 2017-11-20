@@ -87,6 +87,18 @@ class ObjectEncryptor
     }
 
     /**
+     * @param mixed $data
+     * @param string $wrapperName
+     * @return mixed
+     */
+    public function migrate($data, $wrapperName = BaseWrapper::class)
+    {
+        $decrypted = $this->decrypt($data);
+        $encrypted = $this->encrypt($decrypted, $wrapperName);
+        return $encrypted;
+    }
+
+    /**
      * Manually add a known crypto wrapper. Generally, wrappers should be added to services.yml with tag
      * 'syrup.encryption.wrapper' - that way, they will be added automatically.
      * @param CryptoWrapperInterface $wrapper
