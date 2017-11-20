@@ -88,7 +88,6 @@ class ObjectEncryptorMigrationTest extends TestCase
         self::assertEquals("value1", $decrypted["key1"]);
         self::assertEquals("value2", $decrypted["key2"]["nestedKey1"]);
         self::assertEquals("value3", $decrypted["key2"]["nestedKey2"]["#finalKey"]);
-
     }
 
     public function testMixedCryptoWrappersDecryptArray()

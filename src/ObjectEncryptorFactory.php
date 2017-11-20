@@ -101,7 +101,6 @@ class ObjectEncryptorFactory
         if (!is_null($this->configurationId) && !is_string($this->configurationId)) {
             throw new ApplicationException("Invalid Configuration Id.");
         }
-
     }
 
     /**

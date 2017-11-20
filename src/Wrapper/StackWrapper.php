@@ -132,7 +132,8 @@ class StackWrapper implements CryptoWrapperInterface
         }
     }
 
-    private function addPrefix($value) {
+    private function addPrefix($value)
+    {
         $result = '';
         if ($this->componentId) {
             $result .= 'C';
