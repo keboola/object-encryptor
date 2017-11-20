@@ -318,7 +318,7 @@ class StackWrapperDataTest extends TestCase
         $stackWrapper->setGeneralKey($keyGeneral);
         $stackWrapper->setStackKey($keyStack);
         $stackWrapper->setStackId('my-stack');
-        $stackWrapper->setComponentId('123');
+        $stackWrapper->setProjectId('123');
         $stackWrapper->decrypt($encrypted);
     }
 
@@ -364,6 +364,30 @@ class StackWrapperDataTest extends TestCase
         $stackWrapper->setStackKey($keyStack);
         $stackWrapper->setStackId('my-stack');
         $stackWrapper->setComponentId('321');
+        $stackWrapper->decrypt($encrypted);
+    }
+
+    /**
+     * @expectedException \Keboola\ObjectEncryptor\Exception\EncryptionException
+     * @expectedExceptionMessage Invalid project
+     */
+    public function testWrongProject3()
+    {
+        $keyGeneral = Key::createNewRandomKey()->saveToAsciiSafeString();
+        $keyStack = Key::createNewRandomKey()->saveToAsciiSafeString();
+        $inCipher = Crypto::encrypt('fooBar', Key::loadFromAsciiSafeString($keyStack));
+        $encrypted = base64_encode(
+            Crypto::encrypt(
+                // values inside the crypt struct are always strings
+                json_encode(['stacks' => ['my-stack' => $inCipher], 'prj' => 123]),
+                Key::loadFromAsciiSafeString($keyGeneral)
+            )
+        );
+        $stackWrapper = new StackWrapper();
+        $stackWrapper->setGeneralKey($keyGeneral);
+        $stackWrapper->setStackKey($keyStack);
+        $stackWrapper->setStackId('my-stack');
+        $stackWrapper->setComponentId('123');
         $stackWrapper->decrypt($encrypted);
     }
 
@@ -461,7 +485,7 @@ class StackWrapperDataTest extends TestCase
                     [
                         'stacks' => ['my-stack' => $inCipher],
                         'cmp' => 'keboola.docker-demo-app',
-                        'prj' => 123,
+                        'prj' => '123',
                         'cfg' => '12345'
                     ]
                 ),
@@ -493,7 +517,7 @@ class StackWrapperDataTest extends TestCase
                     [
                         'stacks' => ['my-stack' => $inCipher],
                         'cmp' => 'keboola.docker-demo-app',
-                        'prj' => 123,
+                        'prj' => '123',
                         'cfg' => '12345'
                     ]
                 ),
@@ -525,7 +549,7 @@ class StackWrapperDataTest extends TestCase
                     [
                         'stacks' => ['my-stack' => $inCipher],
                         'cmp' => 'keboola.docker-demo-app',
-                        'prj' => 123,
+                        'prj' => '123',
                         'cfg' => '12345'
                     ]
                 ),
@@ -538,7 +562,7 @@ class StackWrapperDataTest extends TestCase
         $stackWrapper->setStackId('my-stack');
         $stackWrapper->setComponentId('keboola.docker-demo-app');
         $stackWrapper->setProjectId('321');
-        $stackWrapper->setConfigurationId('12345');
+        $stackWrapper->setConfigurationId('54321');
         $stackWrapper->decrypt($encrypted);
     }
 
@@ -557,7 +581,7 @@ class StackWrapperDataTest extends TestCase
                     [
                         'stacks' => ['my-stack' => $inCipher],
                         'cmp' => 'keboola.docker-demo-app',
-                        'prj' => 123,
+                        'prj' => '123',
                         'cfg' => '12345'
                     ]
                 ),
@@ -569,8 +593,8 @@ class StackWrapperDataTest extends TestCase
         $stackWrapper->setStackKey($keyStack);
         $stackWrapper->setStackId('my-stack');
         $stackWrapper->setComponentId('keboola.docker-demo-app');
-        $stackWrapper->setProjectId('123');
-        $stackWrapper->setConfigurationId('54321');
+        $stackWrapper->setProjectId('321');
+        $stackWrapper->setConfigurationId('12345');
         $stackWrapper->decrypt($encrypted);
     }
 
@@ -589,7 +613,7 @@ class StackWrapperDataTest extends TestCase
                     [
                         'stacks' => ['my-stack' => $inCipher],
                         'cmp' => 'keboola.docker-demo-app',
-                        'prj' => 123,
+                        'prj' => '123',
                         'cfg' => '12345'
                     ]
                 ),
@@ -602,7 +626,7 @@ class StackWrapperDataTest extends TestCase
         $stackWrapper->setStackId('not-my-stack');
         $stackWrapper->setComponentId('keboola.docker-demo-app');
         $stackWrapper->setProjectId('123');
-        $stackWrapper->setConfigurationId('54321');
+        $stackWrapper->setConfigurationId('12345');
         $stackWrapper->decrypt($encrypted);
     }
 

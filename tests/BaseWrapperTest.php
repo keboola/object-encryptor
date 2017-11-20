@@ -2,26 +2,22 @@
 
 namespace Keboola\ObjectEncryptor\Tests;
 
-use Framework\TestCase;
+use Keboola\ObjectEncryptor\Legacy\Wrapper\BaseWrapper;
+use PHPUnit\Framework\TestCase;
 
 class BaseWrapperTest extends TestCase
 {
-    public function setUp()
-    {
-        static::bootKernel();
-    }
-
     public function testPrefix()
     {
-        /** @var BaseWrapper $wrapper */
-        $wrapper = self::$kernel->getContainer()->get('syrup.encryption.base_wrapper');
-        $this->assertEquals('KBC::Encrypted==', $wrapper->getPrefix());
+        $wrapper = new BaseWrapper();
+        self::assertEquals('KBC::Encrypted==', $wrapper->getPrefix());
     }
 
     public function testEncryptor()
     {
-        $wrapper = self::$kernel->getContainer()->get('syrup.encryption.base_wrapper');
+        $wrapper = new BaseWrapper();
+        $wrapper->setKey(1234567890123456);
         $encrypted = $wrapper->encrypt('secret');
-        $this->assertEquals('secret', $wrapper->decrypt($encrypted));
+        self::assertEquals('secret', $wrapper->decrypt($encrypted));
     }
 }

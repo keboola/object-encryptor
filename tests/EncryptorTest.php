@@ -2,19 +2,15 @@
 
 namespace Keboola\ObjectEncryptor\Tests;
 
+use Keboola\ObjectEncryptor\Legacy\Encryptor;
 use PHPUnit\Framework\TestCase;
 
 class EncryptorTest extends TestCase
 {
     public function testEncryptor()
     {
-        $client = static::createClient();
-        $container = $client->getContainer();
-
-        $encryptor = $container->get('syrup.encryptor');
-
+        $encryptor = new Encryptor('123456789012345678901234567890ab');
         $encrypted = $encryptor->encrypt('secret');
-
-        $this->assertEquals('secret', $encryptor->decrypt($encrypted));
+        self::assertEquals('secret', $encryptor->decrypt($encrypted));
     }
 }

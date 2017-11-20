@@ -99,7 +99,7 @@ class StackWrapperTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage Bad Init
+     * @expectedExceptionMessage Bad init
      */
     public function testInvalidSetupEncrypt1()
     {
@@ -109,7 +109,7 @@ class StackWrapperTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage Bad Init
+     * @expectedExceptionMessage Bad init
      */
     public function testInvalidSetupEncrypt2()
     {
@@ -120,7 +120,7 @@ class StackWrapperTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage Bad Init
+     * @expectedExceptionMessage Bad init
      */
     public function testInvalidSetupEncrypt3()
     {
@@ -132,7 +132,7 @@ class StackWrapperTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage Bad Init
+     * @expectedExceptionMessage Bad init
      */
     public function testInvalidSetupDecrypt1()
     {
@@ -142,7 +142,7 @@ class StackWrapperTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage Bad Init
+     * @expectedExceptionMessage Bad init
      */
     public function testInvalidSetupDecrypt2()
     {
@@ -153,7 +153,7 @@ class StackWrapperTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage Bad Init
+     * @expectedExceptionMessage Bad init
      */
     public function testInvalidSetupDecrypt3()
     {
