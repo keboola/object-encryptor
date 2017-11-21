@@ -58,11 +58,8 @@ class ObjectEncryptorFactory
      * @param string $keyVersion0 Encryption key for legacy ciphers.
      * @param string $stackKeyVersion2 Stack specific encryption key for KBC::SecureV3 ciphers.
      * @param string $stackId Id of KBC Stack.
-     * @param string $projectId Id of KBC Project.
-     * @param string $componentId Id of current component.
-     * @param string $configurationId Id of current configuration.
      */
-    public function __construct($keyVersion2, $keyVersion1, $keyVersion0, $stackKeyVersion2, $stackId, $projectId, $componentId, $configurationId)
+    public function __construct($keyVersion2, $keyVersion1, $keyVersion0, $stackKeyVersion2, $stackId)
     {
         // No logic here, this ctor is exception-less so as not to leak keys in stack trace
         $this->keyVersion2 = $keyVersion2;
@@ -70,9 +67,30 @@ class ObjectEncryptorFactory
         $this->keyVersion0 = $keyVersion0;
         $this->stackKeyVersion2 = $stackKeyVersion2;
         $this->stackId = $stackId;
-        $this->projectId = $projectId;
+    }
+
+    /**
+     * @param string $componentId Id of current component.
+     */
+    public function setComponentId($componentId)
+    {
         $this->componentId = $componentId;
+    }
+
+    /**
+     * @param string $configurationId Id of current configuration.
+     */
+    public function setConfigurationId($configurationId)
+    {
         $this->configurationId = $configurationId;
+    }
+
+    /**
+     * @param string $projectId Id of KBC Project.
+     */
+    public function setProjectId($projectId)
+    {
+        $this->projectId = $projectId;
     }
 
     /**

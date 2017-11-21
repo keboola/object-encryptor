@@ -30,10 +30,10 @@ class ObjectEncryptorMigrationTest extends TestCase
         $legacyKey = '1234567890123456';
         $this->aesKey = '123456789012345678901234567890ab';
         $stack = 'us-east-1';
-        $componentId = 'keboola.docker-demo';
-        $configurationId = '123456';
-        $projectId = '123';
-        $this->factory = new ObjectEncryptorFactory($globalKey, $legacyKey, $this->aesKey, $stackKey, $stack, $projectId, $componentId, $configurationId);
+        $this->factory = new ObjectEncryptorFactory($globalKey, $legacyKey, $this->aesKey, $stackKey, $stack);
+        $this->factory->setComponentId('keboola.docker-demo');
+        $this->factory->setConfigurationId('123456');
+        $this->factory->setProjectId('123');
     }
 
     public function testEncryptorScalar()
