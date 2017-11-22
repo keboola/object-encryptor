@@ -71,26 +71,38 @@ class ObjectEncryptorFactory
 
     /**
      * @param string $componentId Id of current component.
+     * @throws ApplicationException
      */
     public function setComponentId($componentId)
     {
-        $this->componentId = $componentId;
+        if (!is_null($componentId) && !is_scalar($componentId)) {
+            throw new ApplicationException("Invalid Component Id.");
+        }
+        $this->componentId = (string)$componentId;
     }
 
     /**
      * @param string $configurationId Id of current configuration.
+     * @throws ApplicationException
      */
     public function setConfigurationId($configurationId)
     {
-        $this->configurationId = $configurationId;
+        if (!is_null($configurationId) && !is_scalar($configurationId)) {
+            throw new ApplicationException("Invalid Configuration Id.");
+        }
+        $this->configurationId = (string)$configurationId;
     }
 
     /**
      * @param string $projectId Id of KBC Project.
+     * @throws ApplicationException
      */
     public function setProjectId($projectId)
     {
-        $this->projectId = $projectId;
+        if (!is_null($projectId) && !is_scalar($projectId)) {
+            throw new ApplicationException("Invalid Project Id.");
+        }
+        $this->projectId = (string)$projectId;
     }
 
     /**
@@ -109,15 +121,6 @@ class ObjectEncryptorFactory
         }
         if (!is_null($this->stackKeyVersion2) && !is_string($this->stackKeyVersion2)) {
             throw new ApplicationException("Invalid stack key.");
-        }
-        if (!is_null($this->projectId) && !is_string($this->projectId)) {
-            throw new ApplicationException("Invalid Project Id.");
-        }
-        if (!is_null($this->componentId) && !is_string($this->componentId)) {
-            throw new ApplicationException("Invalid Component Id.");
-        }
-        if (!is_null($this->configurationId) && !is_string($this->configurationId)) {
-            throw new ApplicationException("Invalid Configuration Id.");
         }
     }
 
