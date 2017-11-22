@@ -64,7 +64,7 @@ class ObjectEncryptorFactory
         // No logic here, this ctor is exception-less so as not to leak keys in stack trace
         $this->keyVersion2 = $keyVersion2;
         $this->keyVersion1 = $keyVersion1;
-        $this->keyVersion0 = $keyVersion0;
+        $this->keyVersion0 = substr($keyVersion0, 0, 32);
         $this->stackKeyVersion2 = $stackKeyVersion2;
         $this->stackId = $stackId;
     }
