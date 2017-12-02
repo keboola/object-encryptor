@@ -126,6 +126,7 @@ class ObjectEncryptorFactory
 
     /**
      * @return ObjectEncryptor Object encryptor instance.
+     * @throws ApplicationException
      */
     public function getEncryptor()
     {
@@ -143,10 +144,12 @@ class ObjectEncryptorFactory
             $encryptor->pushWrapper($wrapper);
             if ($this->componentId !== null) {
                 $wrapper = new ComponentWrapper();
+                $wrapper->setKey($this->keyVersion1);
                 $wrapper->setComponentId($this->componentId);
                 $encryptor->pushWrapper($wrapper);
                 if ($this->projectId !== null) {
                     $wrapper = new ComponentProjectWrapper();
+                    $wrapper->setKey($this->keyVersion1);
                     $wrapper->setComponentId($this->componentId);
                     $wrapper->setProjectId($this->projectId);
                     $encryptor->pushWrapper($wrapper);
@@ -156,8 +159,8 @@ class ObjectEncryptorFactory
 
         if ($this->keyVersion2 && $this->stackKeyVersion2 && $this->stackId) {
             $wrapper = new StackWrapper();
-            $wrapper->setStackKey($this->keyVersion2);
-            $wrapper->setGeneralKey($this->stackKeyVersion2);
+            $wrapper->setStackKey($this->stackKeyVersion2);
+            $wrapper->setGeneralKey($this->keyVersion2);
             $wrapper->setStackId($this->stackId);
             $wrapper->setComponentId($this->componentId);
             $wrapper->setProjectId($this->projectId);

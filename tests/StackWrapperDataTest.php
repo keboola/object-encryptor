@@ -18,7 +18,7 @@ class StackWrapperDataTest extends TestCase
     {
         $keyGeneral = Key::createNewRandomKey()->saveToAsciiSafeString();
         $keyStack = Key::createNewRandomKey()->saveToAsciiSafeString();
-        $encrypted = base64_encode(Crypto::encrypt('fooBar', Key::loadFromAsciiSafeString($keyGeneral)));
+        $encrypted = Crypto::encrypt('fooBar', Key::loadFromAsciiSafeString($keyGeneral));
         $stackWrapper = new StackWrapper();
         $stackWrapper->setGeneralKey(Key::createNewRandomKey()->saveToAsciiSafeString());
         $stackWrapper->setStackKey($keyStack);
@@ -34,7 +34,7 @@ class StackWrapperDataTest extends TestCase
     {
         $keyGeneral = Key::createNewRandomKey()->saveToAsciiSafeString();
         $keyStack = Key::createNewRandomKey()->saveToAsciiSafeString();
-        $encrypted = base64_encode(Crypto::encrypt('fooBar', Key::loadFromAsciiSafeString($keyGeneral)));
+        $encrypted = Crypto::encrypt('fooBar', Key::loadFromAsciiSafeString($keyGeneral));
         $stackWrapper = new StackWrapper();
         $stackWrapper->setGeneralKey($keyGeneral);
         $stackWrapper->setStackKey($keyStack);
@@ -50,11 +50,9 @@ class StackWrapperDataTest extends TestCase
     {
         $keyGeneral = Key::createNewRandomKey()->saveToAsciiSafeString();
         $keyStack = Key::createNewRandomKey()->saveToAsciiSafeString();
-        $encrypted = base64_encode(
-            Crypto::encrypt(
-                json_encode(['foo' => 'bar']),
-                Key::loadFromAsciiSafeString($keyGeneral)
-            )
+        $encrypted = Crypto::encrypt(
+            json_encode(['foo' => 'bar']),
+            Key::loadFromAsciiSafeString($keyGeneral)
         );
         $stackWrapper = new StackWrapper();
         $stackWrapper->setGeneralKey($keyGeneral);
@@ -71,11 +69,9 @@ class StackWrapperDataTest extends TestCase
     {
         $keyGeneral = Key::createNewRandomKey()->saveToAsciiSafeString();
         $keyStack = Key::createNewRandomKey()->saveToAsciiSafeString();
-        $encrypted = base64_encode(
-            Crypto::encrypt(
-                json_encode(['stacks' => ['my-stack' => 'foo']]),
-                Key::loadFromAsciiSafeString($keyGeneral)
-            )
+        $encrypted = Crypto::encrypt(
+            json_encode(['stacks' => ['my-stack' => 'foo']]),
+            Key::loadFromAsciiSafeString($keyGeneral)
         );
         $stackWrapper = new StackWrapper();
         $stackWrapper->setGeneralKey($keyGeneral);
@@ -89,11 +85,9 @@ class StackWrapperDataTest extends TestCase
         $keyGeneral = Key::createNewRandomKey()->saveToAsciiSafeString();
         $keyStack = Key::createNewRandomKey()->saveToAsciiSafeString();
         $inCipher = Crypto::encrypt('fooBar', Key::loadFromAsciiSafeString($keyStack));
-        $encrypted = base64_encode(
-            Crypto::encrypt(
-                json_encode(['stacks' => ['my-stack' => $inCipher]]),
-                Key::loadFromAsciiSafeString($keyGeneral)
-            )
+        $encrypted = Crypto::encrypt(
+            json_encode(['stacks' => ['my-stack' => $inCipher]]),
+            Key::loadFromAsciiSafeString($keyGeneral)
         );
         $stackWrapper = new StackWrapper();
         $stackWrapper->setGeneralKey($keyGeneral);
@@ -110,15 +104,13 @@ class StackWrapperDataTest extends TestCase
         $inCipher1 = Crypto::encrypt('fooBar', Key::loadFromAsciiSafeString($keyStack));
         $inCipher2 = Crypto::encrypt('barKochba', Key::loadFromAsciiSafeString($keyStack));
         $inCipher3 = Crypto::encrypt('barFoo', Key::loadFromAsciiSafeString($keyStack));
-        $encrypted = base64_encode(
-            Crypto::encrypt(
-                json_encode(
-                    ['stacks' =>
-                        ['my-stack' => $inCipher1, 'another-stack' => $inCipher2, 'yet-another-stack' => $inCipher3]
-                    ]
-                ),
-                Key::loadFromAsciiSafeString($keyGeneral)
-            )
+        $encrypted = Crypto::encrypt(
+            json_encode(
+                ['stacks' =>
+                    ['my-stack' => $inCipher1, 'another-stack' => $inCipher2, 'yet-another-stack' => $inCipher3]
+                ]
+            ),
+            Key::loadFromAsciiSafeString($keyGeneral)
         );
         $stackWrapper = new StackWrapper();
         $stackWrapper->setGeneralKey($keyGeneral);
@@ -139,15 +131,13 @@ class StackWrapperDataTest extends TestCase
         $inCipher1 = Crypto::encrypt('fooBar', Key::loadFromAsciiSafeString($keyStack));
         $inCipher2 = Crypto::encrypt('barKochba', Key::createNewRandomKey());
         $inCipher3 = Crypto::encrypt('barFoo', Key::loadFromAsciiSafeString($keyStack));
-        $encrypted = base64_encode(
-            Crypto::encrypt(
-                json_encode(
-                    ['stacks' =>
-                        ['my-stack' => $inCipher1, 'another-stack' => $inCipher2, 'yet-another-stack' => $inCipher3]
-                    ]
-                ),
-                Key::loadFromAsciiSafeString($keyGeneral)
-            )
+        $encrypted = Crypto::encrypt(
+            json_encode(
+                ['stacks' =>
+                    ['my-stack' => $inCipher1, 'another-stack' => $inCipher2, 'yet-another-stack' => $inCipher3]
+                ]
+            ),
+            Key::loadFromAsciiSafeString($keyGeneral)
         );
         $stackWrapper = new StackWrapper();
         $stackWrapper->setGeneralKey($keyGeneral);
@@ -166,11 +156,9 @@ class StackWrapperDataTest extends TestCase
         $keyGeneral = Key::createNewRandomKey()->saveToAsciiSafeString();
         $keyStack = Key::createNewRandomKey()->saveToAsciiSafeString();
         $inCipher = Crypto::encrypt('fooBar', Key::createNewRandomKey());
-        $encrypted = base64_encode(
-            Crypto::encrypt(
-                json_encode(['stacks' => ['my-stack' => $inCipher]]),
-                Key::loadFromAsciiSafeString($keyGeneral)
-            )
+        $encrypted = Crypto::encrypt(
+            json_encode(['stacks' => ['my-stack' => $inCipher]]),
+            Key::loadFromAsciiSafeString($keyGeneral)
         );
         $stackWrapper = new StackWrapper();
         $stackWrapper->setGeneralKey($keyGeneral);
@@ -188,11 +176,9 @@ class StackWrapperDataTest extends TestCase
         $keyGeneral = Key::createNewRandomKey()->saveToAsciiSafeString();
         $keyStack = Key::createNewRandomKey()->saveToAsciiSafeString();
         $inCipher = Crypto::encrypt('fooBar', Key::loadFromAsciiSafeString($keyStack));
-        $encrypted = base64_encode(
-            Crypto::encrypt(
-                json_encode(['stacks' => ['not-my-stack' => $inCipher]]),
-                Key::loadFromAsciiSafeString($keyGeneral)
-            )
+        $encrypted = Crypto::encrypt(
+            json_encode(['stacks' => ['not-my-stack' => $inCipher]]),
+            Key::loadFromAsciiSafeString($keyGeneral)
         );
         $stackWrapper = new StackWrapper();
         $stackWrapper->setGeneralKey($keyGeneral);
@@ -206,11 +192,9 @@ class StackWrapperDataTest extends TestCase
         $keyGeneral = Key::createNewRandomKey()->saveToAsciiSafeString();
         $keyStack = Key::createNewRandomKey()->saveToAsciiSafeString();
         $inCipher = Crypto::encrypt('fooBar', Key::loadFromAsciiSafeString($keyStack));
-        $encrypted = base64_encode(
-            Crypto::encrypt(
-                json_encode(['stacks' => ['my-stack' => $inCipher]]),
-                Key::loadFromAsciiSafeString($keyGeneral)
-            )
+        $encrypted = Crypto::encrypt(
+            json_encode(['stacks' => ['my-stack' => $inCipher]]),
+            Key::loadFromAsciiSafeString($keyGeneral)
         );
         $stackWrapper = new StackWrapper();
         $stackWrapper->setGeneralKey($keyGeneral);
@@ -225,11 +209,9 @@ class StackWrapperDataTest extends TestCase
         $keyGeneral = Key::createNewRandomKey()->saveToAsciiSafeString();
         $keyStack = Key::createNewRandomKey()->saveToAsciiSafeString();
         $inCipher = Crypto::encrypt('fooBar', Key::loadFromAsciiSafeString($keyStack));
-        $encrypted = base64_encode(
-            Crypto::encrypt(
-                json_encode(['stacks' => ['my-stack' => $inCipher], 'cmp' => 'keboola.docker-demo-app']),
-                Key::loadFromAsciiSafeString($keyGeneral)
-            )
+        $encrypted = Crypto::encrypt(
+            json_encode(['stacks' => ['my-stack' => $inCipher], 'cmp' => 'keboola.docker-demo-app']),
+            Key::loadFromAsciiSafeString($keyGeneral)
         );
         $stackWrapper = new StackWrapper();
         $stackWrapper->setGeneralKey($keyGeneral);
@@ -248,11 +230,9 @@ class StackWrapperDataTest extends TestCase
         $keyGeneral = Key::createNewRandomKey()->saveToAsciiSafeString();
         $keyStack = Key::createNewRandomKey()->saveToAsciiSafeString();
         $inCipher = Crypto::encrypt('fooBar', Key::loadFromAsciiSafeString($keyStack));
-        $encrypted = base64_encode(
-            Crypto::encrypt(
-                json_encode(['stacks' => ['my-stack' => $inCipher], 'cmp' => 'keboola.docker-demo-app']),
-                Key::loadFromAsciiSafeString($keyGeneral)
-            )
+        $encrypted = Crypto::encrypt(
+            json_encode(['stacks' => ['my-stack' => $inCipher], 'cmp' => 'keboola.docker-demo-app']),
+            Key::loadFromAsciiSafeString($keyGeneral)
         );
         $stackWrapper = new StackWrapper();
         $stackWrapper->setGeneralKey($keyGeneral);
@@ -270,11 +250,9 @@ class StackWrapperDataTest extends TestCase
         $keyGeneral = Key::createNewRandomKey()->saveToAsciiSafeString();
         $keyStack = Key::createNewRandomKey()->saveToAsciiSafeString();
         $inCipher = Crypto::encrypt('fooBar', Key::loadFromAsciiSafeString($keyStack));
-        $encrypted = base64_encode(
-            Crypto::encrypt(
-                json_encode(['stacks' => ['my-stack' => $inCipher], 'cmp' => 'keboola.docker-demo-app']),
-                Key::loadFromAsciiSafeString($keyGeneral)
-            )
+        $encrypted = Crypto::encrypt(
+            json_encode(['stacks' => ['my-stack' => $inCipher], 'cmp' => 'keboola.docker-demo-app']),
+            Key::loadFromAsciiSafeString($keyGeneral)
         );
         $stackWrapper = new StackWrapper();
         $stackWrapper->setGeneralKey($keyGeneral);
@@ -289,11 +267,9 @@ class StackWrapperDataTest extends TestCase
         $keyGeneral = Key::createNewRandomKey()->saveToAsciiSafeString();
         $keyStack = Key::createNewRandomKey()->saveToAsciiSafeString();
         $inCipher = Crypto::encrypt('fooBar', Key::loadFromAsciiSafeString($keyStack));
-        $encrypted = base64_encode(
-            Crypto::encrypt(
-                json_encode(['stacks' => ['my-stack' => $inCipher]]),
-                Key::loadFromAsciiSafeString($keyGeneral)
-            )
+        $encrypted = Crypto::encrypt(
+            json_encode(['stacks' => ['my-stack' => $inCipher]]),
+            Key::loadFromAsciiSafeString($keyGeneral)
         );
         $stackWrapper = new StackWrapper();
         $stackWrapper->setGeneralKey($keyGeneral);
@@ -308,11 +284,9 @@ class StackWrapperDataTest extends TestCase
         $keyGeneral = Key::createNewRandomKey()->saveToAsciiSafeString();
         $keyStack = Key::createNewRandomKey()->saveToAsciiSafeString();
         $inCipher = Crypto::encrypt('fooBar', Key::loadFromAsciiSafeString($keyStack));
-        $encrypted = base64_encode(
-            Crypto::encrypt(
-                json_encode(['stacks' => ['my-stack' => $inCipher], 'prj' => '123']),
-                Key::loadFromAsciiSafeString($keyGeneral)
-            )
+        $encrypted = Crypto::encrypt(
+            json_encode(['stacks' => ['my-stack' => $inCipher], 'prj' => '123']),
+            Key::loadFromAsciiSafeString($keyGeneral)
         );
         $stackWrapper = new StackWrapper();
         $stackWrapper->setGeneralKey($keyGeneral);
@@ -331,11 +305,9 @@ class StackWrapperDataTest extends TestCase
         $keyGeneral = Key::createNewRandomKey()->saveToAsciiSafeString();
         $keyStack = Key::createNewRandomKey()->saveToAsciiSafeString();
         $inCipher = Crypto::encrypt('fooBar', Key::loadFromAsciiSafeString($keyStack));
-        $encrypted = base64_encode(
-            Crypto::encrypt(
-                json_encode(['stacks' => ['my-stack' => $inCipher], 'prj' => '123']),
-                Key::loadFromAsciiSafeString($keyGeneral)
-            )
+        $encrypted = Crypto::encrypt(
+            json_encode(['stacks' => ['my-stack' => $inCipher], 'prj' => '123']),
+            Key::loadFromAsciiSafeString($keyGeneral)
         );
         $stackWrapper = new StackWrapper();
         $stackWrapper->setGeneralKey($keyGeneral);
@@ -353,11 +325,9 @@ class StackWrapperDataTest extends TestCase
         $keyGeneral = Key::createNewRandomKey()->saveToAsciiSafeString();
         $keyStack = Key::createNewRandomKey()->saveToAsciiSafeString();
         $inCipher = Crypto::encrypt('fooBar', Key::loadFromAsciiSafeString($keyStack));
-        $encrypted = base64_encode(
-            Crypto::encrypt(
-                json_encode(['stacks' => ['my-stack' => $inCipher], 'prj' => '123']),
-                Key::loadFromAsciiSafeString($keyGeneral)
-            )
+        $encrypted = Crypto::encrypt(
+            json_encode(['stacks' => ['my-stack' => $inCipher], 'prj' => '123']),
+            Key::loadFromAsciiSafeString($keyGeneral)
         );
         $stackWrapper = new StackWrapper();
         $stackWrapper->setGeneralKey($keyGeneral);
@@ -376,12 +346,10 @@ class StackWrapperDataTest extends TestCase
         $keyGeneral = Key::createNewRandomKey()->saveToAsciiSafeString();
         $keyStack = Key::createNewRandomKey()->saveToAsciiSafeString();
         $inCipher = Crypto::encrypt('fooBar', Key::loadFromAsciiSafeString($keyStack));
-        $encrypted = base64_encode(
-            Crypto::encrypt(
-                // values inside the crypt struct are always strings
-                json_encode(['stacks' => ['my-stack' => $inCipher], 'prj' => 123]),
-                Key::loadFromAsciiSafeString($keyGeneral)
-            )
+        $encrypted = Crypto::encrypt(
+            // values inside the crypt struct are always strings
+            json_encode(['stacks' => ['my-stack' => $inCipher], 'prj' => 123]),
+            Key::loadFromAsciiSafeString($keyGeneral)
         );
         $stackWrapper = new StackWrapper();
         $stackWrapper->setGeneralKey($keyGeneral);
@@ -396,11 +364,9 @@ class StackWrapperDataTest extends TestCase
         $keyGeneral = Key::createNewRandomKey()->saveToAsciiSafeString();
         $keyStack = Key::createNewRandomKey()->saveToAsciiSafeString();
         $inCipher = Crypto::encrypt('fooBar', Key::loadFromAsciiSafeString($keyStack));
-        $encrypted = base64_encode(
-            Crypto::encrypt(
-                json_encode(['stacks' => ['my-stack' => $inCipher], 'cfg' => '12345']),
-                Key::loadFromAsciiSafeString($keyGeneral)
-            )
+        $encrypted = Crypto::encrypt(
+            json_encode(['stacks' => ['my-stack' => $inCipher], 'cfg' => '12345']),
+            Key::loadFromAsciiSafeString($keyGeneral)
         );
         $stackWrapper = new StackWrapper();
         $stackWrapper->setGeneralKey($keyGeneral);
@@ -415,11 +381,9 @@ class StackWrapperDataTest extends TestCase
         $keyGeneral = Key::createNewRandomKey()->saveToAsciiSafeString();
         $keyStack = Key::createNewRandomKey()->saveToAsciiSafeString();
         $inCipher = Crypto::encrypt('fooBar', Key::loadFromAsciiSafeString($keyStack));
-        $encrypted = base64_encode(
-            Crypto::encrypt(
-                json_encode(['stacks' => ['my-stack' => $inCipher], 'cfg' => '12345']),
-                Key::loadFromAsciiSafeString($keyGeneral)
-            )
+        $encrypted = Crypto::encrypt(
+            json_encode(['stacks' => ['my-stack' => $inCipher], 'cfg' => '12345']),
+            Key::loadFromAsciiSafeString($keyGeneral)
         );
         $stackWrapper = new StackWrapper();
         $stackWrapper->setGeneralKey($keyGeneral);
@@ -438,11 +402,9 @@ class StackWrapperDataTest extends TestCase
         $keyGeneral = Key::createNewRandomKey()->saveToAsciiSafeString();
         $keyStack = Key::createNewRandomKey()->saveToAsciiSafeString();
         $inCipher = Crypto::encrypt('fooBar', Key::loadFromAsciiSafeString($keyStack));
-        $encrypted = base64_encode(
-            Crypto::encrypt(
-                json_encode(['stacks' => ['my-stack' => $inCipher], 'cfg' => '12345']),
-                Key::loadFromAsciiSafeString($keyGeneral)
-            )
+        $encrypted = Crypto::encrypt(
+            json_encode(['stacks' => ['my-stack' => $inCipher], 'cfg' => '12345']),
+            Key::loadFromAsciiSafeString($keyGeneral)
         );
         $stackWrapper = new StackWrapper();
         $stackWrapper->setGeneralKey($keyGeneral);
@@ -460,11 +422,9 @@ class StackWrapperDataTest extends TestCase
         $keyGeneral = Key::createNewRandomKey()->saveToAsciiSafeString();
         $keyStack = Key::createNewRandomKey()->saveToAsciiSafeString();
         $inCipher = Crypto::encrypt('fooBar', Key::loadFromAsciiSafeString($keyStack));
-        $encrypted = base64_encode(
-            Crypto::encrypt(
-                json_encode(['stacks' => ['my-stack' => $inCipher], 'cfg' => '12345']),
-                Key::loadFromAsciiSafeString($keyGeneral)
-            )
+        $encrypted = Crypto::encrypt(
+            json_encode(['stacks' => ['my-stack' => $inCipher], 'cfg' => '12345']),
+            Key::loadFromAsciiSafeString($keyGeneral)
         );
         $stackWrapper = new StackWrapper();
         $stackWrapper->setGeneralKey($keyGeneral);
@@ -479,18 +439,16 @@ class StackWrapperDataTest extends TestCase
         $keyGeneral = Key::createNewRandomKey()->saveToAsciiSafeString();
         $keyStack = Key::createNewRandomKey()->saveToAsciiSafeString();
         $inCipher = Crypto::encrypt('fooBar', Key::loadFromAsciiSafeString($keyStack));
-        $encrypted = base64_encode(
-            Crypto::encrypt(
-                json_encode(
-                    [
-                        'stacks' => ['my-stack' => $inCipher],
-                        'cmp' => 'keboola.docker-demo-app',
-                        'prj' => '123',
-                        'cfg' => '12345'
-                    ]
-                ),
-                Key::loadFromAsciiSafeString($keyGeneral)
-            )
+        $encrypted = Crypto::encrypt(
+            json_encode(
+                [
+                    'stacks' => ['my-stack' => $inCipher],
+                    'cmp' => 'keboola.docker-demo-app',
+                    'prj' => '123',
+                    'cfg' => '12345'
+                ]
+            ),
+            Key::loadFromAsciiSafeString($keyGeneral)
         );
         $stackWrapper = new StackWrapper();
         $stackWrapper->setGeneralKey($keyGeneral);
@@ -511,18 +469,16 @@ class StackWrapperDataTest extends TestCase
         $keyGeneral = Key::createNewRandomKey()->saveToAsciiSafeString();
         $keyStack = Key::createNewRandomKey()->saveToAsciiSafeString();
         $inCipher = Crypto::encrypt('fooBar', Key::loadFromAsciiSafeString($keyStack));
-        $encrypted = base64_encode(
-            Crypto::encrypt(
-                json_encode(
-                    [
-                        'stacks' => ['my-stack' => $inCipher],
-                        'cmp' => 'keboola.docker-demo-app',
-                        'prj' => '123',
-                        'cfg' => '12345'
-                    ]
-                ),
-                Key::loadFromAsciiSafeString($keyGeneral)
-            )
+        $encrypted = Crypto::encrypt(
+            json_encode(
+                [
+                    'stacks' => ['my-stack' => $inCipher],
+                    'cmp' => 'keboola.docker-demo-app',
+                    'prj' => '123',
+                    'cfg' => '12345'
+                ]
+            ),
+            Key::loadFromAsciiSafeString($keyGeneral)
         );
         $stackWrapper = new StackWrapper();
         $stackWrapper->setGeneralKey($keyGeneral);
@@ -543,18 +499,16 @@ class StackWrapperDataTest extends TestCase
         $keyGeneral = Key::createNewRandomKey()->saveToAsciiSafeString();
         $keyStack = Key::createNewRandomKey()->saveToAsciiSafeString();
         $inCipher = Crypto::encrypt('fooBar', Key::loadFromAsciiSafeString($keyStack));
-        $encrypted = base64_encode(
-            Crypto::encrypt(
-                json_encode(
-                    [
-                        'stacks' => ['my-stack' => $inCipher],
-                        'cmp' => 'keboola.docker-demo-app',
-                        'prj' => '123',
-                        'cfg' => '12345'
-                    ]
-                ),
-                Key::loadFromAsciiSafeString($keyGeneral)
-            )
+        $encrypted = Crypto::encrypt(
+            json_encode(
+                [
+                    'stacks' => ['my-stack' => $inCipher],
+                    'cmp' => 'keboola.docker-demo-app',
+                    'prj' => '123',
+                    'cfg' => '12345'
+                ]
+            ),
+            Key::loadFromAsciiSafeString($keyGeneral)
         );
         $stackWrapper = new StackWrapper();
         $stackWrapper->setGeneralKey($keyGeneral);
@@ -575,18 +529,16 @@ class StackWrapperDataTest extends TestCase
         $keyGeneral = Key::createNewRandomKey()->saveToAsciiSafeString();
         $keyStack = Key::createNewRandomKey()->saveToAsciiSafeString();
         $inCipher = Crypto::encrypt('fooBar', Key::loadFromAsciiSafeString($keyStack));
-        $encrypted = base64_encode(
-            Crypto::encrypt(
-                json_encode(
-                    [
-                        'stacks' => ['my-stack' => $inCipher],
-                        'cmp' => 'keboola.docker-demo-app',
-                        'prj' => '123',
-                        'cfg' => '12345'
-                    ]
-                ),
-                Key::loadFromAsciiSafeString($keyGeneral)
-            )
+        $encrypted = Crypto::encrypt(
+            json_encode(
+                [
+                    'stacks' => ['my-stack' => $inCipher],
+                    'cmp' => 'keboola.docker-demo-app',
+                    'prj' => '123',
+                    'cfg' => '12345'
+                ]
+            ),
+            Key::loadFromAsciiSafeString($keyGeneral)
         );
         $stackWrapper = new StackWrapper();
         $stackWrapper->setGeneralKey($keyGeneral);
@@ -607,18 +559,16 @@ class StackWrapperDataTest extends TestCase
         $keyGeneral = Key::createNewRandomKey()->saveToAsciiSafeString();
         $keyStack = Key::createNewRandomKey()->saveToAsciiSafeString();
         $inCipher = Crypto::encrypt('fooBar', Key::loadFromAsciiSafeString($keyStack));
-        $encrypted = base64_encode(
-            Crypto::encrypt(
-                json_encode(
-                    [
-                        'stacks' => ['my-stack' => $inCipher],
-                        'cmp' => 'keboola.docker-demo-app',
-                        'prj' => '123',
-                        'cfg' => '12345'
-                    ]
-                ),
-                Key::loadFromAsciiSafeString($keyGeneral)
-            )
+        $encrypted = Crypto::encrypt(
+            json_encode(
+                [
+                    'stacks' => ['my-stack' => $inCipher],
+                    'cmp' => 'keboola.docker-demo-app',
+                    'prj' => '123',
+                    'cfg' => '12345'
+                ]
+            ),
+            Key::loadFromAsciiSafeString($keyGeneral)
         );
         $stackWrapper = new StackWrapper();
         $stackWrapper->setGeneralKey($keyGeneral);

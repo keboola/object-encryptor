@@ -166,7 +166,7 @@ class StackWrapper implements CryptoWrapperInterface
     private function generalDecipher($encryptedData)
     {
         try {
-            $jsonString = Crypto::Decrypt(base64_decode($this->stripPrefix($encryptedData)), $this->keyGeneralKey);
+            $jsonString = Crypto::Decrypt($this->stripPrefix($encryptedData), $this->keyGeneralKey);
         } catch (\Exception $e) {
             throw new EncryptionException("Invalid cipher");
         }
@@ -197,7 +197,7 @@ class StackWrapper implements CryptoWrapperInterface
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new EncryptionException("Serialization of encrypted data failed: " . json_last_error_msg());
         }
-        return $this->addPrefix(base64_encode(Crypto::Encrypt($jsonString, $this->keyGeneralKey)));
+        return $this->addPrefix(Crypto::Encrypt($jsonString, $this->keyGeneralKey));
     }
 
     /**

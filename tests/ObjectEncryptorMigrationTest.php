@@ -3,10 +3,6 @@
 namespace Keboola\ObjectEncryptor\Tests;
 
 use Defuse\Crypto\Key;
-use Keboola\ObjectEncryptor\Exception\ApplicationException;
-use Keboola\ObjectEncryptor\Exception\UserException;
-use Keboola\ObjectEncryptor\Legacy\Encryptor;
-use Keboola\ObjectEncryptor\ObjectEncryptor;
 use Keboola\ObjectEncryptor\ObjectEncryptorFactory;
 use Keboola\ObjectEncryptor\Wrapper\StackWrapper;
 use PHPUnit\Framework\TestCase;
