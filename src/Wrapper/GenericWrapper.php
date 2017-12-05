@@ -10,6 +10,9 @@ use Keboola\ObjectEncryptor\Exception\UserException;
 
 class GenericWrapper implements CryptoWrapperInterface
 {
+    const KEY_METADATA = 'metadata';
+    const KEY_VALUE = 'value';
+
     /**
      * @var string
      */
@@ -107,10 +110,10 @@ class GenericWrapper implements CryptoWrapperInterface
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new UserException('Deserialization of decrypted data failed: ' . json_last_error_msg());
         }
-        if (!isset($data['metadata']) || !isset($data['value']) || !is_array($data['metadata'])) {
+        if (!isset($data[self::KEY_METADATA]) || !isset($data[self::KEY_VALUE]) || !is_array($data[self::KEY_METADATA])) {
             throw new UserException('Invalid cipher data');
         }
-        foreach ($data['metadata'] as $key => $value) {
+        foreach ($data[self::KEY_METADATA] as $key => $value) {
             if (!empty($value) && (empty($this->metadata[$key]) || $value !== $this->metadata[$key])) {
                 throw new UserException('Invalid metadata');
             }
@@ -169,11 +172,11 @@ class GenericWrapper implements CryptoWrapperInterface
         } catch (\Exception $e) {
             throw new ApplicationException($e->getMessage());
         }
-        $result = ['metadata' => []];
+        $result = [self::KEY_METADATA => []];
         foreach ($this->metadata as $key => $value) {
-            $result['metadata'][$key] = $value;
+            $result[self::KEY_METADATA][$key] = $value;
         }
-        $result['value'] = $encrypted;
+        $result[self::KEY_VALUE] = $encrypted;
         return $this->generalCipher($result);
     }
 

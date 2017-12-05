@@ -84,7 +84,10 @@ class CipherDataTest extends TestCase
         $keyStack = Key::createNewRandomKey()->saveToAsciiSafeString();
         $inCipher = Crypto::encrypt('fooBar', Key::loadFromAsciiSafeString($keyStack));
         $encrypted = Crypto::encrypt(
-            json_encode(['metadata' => [], 'value' => $inCipher]),
+            json_encode([
+                GenericWrapper::KEY_METADATA => [],
+                GenericWrapper::KEY_VALUE => $inCipher
+            ]),
             Key::loadFromAsciiSafeString($keyGeneral)
         );
         $wrapper = new GenericWrapper();
@@ -104,7 +107,10 @@ class CipherDataTest extends TestCase
         $keyStack = Key::createNewRandomKey()->saveToAsciiSafeString();
         $inCipher = Crypto::encrypt('fooBar', Key::createNewRandomKey());
         $encrypted = Crypto::encrypt(
-            json_encode(['stacks' => ['my-stack' => $inCipher]]),
+            json_encode([
+                GenericWrapper::KEY_METADATA => [],
+                GenericWrapper::KEY_VALUE => $inCipher
+            ]),
             Key::loadFromAsciiSafeString($keyGeneral)
         );
         $wrapper = new GenericWrapper();
@@ -119,7 +125,10 @@ class CipherDataTest extends TestCase
         $keyStack = Key::createNewRandomKey()->saveToAsciiSafeString();
         $inCipher = Crypto::encrypt('fooBar', Key::loadFromAsciiSafeString($keyStack));
         $encrypted = Crypto::encrypt(
-            json_encode(['metadata' => ['stackId' => 'my-stack'], 'value' => $inCipher]),
+            json_encode([
+                GenericWrapper::KEY_METADATA => ['stackId' => 'my-stack'],
+                GenericWrapper::KEY_VALUE => $inCipher
+            ]),
             Key::loadFromAsciiSafeString($keyGeneral)
         );
         $wrapper = new GenericWrapper();
@@ -139,7 +148,10 @@ class CipherDataTest extends TestCase
         $keyStack = Key::createNewRandomKey()->saveToAsciiSafeString();
         $inCipher = Crypto::encrypt('fooBar', Key::loadFromAsciiSafeString($keyStack));
         $encrypted = Crypto::encrypt(
-            json_encode(['metadata' => ['stackId' => 'my-stack'], 'value' => $inCipher]),
+            json_encode([
+                GenericWrapper::KEY_METADATA => ['stackId' => 'my-stack'],
+                GenericWrapper::KEY_VALUE => $inCipher
+            ]),
             Key::loadFromAsciiSafeString($keyGeneral)
         );
         $wrapper = new GenericWrapper();
@@ -155,7 +167,10 @@ class CipherDataTest extends TestCase
         $keyStack = Key::createNewRandomKey()->saveToAsciiSafeString();
         $inCipher = Crypto::encrypt('fooBar', Key::loadFromAsciiSafeString($keyStack));
         $encrypted = Crypto::encrypt(
-            json_encode(['metadata' => [ComponentDefinitionWrapper::KEY_COMPONENT => 'dummy-component'], 'value' => $inCipher]),
+            json_encode([
+                GenericWrapper::KEY_METADATA => [ComponentDefinitionWrapper::KEY_COMPONENT => 'dummy-component'],
+                GenericWrapper::KEY_VALUE => $inCipher
+            ]),
             Key::loadFromAsciiSafeString($keyGeneral)
         );
         $wrapper = new ComponentDefinitionWrapper();
@@ -175,7 +190,10 @@ class CipherDataTest extends TestCase
         $keyStack = Key::createNewRandomKey()->saveToAsciiSafeString();
         $inCipher = Crypto::encrypt('fooBar', Key::loadFromAsciiSafeString($keyStack));
         $encrypted = Crypto::encrypt(
-            json_encode(['metadata' => ['componentId' => 'dummy-component'], 'value' => $inCipher]),
+            json_encode([
+                GenericWrapper::KEY_METADATA => ['componentId' => 'dummy-component'],
+                GenericWrapper::KEY_VALUE => $inCipher
+            ]),
             Key::loadFromAsciiSafeString($keyGeneral)
         );
         $wrapper = new GenericWrapper();
@@ -190,7 +208,10 @@ class CipherDataTest extends TestCase
         $keyStack = Key::createNewRandomKey()->saveToAsciiSafeString();
         $inCipher = Crypto::encrypt('fooBar', Key::loadFromAsciiSafeString($keyStack));
         $encrypted = Crypto::encrypt(
-            json_encode(['metadata' => [ComponentDefinitionWrapper::KEY_COMPONENT => 'dummy-component'], 'value' => $inCipher]),
+            json_encode([
+                GenericWrapper::KEY_METADATA => [ComponentDefinitionWrapper::KEY_COMPONENT => 'dummy-component'],
+                GenericWrapper::KEY_VALUE => $inCipher
+            ]),
             Key::loadFromAsciiSafeString($keyGeneral)
         );
         $wrapper = new ComponentDefinitionWrapper();
@@ -207,11 +228,11 @@ class CipherDataTest extends TestCase
         $inCipher = Crypto::encrypt('fooBar', Key::loadFromAsciiSafeString($keyStack));
         $encrypted = Crypto::encrypt(
             json_encode([
-                'metadata' => [
+                GenericWrapper::KEY_METADATA => [
                     ConfigurationWrapper::KEY_COMPONENT => 'dummy-component',
                     ConfigurationWrapper::KEY_STACK => 'my-stack'
                 ],
-                'value' => $inCipher
+                GenericWrapper::KEY_VALUE => $inCipher
             ]),
             Key::loadFromAsciiSafeString($keyGeneral)
         );
@@ -229,7 +250,10 @@ class CipherDataTest extends TestCase
         $keyStack = Key::createNewRandomKey()->saveToAsciiSafeString();
         $inCipher = Crypto::encrypt('fooBar', Key::loadFromAsciiSafeString($keyStack));
         $encrypted = Crypto::encrypt(
-            json_encode(['metadata' => ['componentId' => 'dummy-component', 'stackId' => 'my-stack'], 'value' => $inCipher]),
+            json_encode([
+                GenericWrapper::KEY_METADATA => ['componentId' => 'dummy-component', 'stackId' => 'my-stack'],
+                GenericWrapper::KEY_VALUE => $inCipher
+            ]),
             Key::loadFromAsciiSafeString($keyGeneral)
         );
         $wrapper = new GenericWrapper();
