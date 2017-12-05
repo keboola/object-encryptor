@@ -10,7 +10,7 @@
          syntaxCheck="false"
          bootstrap="vendor/autoload.php">
 
-    <testsuite name="API Test Suite">
+    <testsuite name="Test Suite">
         <directory>tests</directory>
     </testsuite>
     <filter>

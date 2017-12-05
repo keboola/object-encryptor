@@ -47,6 +47,7 @@ class BaseWrapper implements CryptoWrapperInterface
     /**
      * @param $data string data to encrypt
      * @return string encrypted data
+     * @throws \CannotPerformOperationException
      */
     public function encrypt($data)
     {
@@ -56,6 +57,8 @@ class BaseWrapper implements CryptoWrapperInterface
     /**
      * @param $encryptedData string
      * @return string decrypted data
+     * @throws \CannotPerformOperationException
+     * @throws \InvalidCiphertextException
      */
     public function decrypt($encryptedData)
     {

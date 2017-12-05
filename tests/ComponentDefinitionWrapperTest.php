@@ -1,0 +1,164 @@
+<?php
+
+namespace Keboola\ObjectEncryptor\Tests;
+
+use Defuse\Crypto\Key;
+use Keboola\ObjectEncryptor\Wrapper\ComponentDefinitionWrapper;
+use PHPUnit\Framework\TestCase;
+
+class ComponentDefinitionWrapperTest extends TestCase
+{
+    /**
+     * @return ComponentDefinitionWrapper
+     * @throws \Defuse\Crypto\Exception\EnvironmentIsBrokenException
+     */
+    private function getComponentWrapper()
+    {
+        $generalKey = Key::createNewRandomKey()->saveToAsciiSafeString();
+        $stackKey = Key::createNewRandomKey()->saveToAsciiSafeString();
+        $wrapper = new ComponentDefinitionWrapper();
+        $wrapper->setGeneralKey($generalKey);
+        $wrapper->setStackKey($stackKey);
+        $wrapper->setComponentId('dummy-component');
+        return $wrapper;
+    }
+
+    public function testEncrypt()
+    {
+        $wrapper = $this->getComponentWrapper();
+        $secret = 'mySecretValue';
+        $encrypted = $wrapper->encrypt($secret);
+        self::assertNotEquals($secret, $encrypted);
+        self::assertEquals($secret, $wrapper->decrypt($encrypted));
+    }
+
+    public function testEncryptStack()
+    {
+        $wrapper = $this->getComponentWrapper();
+        $wrapper->setStackId('my-stack');
+        $secret = 'mySecretValue';
+        $encrypted = $wrapper->encrypt($secret);
+        self::assertNotEquals($secret, $encrypted);
+        self::assertEquals($secret, $wrapper->decrypt($encrypted));
+    }
+
+    /**
+     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
+     * @expectedExceptionMessage Bad init
+     */
+    public function testInvalidSetupEncrypt1()
+    {
+        $wrapper = new ComponentDefinitionWrapper();
+        $wrapper->encrypt('mySecretValue');
+    }
+
+    /**
+     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
+     * @expectedExceptionMessage Bad init
+     */
+    public function testInvalidSetupEncrypt2()
+    {
+        $wrapper = new ComponentDefinitionWrapper();
+        $wrapper->setGeneralKey(Key::createNewRandomKey()->saveToAsciiSafeString());
+        $wrapper->encrypt('mySecretValue');
+    }
+
+    /**
+     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
+     * @expectedExceptionMessage Bad init
+     */
+    public function testInvalidSetupEncrypt3()
+    {
+        $wrapper = new ComponentDefinitionWrapper();
+        $wrapper->setGeneralKey(Key::createNewRandomKey()->saveToAsciiSafeString());
+        $wrapper->setStackKey(Key::createNewRandomKey()->saveToAsciiSafeString());
+        $wrapper->encrypt('mySecretValue');
+    }
+
+    /**
+     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
+     * @expectedExceptionMessage Bad init
+     */
+    public function testInvalidSetupDecrypt1()
+    {
+        $wrapper = new ComponentDefinitionWrapper();
+        $wrapper->decrypt('mySecretValue');
+    }
+
+    /**
+     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
+     * @expectedExceptionMessage Bad init
+     */
+    public function testInvalidSetupDecrypt2()
+    {
+        $wrapper = new ComponentDefinitionWrapper();
+        $wrapper->setGeneralKey(Key::createNewRandomKey()->saveToAsciiSafeString());
+        $wrapper->decrypt('mySecretValue');
+    }
+
+    /**
+     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
+     * @expectedExceptionMessage Bad init
+     */
+    public function testInvalidSetupDecrypt3()
+    {
+        $wrapper = new ComponentDefinitionWrapper();
+        $wrapper->setGeneralKey(Key::createNewRandomKey()->saveToAsciiSafeString());
+        $wrapper->setStackKey(Key::createNewRandomKey()->saveToAsciiSafeString());
+        $wrapper->decrypt('mySecretValue');
+    }
+
+    /**
+     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
+     * @expectedExceptionMessage Invalid Key
+     */
+    public function testInvalidKey1()
+    {
+        $wrapper = new ComponentDefinitionWrapper();
+        $wrapper->setGeneralKey('foobar');
+        $wrapper->setStackKey(Key::createNewRandomKey()->saveToAsciiSafeString());
+        $wrapper->setStackId('my-stack');
+        $wrapper->encrypt('mySecretValue');
+    }
+
+    /**
+     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
+     * @expectedExceptionMessage Invalid Key
+     */
+    public function testInvalidKey2()
+    {
+        $wrapper = new ComponentDefinitionWrapper();
+        $wrapper->setGeneralKey(Key::createNewRandomKey()->saveToAsciiSafeString());
+        $wrapper->setStackKey('foobar');
+        $wrapper->setStackId('my-stack');
+        $wrapper->encrypt('mySecretValue');
+    }
+
+    /**
+     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
+     * @expectedExceptionMessage Invalid Component Id
+     */
+    public function testInvalidComponent()
+    {
+        $wrapper = new ComponentDefinitionWrapper();
+        $wrapper->setGeneralKey(Key::createNewRandomKey()->saveToAsciiSafeString());
+        $wrapper->setStackKey(Key::createNewRandomKey()->saveToAsciiSafeString());
+        $wrapper->setStackId('my-stack');
+        $wrapper->setComponentId(new \stdClass());
+        $wrapper->encrypt('mySecretValue');
+    }
+
+    /**
+     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
+     * @expectedExceptionMessage Invalid Stack
+     */
+    public function testInvalidStack()
+    {
+        $wrapper = new ComponentDefinitionWrapper();
+        $wrapper->setGeneralKey(Key::createNewRandomKey()->saveToAsciiSafeString());
+        $wrapper->setStackKey(Key::createNewRandomKey()->saveToAsciiSafeString());
+        $wrapper->setStackId(new \stdClass());
+        $wrapper->setComponentId('dummy-component');
+        $wrapper->encrypt('mySecretValue');
+    }
+}

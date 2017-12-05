@@ -3,9 +3,10 @@
 namespace Keboola\ObjectEncryptor\Wrapper;
 
 use Defuse\Crypto\Crypto;
+use Defuse\Crypto\Exception\CryptoException;
 use Defuse\Crypto\Key;
 use Keboola\ObjectEncryptor\Exception\ApplicationException;
-use Keboola\ObjectEncryptor\Exception\EncryptionException;
+use Keboola\ObjectEncryptor\Exception\UserException;
 
 class GenericWrapper implements CryptoWrapperInterface
 {
@@ -20,26 +21,6 @@ class GenericWrapper implements CryptoWrapperInterface
     private $generalKey;
 
     /**
-     * @var string
-     */
-    private $stackId;
-
-    /**
-     * @var string
-     */
-    private $componentId = null;
-
-    /**
-     * @var string
-     */
-    private $projectId = null;
-
-    /**
-     * @var string
-     */
-    private $configurationId = null;
-
-    /**
      * @var Key
      */
     private $keyStackKey;
@@ -50,11 +31,9 @@ class GenericWrapper implements CryptoWrapperInterface
     private $keyGeneralKey;
 
     /**
-     * BaseWrapper constructor.
+     * @var array Key value metadata
      */
-    public function __construct()
-    {
-    }
+    private $metadata = [];
 
     /**
      * @param string $key
@@ -73,192 +52,129 @@ class GenericWrapper implements CryptoWrapperInterface
     }
 
     /**
-     * @param string $stackId
+     * Set cipher metadata.
+     * @param string $key
+     * @param string $value
      */
-    public function setStackId($stackId)
+    public function setMetadataValue($key, $value)
     {
-        $this->stackId = $stackId;
+        $this->metadata[$key] = $value;
     }
 
     /**
-     * @param string $componentId
+     * Get metadata value
+     * @param string $key
+     * @return string|null Value or null if key does not exist.
      */
-    public function setComponentId($componentId)
+    protected function getMetadataValue($key)
     {
-        $this->componentId = $componentId;
-    }
-
-    /**
-     * @param string $projectId
-     */
-    public function setProjectId($projectId)
-    {
-        $this->projectId = $projectId;
-    }
-
-    /**
-     * @param string $configurationId
-     */
-    public function setConfigurationId($configurationId)
-    {
-        $this->configurationId = $configurationId;
+        if (isset($this->metadata[$key])) {
+            return $this->metadata[$key];
+        } else {
+            return null;
+        }
     }
 
     /**
      * @throws ApplicationException
      */
-    private function validateState()
+    protected function validateState()
     {
-        if (empty($this->stackId) || empty($this->stackKey) || empty($this->generalKey)) {
-            throw new ApplicationException("Bad init");
-        }
-        if (!is_string($this->stackId)) {
-            throw new ApplicationException("Invalid Stack");
-        }
-        if (!is_null($this->projectId) && !is_string($this->projectId)) {
-            throw new ApplicationException("Invalid Project Id.");
-        }
-        if (!is_null($this->componentId) && !is_string($this->componentId)) {
-            throw new ApplicationException("Invalid Component Id.");
-        }
-        if (!is_null($this->configurationId) && !is_string($this->configurationId)) {
-            throw new ApplicationException("Invalid Configuration Id.");
+        if (empty($this->stackKey) || empty($this->generalKey)) {
+            throw new ApplicationException('Bad init');
         }
         try {
             $this->keyStackKey = Key::loadFromAsciiSafeString($this->stackKey);
             $this->keyGeneralKey = Key::loadFromAsciiSafeString($this->generalKey);
         } catch (\Exception $e) {
-            throw new ApplicationException("Invalid Key");
-        }
-    }
-
-    private function addPrefix($value)
-    {
-        $result = '';
-        if ($this->componentId) {
-            $result .= 'C';
-        }
-        if ($this->projectId) {
-            $result .= 'P';
-        }
-        if ($this->configurationId) {
-            $result .= 'F';
-        }
-        $result .= '::' . $value;
-        return $result;
-    }
-
-    private function stripPrefix($value)
-    {
-        $pos = strpos($value, '::');
-        if ($pos !== false) {
-            return substr($value, $pos + 2);
-        } else {
-            return $value;
+            throw new ApplicationException('Invalid Key');
         }
     }
 
     /**
      * @param string $encryptedData
-     * @return array Cipher structure
-     * @throws EncryptionException
+     * @return string Inner cipher
+     * @throws UserException
      */
     private function generalDecipher($encryptedData)
     {
         try {
-            $jsonString = Crypto::Decrypt($this->stripPrefix($encryptedData), $this->keyGeneralKey);
+            $jsonString = Crypto::Decrypt($encryptedData, $this->keyGeneralKey);
         } catch (\Exception $e) {
-            throw new EncryptionException("Invalid cipher");
+            throw new UserException('Invalid cipher');
         }
         $data = json_decode($jsonString, true);
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new EncryptionException("Deserialization of decrypted data failed: " . json_last_error_msg());
+            throw new UserException('Deserialization of decrypted data failed: ' . json_last_error_msg());
         }
-        if (!empty($data['cfg']) && (empty($this->configurationId) || ($data['cfg'] !== $this->configurationId))) {
-            throw new EncryptionException("Invalid configuration");
+        if (!isset($data['metadata']) || !isset($data['value']) || !is_array($data['metadata'])) {
+            throw new UserException('Invalid cipher data');
         }
-        if (!empty($data['cmp']) && (empty($this->componentId) || ($data['cmp'] !== $this->componentId))) {
-            throw new EncryptionException("Invalid component");
+        foreach ($data['metadata'] as $key => $value) {
+            if (!empty($value) && (empty($this->metadata[$key]) || $value !== $this->metadata[$key])) {
+                throw new UserException('Invalid metadata');
+            }
         }
-        if (!empty($data['prj']) && (empty($this->projectId) || ($data['prj'] !== $this->projectId))) {
-            throw new EncryptionException("Invalid project");
-        }
-        return $data;
+        return $data['value'];
     }
 
     /**
      * @param array $data Cipher data.
      * @return string Encrypted string.
-     * @throws EncryptionException
+     * @throws ApplicationException
      */
     private function generalCipher($data)
     {
         $jsonString = json_encode($data);
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new EncryptionException("Serialization of encrypted data failed: " . json_last_error_msg());
+            throw new ApplicationException('Serialization of encrypted data failed: ' . json_last_error_msg());
         }
-        return $this->addPrefix(Crypto::Encrypt($jsonString, $this->keyGeneralKey));
+        try {
+            return Crypto::Encrypt($jsonString, $this->keyGeneralKey);
+        } catch (\Exception $e) {
+            throw new ApplicationException("Ciphering failed " . $e->getMessage(), $e);
+        }
     }
 
     /**
      * @param $encryptedData string
      * @return string decrypted data
-     * @throws EncryptionException
+     * @throws UserException
+     * @throws ApplicationException
      */
     public function decrypt($encryptedData)
     {
         $this->validateState();
-        $data = $this->generalDecipher($encryptedData);
-        if (empty($data['stacks'][$this->stackId])) {
-            throw new EncryptionException("Invalid stack");
-        }
         try {
-            return Crypto::Decrypt($data['stacks'][$this->stackId], $this->keyStackKey);
-        } catch (\Exception $e) {
-            throw new EncryptionException("Invalid cipher");
+            return Crypto::Decrypt($this->generalDecipher($encryptedData), $this->keyStackKey);
+        } catch (CryptoException $e) {
+            throw new UserException('Invalid cipher');
         }
     }
 
     /**
-     * @param $data string data to encrypt
+     * @param string $data string data to encrypt
      * @return string encrypted data
-     * @throws EncryptionException
+     * @throws ApplicationException
+     * @throws UserException
      */
     public function encrypt($data)
     {
+        if (!is_scalar($data) && !is_null($data)) {
+            throw new UserException('Cannot encrypt a non-scalar value');
+        }
         $this->validateState();
-        $encrypted = Crypto::Encrypt($data, $this->keyStackKey);
-        $result = [];
-        if ($this->configurationId) {
-            $result['cfg'] = $this->configurationId;
+        try {
+            $encrypted = Crypto::Encrypt($data, $this->keyStackKey);
+        } catch (\Exception $e) {
+            throw new ApplicationException($e->getMessage());
         }
-        if ($this->componentId) {
-            $result['cmp'] = $this->componentId;
+        $result = ['metadata' => []];
+        foreach ($this->metadata as $key => $value) {
+            $result['metadata'][$key] = $value;
         }
-        if ($this->projectId) {
-            $result['prj'] = $this->projectId;
-        }
-        $result['stacks'][$this->stackId] = $encrypted;
+        $result['value'] = $encrypted;
         return $this->generalCipher($result);
-    }
-
-    /**
-     * Add a new stack data to cipher.
-     * @param string $encryptedData Encrypted data.
-     * @param string $newData New encrypted data.
-     * @return string
-     * @throws EncryptionException
-     */
-    public function add($encryptedData, $newData)
-    {
-        $this->validateState();
-        $data = $this->generalDecipher($encryptedData);
-        if (isset($data['stacks'][$this->stackId])) {
-            throw new EncryptionException("Stack is already used");
-        }
-        $encrypted = Crypto::Encrypt($newData, $this->keyStackKey);
-        $data['stacks'][$this->stackId] = $encrypted;
-        return $this->generalCipher($data);
     }
 
     /**
@@ -266,6 +182,6 @@ class GenericWrapper implements CryptoWrapperInterface
      */
     public function getPrefix()
     {
-        return "KBC::SecureV3::";
+        return 'KBC::Secure::';
     }
 }

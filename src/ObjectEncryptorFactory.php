@@ -7,6 +7,8 @@ use Keboola\ObjectEncryptor\Legacy\Encryptor;
 use Keboola\ObjectEncryptor\Legacy\Wrapper\BaseWrapper;
 use Keboola\ObjectEncryptor\Legacy\Wrapper\ComponentProjectWrapper;
 use Keboola\ObjectEncryptor\Legacy\Wrapper\ComponentWrapper;
+use Keboola\ObjectEncryptor\Wrapper\ComponentDefinitionWrapper;
+use Keboola\ObjectEncryptor\Wrapper\ConfigurationWrapper;
 use Keboola\ObjectEncryptor\Wrapper\GenericWrapper;
 
 class ObjectEncryptorFactory
@@ -57,16 +59,14 @@ class ObjectEncryptorFactory
      * @param string $keyVersion1 Encryption key for KBC::Encrypted ciphers.
      * @param string $keyVersion0 Encryption key for legacy ciphers.
      * @param string $stackKeyVersion2 Stack specific encryption key for KBC::SecureV3 ciphers.
-     * @param string $stackId Id of KBC Stack.
      */
-    public function __construct($keyVersion2, $keyVersion1, $keyVersion0, $stackKeyVersion2, $stackId)
+    public function __construct($keyVersion2, $keyVersion1, $keyVersion0, $stackKeyVersion2)
     {
-        // No logic here, this ctor is exception-less so as not to leak keys in stack trace
+        // No logic here, this constructor is exception-less so as not to leak keys in stack trace
         $this->keyVersion2 = $keyVersion2;
         $this->keyVersion1 = $keyVersion1;
         $this->keyVersion0 = substr($keyVersion0, 0, 32);
         $this->stackKeyVersion2 = $stackKeyVersion2;
-        $this->stackId = $stackId;
     }
 
     /**
@@ -76,7 +76,7 @@ class ObjectEncryptorFactory
     public function setComponentId($componentId)
     {
         if (!is_null($componentId) && !is_scalar($componentId)) {
-            throw new ApplicationException("Invalid Component Id.");
+            throw new ApplicationException('Invalid Component Id.');
         }
         $this->componentId = (string)$componentId;
     }
@@ -88,7 +88,7 @@ class ObjectEncryptorFactory
     public function setConfigurationId($configurationId)
     {
         if (!is_null($configurationId) && !is_scalar($configurationId)) {
-            throw new ApplicationException("Invalid Configuration Id.");
+            throw new ApplicationException('Invalid Configuration Id.');
         }
         $this->configurationId = (string)$configurationId;
     }
@@ -100,9 +100,21 @@ class ObjectEncryptorFactory
     public function setProjectId($projectId)
     {
         if (!is_null($projectId) && !is_scalar($projectId)) {
-            throw new ApplicationException("Invalid Project Id.");
+            throw new ApplicationException('Invalid Project Id.');
         }
         $this->projectId = (string)$projectId;
+    }
+
+    /**
+     * @param string $stackId Id of KBC Stack.
+     * @throws ApplicationException
+     */
+    public function setStackId($stackId)
+    {
+        if (!is_null($stackId) && !is_scalar($stackId)) {
+            throw new ApplicationException('Invalid Project Id.');
+        }
+        $this->stackId = (string)$stackId;
     }
 
     /**
@@ -111,16 +123,16 @@ class ObjectEncryptorFactory
     private function validateState()
     {
         if (!is_null($this->keyVersion0) && !is_string($this->keyVersion0)) {
-            throw new ApplicationException("Invalid key0.");
+            throw new ApplicationException('Invalid key0.');
         }
         if (!is_null($this->keyVersion1) && !is_string($this->keyVersion1)) {
-            throw new ApplicationException("Invalid key1.");
+            throw new ApplicationException('Invalid key1.');
         }
         if (!is_null($this->keyVersion2) && !is_string($this->keyVersion2)) {
-            throw new ApplicationException("Invalid key2.");
+            throw new ApplicationException('Invalid key2.');
         }
         if (!is_null($this->stackKeyVersion2) && !is_string($this->stackKeyVersion2)) {
-            throw new ApplicationException("Invalid stack key.");
+            throw new ApplicationException('Invalid stack key.');
         }
     }
 
@@ -157,15 +169,30 @@ class ObjectEncryptorFactory
             }
         }
 
-        if ($this->keyVersion2 && $this->stackKeyVersion2 && $this->stackId) {
+        if ($this->keyVersion2 && $this->stackKeyVersion2) {
             $wrapper = new GenericWrapper();
             $wrapper->setStackKey($this->stackKeyVersion2);
             $wrapper->setGeneralKey($this->keyVersion2);
-            $wrapper->setStackId($this->stackId);
-            $wrapper->setComponentId($this->componentId);
-            $wrapper->setProjectId($this->projectId);
-            $wrapper->setConfigurationId($this->configurationId);
             $encryptor->pushWrapper($wrapper);
+
+            if ($this->componentId) {
+                $wrapper = new ComponentDefinitionWrapper();
+                $wrapper->setStackKey($this->stackKeyVersion2);
+                $wrapper->setGeneralKey($this->keyVersion2);
+                $wrapper->setComponentId($this->componentId);
+                $wrapper->setStackId($this->stackId);
+                $encryptor->pushWrapper($wrapper);
+            }
+            if ($this->componentId && $this->stackId) {
+                $wrapper = new ConfigurationWrapper();
+                $wrapper->setStackKey($this->stackKeyVersion2);
+                $wrapper->setGeneralKey($this->keyVersion2);
+                $wrapper->setComponentId($this->componentId);
+                $wrapper->setStackId($this->stackId);
+                $wrapper->setProjectId($this->projectId);
+                $wrapper->setConfigurationId($this->configurationId);
+                $encryptor->pushWrapper($wrapper);
+            }
         }
         return $encryptor;
     }
