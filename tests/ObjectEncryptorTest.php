@@ -67,7 +67,7 @@ class ObjectEncryptorTest extends TestCase
 
     public function testEncryptorUnsupportedInput()
     {
-        $invalidClass = $this->getMockBuilder('stdClass')
+        $invalidClass = $this->getMockBuilder(\stdClass::class)
              ->disableOriginalConstructor()
              ->getMock();
         $encryptor = $this->factory->getEncryptor();
@@ -102,7 +102,7 @@ class ObjectEncryptorTest extends TestCase
 
     public function testDecryptorUnsupportedInput()
     {
-        $invalidClass = $this->getMockBuilder('stdClass')
+        $invalidClass = $this->getMockBuilder(\stdClass::class)
              ->disableOriginalConstructor()
              ->getMock();
         $encryptor = $this->factory->getEncryptor();
@@ -745,8 +745,8 @@ class ObjectEncryptorTest extends TestCase
         $encryptor = $this->factory->getEncryptor();
         $object = new \stdClass();
         $encrypted = $encryptor->encrypt($object);
-        self::assertEquals('stdClass', get_class($encrypted));
-        self::assertEquals('stdClass', get_class($encryptor->decrypt($encrypted)));
+        self::assertEquals(\stdClass::class, get_class($encrypted));
+        self::assertEquals(\stdClass::class, get_class($encryptor->decrypt($encrypted)));
     }
 
     public function testEncryptorNoWrappers()

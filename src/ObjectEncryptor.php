@@ -56,7 +56,7 @@ class ObjectEncryptor
         if (is_array($data)) {
             return $this->encryptArray($data, $wrapper);
         }
-        if (is_object($data) && get_class($data) == 'stdClass') {
+        if (is_object($data) && get_class($data) == \stdClass::class) {
             return $this->encryptObject($data, $wrapper);
         }
         throw new ApplicationException('Only stdClass, array and string are supported types for encryption.');
@@ -80,7 +80,7 @@ class ObjectEncryptor
         if (is_array($data)) {
             return $this->decryptArray($data);
         }
-        if (is_object($data) && get_class($data) == 'stdClass') {
+        if (is_object($data) && get_class($data) == \stdClass::class) {
             return $this->decryptObject($data);
         }
         throw new ApplicationException('Only stdClass, array and string are supported types for decryption.');
@@ -192,7 +192,7 @@ class ObjectEncryptor
             }
         } elseif (is_array($value)) {
             return $this->encryptArray($value, $wrapper);
-        } elseif (is_object($value) && get_class($value) == 'stdClass') {
+        } elseif (is_object($value) && get_class($value) == \stdClass::class) {
             return $this->encryptObject($value, $wrapper);
         } else {
             throw new ApplicationException(
@@ -269,7 +269,7 @@ class ObjectEncryptor
                 }
             } elseif (is_array($value)) {
                 return $this->decryptArray($value);
-            } elseif (is_object($value) && get_class($value) == 'stdClass') {
+            } elseif (is_object($value) && get_class($value) == \stdClass::class) {
                 return $this->decryptObject($value);
             } else {
                 throw new ApplicationException(
