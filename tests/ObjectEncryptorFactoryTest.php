@@ -7,7 +7,7 @@ use Keboola\ObjectEncryptor\Legacy\Wrapper\BaseWrapper;
 use Keboola\ObjectEncryptor\Legacy\Wrapper\ComponentProjectWrapper;
 use Keboola\ObjectEncryptor\Legacy\Wrapper\ComponentWrapper;
 use Keboola\ObjectEncryptor\ObjectEncryptorFactory;
-use Keboola\ObjectEncryptor\Wrapper\StackWrapper;
+use Keboola\ObjectEncryptor\Wrapper\GenericWrapper;
 use PHPUnit\Framework\TestCase;
 
 class ObjectEncryptorFactoryTest extends TestCase
@@ -96,7 +96,7 @@ class ObjectEncryptorFactoryTest extends TestCase
         $factory->setComponentId('keboola.docker-demo');
         $factory->setConfigurationId('123456');
         $factory->setProjectId('123');
-        $wrapper = new StackWrapper();
+        $wrapper = new GenericWrapper();
         $wrapper->setStackId($stack);
         $wrapper->setStackKey($stackKey);
         $wrapper->setGeneralKey($globalKey);
@@ -105,7 +105,7 @@ class ObjectEncryptorFactoryTest extends TestCase
         $wrapper->setProjectId('123');
         $encrypted = $wrapper->encrypt($secret);
         self::assertEquals($secret, $wrapper->decrypt($encrypted));
-        $encrypted = $factory->getEncryptor()->encrypt($secret, StackWrapper::class);
+        $encrypted = $factory->getEncryptor()->encrypt($secret, GenericWrapper::class);
         self::assertStringStartsWith('KBC::SecureV3::CPF::', $encrypted);
         $encrypted = substr($encrypted, strlen($wrapper->getPrefix()));
         $decrypted = $wrapper->decrypt($encrypted);

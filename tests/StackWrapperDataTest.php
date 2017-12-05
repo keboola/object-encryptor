@@ -4,7 +4,7 @@ namespace Keboola\ObjectEncryptor\Tests;
 
 use Defuse\Crypto\Crypto;
 use Defuse\Crypto\Key;
-use Keboola\ObjectEncryptor\Wrapper\StackWrapper;
+use Keboola\ObjectEncryptor\Wrapper\GenericWrapper;
 use PHPUnit\Framework\TestCase;
 
 class StackWrapperDataTest extends TestCase
@@ -19,7 +19,7 @@ class StackWrapperDataTest extends TestCase
         $keyGeneral = Key::createNewRandomKey()->saveToAsciiSafeString();
         $keyStack = Key::createNewRandomKey()->saveToAsciiSafeString();
         $encrypted = Crypto::encrypt('fooBar', Key::loadFromAsciiSafeString($keyGeneral));
-        $stackWrapper = new StackWrapper();
+        $stackWrapper = new GenericWrapper();
         $stackWrapper->setGeneralKey(Key::createNewRandomKey()->saveToAsciiSafeString());
         $stackWrapper->setStackKey($keyStack);
         $stackWrapper->setStackId('my-stack');
@@ -35,7 +35,7 @@ class StackWrapperDataTest extends TestCase
         $keyGeneral = Key::createNewRandomKey()->saveToAsciiSafeString();
         $keyStack = Key::createNewRandomKey()->saveToAsciiSafeString();
         $encrypted = Crypto::encrypt('fooBar', Key::loadFromAsciiSafeString($keyGeneral));
-        $stackWrapper = new StackWrapper();
+        $stackWrapper = new GenericWrapper();
         $stackWrapper->setGeneralKey($keyGeneral);
         $stackWrapper->setStackKey($keyStack);
         $stackWrapper->setStackId('my-stack');
@@ -54,7 +54,7 @@ class StackWrapperDataTest extends TestCase
             json_encode(['foo' => 'bar']),
             Key::loadFromAsciiSafeString($keyGeneral)
         );
-        $stackWrapper = new StackWrapper();
+        $stackWrapper = new GenericWrapper();
         $stackWrapper->setGeneralKey($keyGeneral);
         $stackWrapper->setStackKey($keyStack);
         $stackWrapper->setStackId('my-stack');
@@ -73,7 +73,7 @@ class StackWrapperDataTest extends TestCase
             json_encode(['stacks' => ['my-stack' => 'foo']]),
             Key::loadFromAsciiSafeString($keyGeneral)
         );
-        $stackWrapper = new StackWrapper();
+        $stackWrapper = new GenericWrapper();
         $stackWrapper->setGeneralKey($keyGeneral);
         $stackWrapper->setStackKey($keyStack);
         $stackWrapper->setStackId('my-stack');
@@ -89,7 +89,7 @@ class StackWrapperDataTest extends TestCase
             json_encode(['stacks' => ['my-stack' => $inCipher]]),
             Key::loadFromAsciiSafeString($keyGeneral)
         );
-        $stackWrapper = new StackWrapper();
+        $stackWrapper = new GenericWrapper();
         $stackWrapper->setGeneralKey($keyGeneral);
         $stackWrapper->setStackKey($keyStack);
         $stackWrapper->setStackId('my-stack');
@@ -112,7 +112,7 @@ class StackWrapperDataTest extends TestCase
             ),
             Key::loadFromAsciiSafeString($keyGeneral)
         );
-        $stackWrapper = new StackWrapper();
+        $stackWrapper = new GenericWrapper();
         $stackWrapper->setGeneralKey($keyGeneral);
         $stackWrapper->setStackKey($keyStack);
         $stackWrapper->setStackId('another-stack');
@@ -139,7 +139,7 @@ class StackWrapperDataTest extends TestCase
             ),
             Key::loadFromAsciiSafeString($keyGeneral)
         );
-        $stackWrapper = new StackWrapper();
+        $stackWrapper = new GenericWrapper();
         $stackWrapper->setGeneralKey($keyGeneral);
         $stackWrapper->setStackKey($keyStack);
         $stackWrapper->setStackId('another-stack');
@@ -160,7 +160,7 @@ class StackWrapperDataTest extends TestCase
             json_encode(['stacks' => ['my-stack' => $inCipher]]),
             Key::loadFromAsciiSafeString($keyGeneral)
         );
-        $stackWrapper = new StackWrapper();
+        $stackWrapper = new GenericWrapper();
         $stackWrapper->setGeneralKey($keyGeneral);
         $stackWrapper->setStackKey($keyStack);
         $stackWrapper->setStackId('my-stack');
@@ -180,7 +180,7 @@ class StackWrapperDataTest extends TestCase
             json_encode(['stacks' => ['not-my-stack' => $inCipher]]),
             Key::loadFromAsciiSafeString($keyGeneral)
         );
-        $stackWrapper = new StackWrapper();
+        $stackWrapper = new GenericWrapper();
         $stackWrapper->setGeneralKey($keyGeneral);
         $stackWrapper->setStackKey($keyStack);
         $stackWrapper->setStackId('my-stack');
@@ -196,7 +196,7 @@ class StackWrapperDataTest extends TestCase
             json_encode(['stacks' => ['my-stack' => $inCipher]]),
             Key::loadFromAsciiSafeString($keyGeneral)
         );
-        $stackWrapper = new StackWrapper();
+        $stackWrapper = new GenericWrapper();
         $stackWrapper->setGeneralKey($keyGeneral);
         $stackWrapper->setStackKey($keyStack);
         $stackWrapper->setStackId('my-stack');
@@ -213,7 +213,7 @@ class StackWrapperDataTest extends TestCase
             json_encode(['stacks' => ['my-stack' => $inCipher], 'cmp' => 'keboola.docker-demo-app']),
             Key::loadFromAsciiSafeString($keyGeneral)
         );
-        $stackWrapper = new StackWrapper();
+        $stackWrapper = new GenericWrapper();
         $stackWrapper->setGeneralKey($keyGeneral);
         $stackWrapper->setStackKey($keyStack);
         $stackWrapper->setStackId('my-stack');
@@ -234,7 +234,7 @@ class StackWrapperDataTest extends TestCase
             json_encode(['stacks' => ['my-stack' => $inCipher], 'cmp' => 'keboola.docker-demo-app']),
             Key::loadFromAsciiSafeString($keyGeneral)
         );
-        $stackWrapper = new StackWrapper();
+        $stackWrapper = new GenericWrapper();
         $stackWrapper->setGeneralKey($keyGeneral);
         $stackWrapper->setStackKey($keyStack);
         $stackWrapper->setStackId('my-stack');
@@ -254,7 +254,7 @@ class StackWrapperDataTest extends TestCase
             json_encode(['stacks' => ['my-stack' => $inCipher], 'cmp' => 'keboola.docker-demo-app']),
             Key::loadFromAsciiSafeString($keyGeneral)
         );
-        $stackWrapper = new StackWrapper();
+        $stackWrapper = new GenericWrapper();
         $stackWrapper->setGeneralKey($keyGeneral);
         $stackWrapper->setStackKey($keyStack);
         $stackWrapper->setStackId('my-stack');
@@ -271,7 +271,7 @@ class StackWrapperDataTest extends TestCase
             json_encode(['stacks' => ['my-stack' => $inCipher]]),
             Key::loadFromAsciiSafeString($keyGeneral)
         );
-        $stackWrapper = new StackWrapper();
+        $stackWrapper = new GenericWrapper();
         $stackWrapper->setGeneralKey($keyGeneral);
         $stackWrapper->setStackKey($keyStack);
         $stackWrapper->setStackId('my-stack');
@@ -288,7 +288,7 @@ class StackWrapperDataTest extends TestCase
             json_encode(['stacks' => ['my-stack' => $inCipher], 'prj' => '123']),
             Key::loadFromAsciiSafeString($keyGeneral)
         );
-        $stackWrapper = new StackWrapper();
+        $stackWrapper = new GenericWrapper();
         $stackWrapper->setGeneralKey($keyGeneral);
         $stackWrapper->setStackKey($keyStack);
         $stackWrapper->setStackId('my-stack');
@@ -309,7 +309,7 @@ class StackWrapperDataTest extends TestCase
             json_encode(['stacks' => ['my-stack' => $inCipher], 'prj' => '123']),
             Key::loadFromAsciiSafeString($keyGeneral)
         );
-        $stackWrapper = new StackWrapper();
+        $stackWrapper = new GenericWrapper();
         $stackWrapper->setGeneralKey($keyGeneral);
         $stackWrapper->setStackKey($keyStack);
         $stackWrapper->setStackId('my-stack');
@@ -329,7 +329,7 @@ class StackWrapperDataTest extends TestCase
             json_encode(['stacks' => ['my-stack' => $inCipher], 'prj' => '123']),
             Key::loadFromAsciiSafeString($keyGeneral)
         );
-        $stackWrapper = new StackWrapper();
+        $stackWrapper = new GenericWrapper();
         $stackWrapper->setGeneralKey($keyGeneral);
         $stackWrapper->setStackKey($keyStack);
         $stackWrapper->setStackId('my-stack');
@@ -351,7 +351,7 @@ class StackWrapperDataTest extends TestCase
             json_encode(['stacks' => ['my-stack' => $inCipher], 'prj' => 123]),
             Key::loadFromAsciiSafeString($keyGeneral)
         );
-        $stackWrapper = new StackWrapper();
+        $stackWrapper = new GenericWrapper();
         $stackWrapper->setGeneralKey($keyGeneral);
         $stackWrapper->setStackKey($keyStack);
         $stackWrapper->setStackId('my-stack');
@@ -368,7 +368,7 @@ class StackWrapperDataTest extends TestCase
             json_encode(['stacks' => ['my-stack' => $inCipher], 'cfg' => '12345']),
             Key::loadFromAsciiSafeString($keyGeneral)
         );
-        $stackWrapper = new StackWrapper();
+        $stackWrapper = new GenericWrapper();
         $stackWrapper->setGeneralKey($keyGeneral);
         $stackWrapper->setStackKey($keyStack);
         $stackWrapper->setStackId('my-stack');
@@ -385,7 +385,7 @@ class StackWrapperDataTest extends TestCase
             json_encode(['stacks' => ['my-stack' => $inCipher], 'cfg' => '12345']),
             Key::loadFromAsciiSafeString($keyGeneral)
         );
-        $stackWrapper = new StackWrapper();
+        $stackWrapper = new GenericWrapper();
         $stackWrapper->setGeneralKey($keyGeneral);
         $stackWrapper->setStackKey($keyStack);
         $stackWrapper->setStackId('my-stack');
@@ -406,7 +406,7 @@ class StackWrapperDataTest extends TestCase
             json_encode(['stacks' => ['my-stack' => $inCipher], 'cfg' => '12345']),
             Key::loadFromAsciiSafeString($keyGeneral)
         );
-        $stackWrapper = new StackWrapper();
+        $stackWrapper = new GenericWrapper();
         $stackWrapper->setGeneralKey($keyGeneral);
         $stackWrapper->setStackKey($keyStack);
         $stackWrapper->setStackId('my-stack');
@@ -426,7 +426,7 @@ class StackWrapperDataTest extends TestCase
             json_encode(['stacks' => ['my-stack' => $inCipher], 'cfg' => '12345']),
             Key::loadFromAsciiSafeString($keyGeneral)
         );
-        $stackWrapper = new StackWrapper();
+        $stackWrapper = new GenericWrapper();
         $stackWrapper->setGeneralKey($keyGeneral);
         $stackWrapper->setStackKey($keyStack);
         $stackWrapper->setStackId('my-stack');
@@ -450,7 +450,7 @@ class StackWrapperDataTest extends TestCase
             ),
             Key::loadFromAsciiSafeString($keyGeneral)
         );
-        $stackWrapper = new StackWrapper();
+        $stackWrapper = new GenericWrapper();
         $stackWrapper->setGeneralKey($keyGeneral);
         $stackWrapper->setStackKey($keyStack);
         $stackWrapper->setStackId('my-stack');
@@ -480,7 +480,7 @@ class StackWrapperDataTest extends TestCase
             ),
             Key::loadFromAsciiSafeString($keyGeneral)
         );
-        $stackWrapper = new StackWrapper();
+        $stackWrapper = new GenericWrapper();
         $stackWrapper->setGeneralKey($keyGeneral);
         $stackWrapper->setStackKey($keyStack);
         $stackWrapper->setStackId('my-stack');
@@ -510,7 +510,7 @@ class StackWrapperDataTest extends TestCase
             ),
             Key::loadFromAsciiSafeString($keyGeneral)
         );
-        $stackWrapper = new StackWrapper();
+        $stackWrapper = new GenericWrapper();
         $stackWrapper->setGeneralKey($keyGeneral);
         $stackWrapper->setStackKey($keyStack);
         $stackWrapper->setStackId('my-stack');
@@ -540,7 +540,7 @@ class StackWrapperDataTest extends TestCase
             ),
             Key::loadFromAsciiSafeString($keyGeneral)
         );
-        $stackWrapper = new StackWrapper();
+        $stackWrapper = new GenericWrapper();
         $stackWrapper->setGeneralKey($keyGeneral);
         $stackWrapper->setStackKey($keyStack);
         $stackWrapper->setStackId('my-stack');
@@ -570,7 +570,7 @@ class StackWrapperDataTest extends TestCase
             ),
             Key::loadFromAsciiSafeString($keyGeneral)
         );
-        $stackWrapper = new StackWrapper();
+        $stackWrapper = new GenericWrapper();
         $stackWrapper->setGeneralKey($keyGeneral);
         $stackWrapper->setStackKey($keyStack);
         $stackWrapper->setStackId('not-my-stack');
@@ -587,7 +587,7 @@ class StackWrapperDataTest extends TestCase
     public function testAddInvalidComponent()
     {
         $generalKey = Key::createNewRandomKey()->saveToAsciiSafeString();
-        $stackWrapper = new StackWrapper();
+        $stackWrapper = new GenericWrapper();
         $stackWrapper->setGeneralKey($generalKey);
         $stackWrapper->setStackKey(Key::createNewRandomKey()->saveToAsciiSafeString());
         $stackWrapper->setStackId('my-stack');
@@ -596,7 +596,7 @@ class StackWrapperDataTest extends TestCase
         $stackWrapper->setProjectId('123');
         $encrypted = $stackWrapper->encrypt("mySecretValue");
         self::assertStringStartsWith('CPF::', $encrypted);
-        $stackWrapper2 = new StackWrapper();
+        $stackWrapper2 = new GenericWrapper();
         $stackWrapper2->setGeneralKey($generalKey);
         $stackWrapper2->setStackKey(Key::createNewRandomKey()->saveToAsciiSafeString());
         $stackWrapper2->setStackId('another-stack');
@@ -613,7 +613,7 @@ class StackWrapperDataTest extends TestCase
     public function testAddInvalidOverwrite()
     {
         $generalKey = Key::createNewRandomKey()->saveToAsciiSafeString();
-        $stackWrapper = new StackWrapper();
+        $stackWrapper = new GenericWrapper();
         $stackWrapper->setGeneralKey($generalKey);
         $stackWrapper->setStackKey(Key::createNewRandomKey()->saveToAsciiSafeString());
         $stackWrapper->setStackId('my-stack');
@@ -622,7 +622,7 @@ class StackWrapperDataTest extends TestCase
         $stackWrapper->setProjectId('123');
         $encrypted = $stackWrapper->encrypt("mySecretValue");
         self::assertStringStartsWith('CPF::', $encrypted);
-        $stackWrapper2 = new StackWrapper();
+        $stackWrapper2 = new GenericWrapper();
         $stackWrapper2->setGeneralKey($generalKey);
         $stackWrapper2->setStackKey(Key::createNewRandomKey()->saveToAsciiSafeString());
         $stackWrapper2->setStackId('my-stack');
@@ -639,7 +639,7 @@ class StackWrapperDataTest extends TestCase
     public function testAddInvalidKey()
     {
         $generalKey = Key::createNewRandomKey()->saveToAsciiSafeString();
-        $stackWrapper = new StackWrapper();
+        $stackWrapper = new GenericWrapper();
         $stackWrapper->setGeneralKey($generalKey);
         $stackWrapper->setStackKey(Key::createNewRandomKey()->saveToAsciiSafeString());
         $stackWrapper->setStackId('my-stack');
@@ -648,7 +648,7 @@ class StackWrapperDataTest extends TestCase
         $stackWrapper->setProjectId('123');
         $encrypted = $stackWrapper->encrypt("mySecretValue");
         self::assertStringStartsWith('CPF::', $encrypted);
-        $stackWrapper2 = new StackWrapper();
+        $stackWrapper2 = new GenericWrapper();
         $stackWrapper2->setGeneralKey(Key::createNewRandomKey()->saveToAsciiSafeString());
         $stackWrapper2->setStackKey(Key::createNewRandomKey()->saveToAsciiSafeString());
         $stackWrapper2->setStackId('another-stack');

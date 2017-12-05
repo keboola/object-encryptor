@@ -7,7 +7,7 @@ use Keboola\ObjectEncryptor\Legacy\Encryptor;
 use Keboola\ObjectEncryptor\Legacy\Wrapper\BaseWrapper;
 use Keboola\ObjectEncryptor\Legacy\Wrapper\ComponentProjectWrapper;
 use Keboola\ObjectEncryptor\Legacy\Wrapper\ComponentWrapper;
-use Keboola\ObjectEncryptor\Wrapper\StackWrapper;
+use Keboola\ObjectEncryptor\Wrapper\GenericWrapper;
 
 class ObjectEncryptorFactory
 {
@@ -158,7 +158,7 @@ class ObjectEncryptorFactory
         }
 
         if ($this->keyVersion2 && $this->stackKeyVersion2 && $this->stackId) {
-            $wrapper = new StackWrapper();
+            $wrapper = new GenericWrapper();
             $wrapper->setStackKey($this->stackKeyVersion2);
             $wrapper->setGeneralKey($this->keyVersion2);
             $wrapper->setStackId($this->stackId);

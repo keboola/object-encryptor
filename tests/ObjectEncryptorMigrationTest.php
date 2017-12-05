@@ -4,7 +4,7 @@ namespace Keboola\ObjectEncryptor\Tests;
 
 use Defuse\Crypto\Key;
 use Keboola\ObjectEncryptor\ObjectEncryptorFactory;
-use Keboola\ObjectEncryptor\Wrapper\StackWrapper;
+use Keboola\ObjectEncryptor\Wrapper\GenericWrapper;
 use PHPUnit\Framework\TestCase;
 
 class ObjectEncryptorMigrationTest extends TestCase
@@ -39,7 +39,7 @@ class ObjectEncryptorMigrationTest extends TestCase
         $encrypted = $encryptor->encrypt($originalText);
         self::assertStringStartsWith("KBC::Encrypted==", $encrypted);
         self::assertEquals($originalText, $encryptor->decrypt($encrypted));
-        $migrated = $encryptor->migrate($encrypted, StackWrapper::class);
+        $migrated = $encryptor->migrate($encrypted, GenericWrapper::class);
         self::assertStringStartsWith("KBC::SecureV3::CPF::", $migrated);
         self::assertEquals($originalText, $encryptor->decrypt($migrated));
     }
@@ -48,10 +48,10 @@ class ObjectEncryptorMigrationTest extends TestCase
     {
         $encryptor = $this->factory->getEncryptor();
         $originalText = 'secret';
-        $encrypted = $encryptor->encrypt($originalText, StackWrapper::class);
+        $encrypted = $encryptor->encrypt($originalText, GenericWrapper::class);
         self::assertStringStartsWith("KBC::SecureV3::CPF::", $encrypted);
         self::assertEquals($originalText, $encryptor->decrypt($encrypted));
-        $migrated = $encryptor->migrate($encrypted, StackWrapper::class);
+        $migrated = $encryptor->migrate($encrypted, GenericWrapper::class);
         self::assertStringStartsWith("KBC::SecureV3::CPF::", $migrated);
         self::assertEquals($originalText, $encryptor->decrypt($migrated));
     }
@@ -78,7 +78,7 @@ class ObjectEncryptorMigrationTest extends TestCase
         self::assertEquals("value2", $decrypted["key2"]["nestedKey1"]);
         self::assertEquals("value3", $decrypted["key2"]["nestedKey2"]["#finalKey"]);
 
-        $migrated = $encryptor->migrate($result, StackWrapper::class);
+        $migrated = $encryptor->migrate($result, GenericWrapper::class);
         self::assertStringStartsWith("KBC::SecureV3::CPF::", $migrated["key2"]["nestedKey2"]["#finalKey"]);
         $decrypted = $encryptor->decrypt($migrated);
         self::assertEquals("value1", $decrypted["key1"]);
@@ -102,7 +102,7 @@ class ObjectEncryptorMigrationTest extends TestCase
         $decrypted = $encryptor->decrypt($array);
         self::assertEquals("value1", $decrypted["#key1"]);
         self::assertEquals("value2", $decrypted["#key2"]);
-        $migrated = $encryptor->migrate($array, StackWrapper::class);
+        $migrated = $encryptor->migrate($array, GenericWrapper::class);
 
         self::assertStringStartsWith("KBC::SecureV3::CPF::", $migrated["#key1"]);
         self::assertStringStartsWith("KBC::SecureV3::CPF::", $migrated["#key2"]);

@@ -7,7 +7,7 @@ use Defuse\Crypto\Key;
 use Keboola\ObjectEncryptor\Exception\ApplicationException;
 use Keboola\ObjectEncryptor\Exception\EncryptionException;
 
-class StackWrapper implements CryptoWrapperInterface
+class GenericWrapper implements CryptoWrapperInterface
 {
     /**
      * @var string

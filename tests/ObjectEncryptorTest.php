@@ -8,7 +8,7 @@ use Keboola\ObjectEncryptor\Exception\UserException;
 use Keboola\ObjectEncryptor\Legacy\Encryptor;
 use Keboola\ObjectEncryptor\ObjectEncryptor;
 use Keboola\ObjectEncryptor\ObjectEncryptorFactory;
-use Keboola\ObjectEncryptor\Wrapper\StackWrapper;
+use Keboola\ObjectEncryptor\Wrapper\GenericWrapper;
 use PHPUnit\Framework\TestCase;
 
 class ObjectEncryptorTest extends TestCase
@@ -49,7 +49,7 @@ class ObjectEncryptorTest extends TestCase
     {
         $encryptor = $this->factory->getEncryptor();
         $originalText = 'secret';
-        $encrypted = $encryptor->encrypt($originalText, StackWrapper::class);
+        $encrypted = $encryptor->encrypt($originalText, GenericWrapper::class);
         self::assertStringStartsWith("KBC::SecureV3::CPF::", $encrypted);
         self::assertEquals($originalText, $encryptor->decrypt($encrypted));
     }

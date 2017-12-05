@@ -3,18 +3,18 @@
 namespace Keboola\ObjectEncryptor\Tests;
 
 use Defuse\Crypto\Key;
-use Keboola\ObjectEncryptor\Wrapper\StackWrapper;
+use Keboola\ObjectEncryptor\Wrapper\GenericWrapper;
 
 class StackWrapperTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @return StackWrapper
+     * @return GenericWrapper
      */
     private function getStackWrapper()
     {
         $generalKey = Key::createNewRandomKey()->saveToAsciiSafeString();
         $stackKey = Key::createNewRandomKey()->saveToAsciiSafeString();
-        $stackWrapper = new StackWrapper();
+        $stackWrapper = new GenericWrapper();
         $stackWrapper->setGeneralKey($generalKey);
         $stackWrapper->setStackKey($stackKey);
         $stackWrapper->setStackId('my-stack');
@@ -103,7 +103,7 @@ class StackWrapperTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidSetupEncrypt1()
     {
-        $stackWrapper = new StackWrapper();
+        $stackWrapper = new GenericWrapper();
         $stackWrapper->encrypt("mySecretValue");
     }
 
@@ -113,7 +113,7 @@ class StackWrapperTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidSetupEncrypt2()
     {
-        $stackWrapper = new StackWrapper();
+        $stackWrapper = new GenericWrapper();
         $stackWrapper->setGeneralKey(Key::createNewRandomKey()->saveToAsciiSafeString());
         $stackWrapper->encrypt("mySecretValue");
     }
@@ -124,7 +124,7 @@ class StackWrapperTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidSetupEncrypt3()
     {
-        $stackWrapper = new StackWrapper();
+        $stackWrapper = new GenericWrapper();
         $stackWrapper->setGeneralKey(Key::createNewRandomKey()->saveToAsciiSafeString());
         $stackWrapper->setStackKey(Key::createNewRandomKey()->saveToAsciiSafeString());
         $stackWrapper->encrypt("mySecretValue");
@@ -136,7 +136,7 @@ class StackWrapperTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidSetupDecrypt1()
     {
-        $stackWrapper = new StackWrapper();
+        $stackWrapper = new GenericWrapper();
         $stackWrapper->decrypt("mySecretValue");
     }
 
@@ -146,7 +146,7 @@ class StackWrapperTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidSetupDecrypt2()
     {
-        $stackWrapper = new StackWrapper();
+        $stackWrapper = new GenericWrapper();
         $stackWrapper->setGeneralKey(Key::createNewRandomKey()->saveToAsciiSafeString());
         $stackWrapper->decrypt("mySecretValue");
     }
@@ -157,7 +157,7 @@ class StackWrapperTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidSetupDecrypt3()
     {
-        $stackWrapper = new StackWrapper();
+        $stackWrapper = new GenericWrapper();
         $stackWrapper->setGeneralKey(Key::createNewRandomKey()->saveToAsciiSafeString());
         $stackWrapper->setStackKey(Key::createNewRandomKey()->saveToAsciiSafeString());
         $stackWrapper->decrypt("mySecretValue");
@@ -169,7 +169,7 @@ class StackWrapperTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidValue1()
     {
-        $stackWrapper = new StackWrapper();
+        $stackWrapper = new GenericWrapper();
         $stackWrapper->setGeneralKey(Key::createNewRandomKey()->saveToAsciiSafeString());
         $stackWrapper->setStackKey(new \stdClass());
         $stackWrapper->setStackId('my-stack');
@@ -182,7 +182,7 @@ class StackWrapperTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidValue2()
     {
-        $stackWrapper = new StackWrapper();
+        $stackWrapper = new GenericWrapper();
         /** @noinspection PhpParamsInspection */
         $stackWrapper->setGeneralKey(["a" => "b"]);
         $stackWrapper->setStackKey(Key::createNewRandomKey()->saveToAsciiSafeString());
@@ -196,7 +196,7 @@ class StackWrapperTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidValue3()
     {
-        $stackWrapper = new StackWrapper();
+        $stackWrapper = new GenericWrapper();
         $stackWrapper->setGeneralKey(Key::createNewRandomKey()->saveToAsciiSafeString());
         $stackWrapper->setStackKey(Key::createNewRandomKey()->saveToAsciiSafeString());
         $stackWrapper->setStackId(new \stdClass());
@@ -209,7 +209,7 @@ class StackWrapperTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidKey1()
     {
-        $stackWrapper = new StackWrapper();
+        $stackWrapper = new GenericWrapper();
         $stackWrapper->setGeneralKey('foobar');
         $stackWrapper->setStackKey(Key::createNewRandomKey()->saveToAsciiSafeString());
         $stackWrapper->setStackId('my-stack');
@@ -222,7 +222,7 @@ class StackWrapperTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidKey2()
     {
-        $stackWrapper = new StackWrapper();
+        $stackWrapper = new GenericWrapper();
         $stackWrapper->setGeneralKey(Key::createNewRandomKey()->saveToAsciiSafeString());
         $stackWrapper->setStackKey('foobar');
         $stackWrapper->setStackId('my-stack');
@@ -235,7 +235,7 @@ class StackWrapperTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidProject()
     {
-        $stackWrapper = new StackWrapper();
+        $stackWrapper = new GenericWrapper();
         $stackWrapper->setGeneralKey(Key::createNewRandomKey()->saveToAsciiSafeString());
         $stackWrapper->setStackKey('foobar');
         $stackWrapper->setStackId('my-stack');
@@ -249,7 +249,7 @@ class StackWrapperTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidComponent()
     {
-        $stackWrapper = new StackWrapper();
+        $stackWrapper = new GenericWrapper();
         $stackWrapper->setGeneralKey(Key::createNewRandomKey()->saveToAsciiSafeString());
         $stackWrapper->setStackKey('foobar');
         $stackWrapper->setStackId('my-stack');
@@ -263,7 +263,7 @@ class StackWrapperTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidConfiguration()
     {
-        $stackWrapper = new StackWrapper();
+        $stackWrapper = new GenericWrapper();
         $stackWrapper->setGeneralKey(Key::createNewRandomKey()->saveToAsciiSafeString());
         $stackWrapper->setStackKey('foobar');
         $stackWrapper->setStackId('my-stack');
@@ -274,7 +274,7 @@ class StackWrapperTest extends \PHPUnit_Framework_TestCase
     public function testAdd()
     {
         $generalKey = Key::createNewRandomKey()->saveToAsciiSafeString();
-        $stackWrapper = new StackWrapper();
+        $stackWrapper = new GenericWrapper();
         $stackWrapper->setGeneralKey($generalKey);
         $stackWrapper->setStackKey(Key::createNewRandomKey()->saveToAsciiSafeString());
         $stackWrapper->setStackId('my-stack');
@@ -283,7 +283,7 @@ class StackWrapperTest extends \PHPUnit_Framework_TestCase
         $stackWrapper->setProjectId('123');
         $encrypted = $stackWrapper->encrypt("mySecretValue");
         self::assertStringStartsWith('CPF::', $encrypted);
-        $stackWrapper2 = new StackWrapper();
+        $stackWrapper2 = new GenericWrapper();
         $stackWrapper2->setGeneralKey($generalKey);
         $stackWrapper2->setStackKey(Key::createNewRandomKey()->saveToAsciiSafeString());
         $stackWrapper2->setStackId('another-stack');
