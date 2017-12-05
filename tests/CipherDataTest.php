@@ -211,8 +211,8 @@ class CipherDataTest extends TestCase
                     ConfigurationWrapper::KEY_COMPONENT => 'dummy-component',
                     ConfigurationWrapper::KEY_STACK => 'my-stack'
                 ],
-                'value' => $inCipher]
-            ),
+                'value' => $inCipher
+            ]),
             Key::loadFromAsciiSafeString($keyGeneral)
         );
         $wrapper = new ConfigurationWrapper();
