@@ -65,11 +65,7 @@ class ObjectEncryptorFactory
         // No logic here, this constructor is exception-less so as not to leak keys in stack trace
         $this->keyVersion2 = $keyVersion2;
         $this->keyVersion1 = $keyVersion1;
-        $this->keyVersion0 = substr($keyVersion0, 0, 32);
-        if (!$this->keyVersion0) {
-            // For php 5.6 compatibility
-            $this->keyVersion0 = '';
-        }
+        $this->keyVersion0 = $keyVersion0;
         $this->stackKeyVersion2 = $stackKeyVersion2;
     }
 
@@ -80,7 +76,7 @@ class ObjectEncryptorFactory
     public function setComponentId($componentId)
     {
         if (!is_null($componentId) && !is_scalar($componentId)) {
-            throw new ApplicationException('Invalid Component Id.');
+            throw new ApplicationException('Invalid component id.');
         }
         $this->componentId = (string)$componentId;
     }
@@ -92,7 +88,7 @@ class ObjectEncryptorFactory
     public function setConfigurationId($configurationId)
     {
         if (!is_null($configurationId) && !is_scalar($configurationId)) {
-            throw new ApplicationException('Invalid Configuration Id.');
+            throw new ApplicationException('Invalid configuration id.');
         }
         $this->configurationId = (string)$configurationId;
     }
@@ -104,7 +100,7 @@ class ObjectEncryptorFactory
     public function setProjectId($projectId)
     {
         if (!is_null($projectId) && !is_scalar($projectId)) {
-            throw new ApplicationException('Invalid Project Id.');
+            throw new ApplicationException('Invalid project id.');
         }
         $this->projectId = (string)$projectId;
     }
@@ -116,7 +112,7 @@ class ObjectEncryptorFactory
     public function setStackId($stackId)
     {
         if (!is_null($stackId) && !is_scalar($stackId)) {
-            throw new ApplicationException('Invalid Project Id.');
+            throw new ApplicationException('Invalid stack id.');
         }
         $this->stackId = (string)$stackId;
     }
@@ -127,13 +123,18 @@ class ObjectEncryptorFactory
     private function validateState()
     {
         if (!is_null($this->keyVersion0) && !is_string($this->keyVersion0)) {
-            throw new ApplicationException('Invalid key0.');
+            throw new ApplicationException('Invalid key version 0.');
+        }
+        $this->keyVersion0 = substr($this->keyVersion0, 0, 32);
+        if (!$this->keyVersion0) {
+            // For php 5.6 compatibility
+            $this->keyVersion0 = '';
         }
         if (!is_null($this->keyVersion1) && !is_string($this->keyVersion1)) {
-            throw new ApplicationException('Invalid key1.');
+            throw new ApplicationException('Invalid key version 1.');
         }
         if (!is_null($this->keyVersion2) && !is_string($this->keyVersion2)) {
-            throw new ApplicationException('Invalid key2.');
+            throw new ApplicationException('Invalid key version 2.');
         }
         if (!is_null($this->stackKeyVersion2) && !is_string($this->stackKeyVersion2)) {
             throw new ApplicationException('Invalid stack key.');

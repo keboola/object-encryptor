@@ -240,4 +240,127 @@ class ObjectEncryptorFactoryTest extends TestCase
         self::assertEquals($secret, $wrapper->decrypt($encrypted));
         $factory->getEncryptor()->decrypt($encrypted);
     }
+
+    /**
+     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
+     * @expectedExceptionMessage Encryption key too short. Minimum is 16 bytes.
+     */
+    public function testInvalidKeys1()
+    {
+        $globalKey = Key::createNewRandomKey()->saveToAsciiSafeString();
+        $stackKey = Key::createNewRandomKey()->saveToAsciiSafeString();
+        $factory = new ObjectEncryptorFactory($globalKey, 'short', '', $stackKey);
+        $factory->getEncryptor();
+    }
+
+    /**
+     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
+     * @expectedExceptionMessage Invalid key version 2.
+     */
+    public function testInvalidKeys2()
+    {
+        $stackKey = Key::createNewRandomKey()->saveToAsciiSafeString();
+        $legacyKey = '1234567890123456';
+        $factory = new ObjectEncryptorFactory(Key::createNewRandomKey(), $legacyKey, '', $stackKey);
+        $factory->getEncryptor();
+    }
+
+    /**
+     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
+     * @expectedExceptionMessage Invalid stack key.
+     */
+    public function testInvalidKeys3()
+    {
+        $globalKey = Key::createNewRandomKey()->saveToAsciiSafeString();
+        $legacyKey = '1234567890123456';
+        /** @noinspection PhpParamsInspection */
+        $factory = new ObjectEncryptorFactory($globalKey, $legacyKey, '', ['a' => 'b']);
+        $factory->getEncryptor();
+    }
+
+    /**
+     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
+     * @expectedExceptionMessage Invalid key version 1.
+     */
+    public function testInvalidKeys4()
+    {
+        $globalKey = Key::createNewRandomKey()->saveToAsciiSafeString();
+        $legacyKey = '1234567890123456';
+        /** @noinspection PhpParamsInspection */
+        $factory = new ObjectEncryptorFactory($globalKey, ['a' => 'b'], '', '');
+        $factory->getEncryptor();
+    }
+
+    /**
+     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
+     * @expectedExceptionMessage Invalid key version 0.
+     */
+    public function testInvalidKeys5()
+    {
+        $globalKey = Key::createNewRandomKey()->saveToAsciiSafeString();
+        $legacyKey = '1234567890123456';
+        /** @noinspection PhpParamsInspection */
+        $factory = new ObjectEncryptorFactory($globalKey, $legacyKey, ['a' => 'b'], '');
+        $factory->getEncryptor();
+    }
+
+    /**
+     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
+     * @expectedExceptionMessage Invalid stack id.
+     */
+    public function testInvalidParams4()
+    {
+        $globalKey = Key::createNewRandomKey()->saveToAsciiSafeString();
+        $stackKey = Key::createNewRandomKey()->saveToAsciiSafeString();
+        $legacyKey = '1234567890123456';
+        $factory = new ObjectEncryptorFactory($globalKey, $legacyKey, '', $stackKey);
+        /** @noinspection PhpParamsInspection */
+        $factory->setStackId(['a' => 'b']);
+        $factory->getEncryptor();
+    }
+
+    /**
+     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
+     * @expectedExceptionMessage Invalid component id.
+     */
+    public function testInvalidParams5()
+    {
+        $globalKey = Key::createNewRandomKey()->saveToAsciiSafeString();
+        $stackKey = Key::createNewRandomKey()->saveToAsciiSafeString();
+        $legacyKey = '1234567890123456';
+        $factory = new ObjectEncryptorFactory($globalKey, $legacyKey, '', $stackKey);
+        /** @noinspection PhpParamsInspection */
+        $factory->setComponentId(['a' => 'b']);
+        $factory->getEncryptor();
+    }
+
+    /**
+     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
+     * @expectedExceptionMessage Invalid configuration id.
+     */
+    public function testInvalidParams6()
+    {
+        $globalKey = Key::createNewRandomKey()->saveToAsciiSafeString();
+        $stackKey = Key::createNewRandomKey()->saveToAsciiSafeString();
+        $legacyKey = '1234567890123456';
+        $factory = new ObjectEncryptorFactory($globalKey, $legacyKey, '', $stackKey);
+        /** @noinspection PhpParamsInspection */
+        $factory->setConfigurationId(['a' => 'b']);
+        $factory->getEncryptor();
+    }
+
+    /**
+     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
+     * @expectedExceptionMessage Invalid project id.
+     */
+    public function testInvalidParams7()
+    {
+        $globalKey = Key::createNewRandomKey()->saveToAsciiSafeString();
+        $stackKey = Key::createNewRandomKey()->saveToAsciiSafeString();
+        $legacyKey = '1234567890123456';
+        $factory = new ObjectEncryptorFactory($globalKey, $legacyKey, '', $stackKey);
+        /** @noinspection PhpParamsInspection */
+        $factory->setProjectId(['a' => 'b']);
+        $factory->getEncryptor();
+    }
 }
