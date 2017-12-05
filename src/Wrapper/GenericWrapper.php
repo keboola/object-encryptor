@@ -81,13 +81,13 @@ class GenericWrapper implements CryptoWrapperInterface
     protected function validateState()
     {
         if (empty($this->stackKey) || empty($this->generalKey)) {
-            throw new ApplicationException('Bad init');
+            throw new ApplicationException('Cipher keys are missing.');
         }
         try {
             $this->keyStackKey = Key::loadFromAsciiSafeString($this->stackKey);
             $this->keyGeneralKey = Key::loadFromAsciiSafeString($this->generalKey);
         } catch (\Exception $e) {
-            throw new ApplicationException('Invalid Key');
+            throw new ApplicationException('Cipher keys are invalid.');
         }
     }
 
@@ -101,7 +101,7 @@ class GenericWrapper implements CryptoWrapperInterface
         try {
             $jsonString = Crypto::Decrypt($encryptedData, $this->keyGeneralKey);
         } catch (\Exception $e) {
-            throw new UserException('Invalid cipher');
+            throw new UserException('Value is not an encrypted value.');
         }
         $data = json_decode($jsonString, true);
         if (json_last_error() !== JSON_ERROR_NONE) {

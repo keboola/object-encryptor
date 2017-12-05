@@ -14,7 +14,7 @@ class CipherDataTest extends TestCase
 
     /**
      * @expectedException \Keboola\ObjectEncryptor\Exception\UserException
-     * @expectedExceptionMessage Invalid cipher
+     * @expectedExceptionMessage Value is not an encrypted value.
      */
     public function testDecryptInvalidKey()
     {
@@ -155,7 +155,7 @@ class CipherDataTest extends TestCase
         $keyStack = Key::createNewRandomKey()->saveToAsciiSafeString();
         $inCipher = Crypto::encrypt('fooBar', Key::loadFromAsciiSafeString($keyStack));
         $encrypted = Crypto::encrypt(
-            json_encode(['metadata' => ['componentId' => 'dummy-component'], 'value' => $inCipher]),
+            json_encode(['metadata' => [ComponentDefinitionWrapper::KEY_COMPONENT => 'dummy-component'], 'value' => $inCipher]),
             Key::loadFromAsciiSafeString($keyGeneral)
         );
         $wrapper = new ComponentDefinitionWrapper();
@@ -190,7 +190,7 @@ class CipherDataTest extends TestCase
         $keyStack = Key::createNewRandomKey()->saveToAsciiSafeString();
         $inCipher = Crypto::encrypt('fooBar', Key::loadFromAsciiSafeString($keyStack));
         $encrypted = Crypto::encrypt(
-            json_encode(['metadata' => ['componentId' => 'dummy-component'], 'value' => $inCipher]),
+            json_encode(['metadata' => [ComponentDefinitionWrapper::KEY_COMPONENT => 'dummy-component'], 'value' => $inCipher]),
             Key::loadFromAsciiSafeString($keyGeneral)
         );
         $wrapper = new ComponentDefinitionWrapper();
@@ -206,7 +206,13 @@ class CipherDataTest extends TestCase
         $keyStack = Key::createNewRandomKey()->saveToAsciiSafeString();
         $inCipher = Crypto::encrypt('fooBar', Key::loadFromAsciiSafeString($keyStack));
         $encrypted = Crypto::encrypt(
-            json_encode(['metadata' => ['componentId' => 'dummy-component', 'stackId' => 'my-stack'], 'value' => $inCipher]),
+            json_encode([
+                'metadata' => [
+                    ConfigurationWrapper::KEY_COMPONENT => 'dummy-component',
+                    ConfigurationWrapper::KEY_STACK => 'my-stack'
+                ],
+                'value' => $inCipher]
+            ),
             Key::loadFromAsciiSafeString($keyGeneral)
         );
         $wrapper = new ConfigurationWrapper();

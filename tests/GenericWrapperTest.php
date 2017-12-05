@@ -120,7 +120,7 @@ class GenericWrapperTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage Bad init
+     * @expectedExceptionMessage Cipher keys are missing.
      */
     public function testInvalidSetupEncrypt1()
     {
@@ -130,7 +130,7 @@ class GenericWrapperTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage Bad init
+     * @expectedExceptionMessage Cipher keys are missing.
      */
     public function testInvalidSetupEncrypt2()
     {
@@ -141,7 +141,7 @@ class GenericWrapperTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage Bad init
+     * @expectedExceptionMessage Cipher keys are missing.
      */
     public function testInvalidSetupDecrypt1()
     {
@@ -151,7 +151,7 @@ class GenericWrapperTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage Bad init
+     * @expectedExceptionMessage Cipher keys are missing.
      */
     public function testInvalidSetupDecrypt2()
     {
@@ -162,7 +162,7 @@ class GenericWrapperTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage Invalid Key
+     * @expectedExceptionMessage Cipher keys are invalid.
      */
     public function testInvalidValue1()
     {
@@ -174,7 +174,7 @@ class GenericWrapperTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage Invalid Key
+     * @expectedExceptionMessage Cipher keys are invalid.
      */
     public function testInvalidValue2()
     {
@@ -187,7 +187,7 @@ class GenericWrapperTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage Invalid Key
+     * @expectedExceptionMessage Cipher keys are invalid.
      */
     public function testInvalidKey1()
     {
@@ -199,7 +199,7 @@ class GenericWrapperTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage Invalid Key
+     * @expectedExceptionMessage Cipher keys are invalid.
      */
     public function testInvalidKey2()
     {

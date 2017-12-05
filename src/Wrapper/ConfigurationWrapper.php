@@ -6,12 +6,17 @@ use Keboola\ObjectEncryptor\Exception\ApplicationException;
 
 class ConfigurationWrapper extends GenericWrapper
 {
+    const KEY_STACK = 'stackId';
+    const KEY_COMPONENT = 'componentId';
+    const KEY_PROJECT = 'projectId';
+    const KEY_CONFIGURATION = 'configurationId';
+
     /**
      * @param string $stackId
      */
     public function setStackId($stackId)
     {
-        $this->setMetadataValue('stackId', $stackId);
+        $this->setMetadataValue(self::KEY_STACK, $stackId);
     }
 
     /**
@@ -19,7 +24,7 @@ class ConfigurationWrapper extends GenericWrapper
      */
     public function setComponentId($componentId)
     {
-        $this->setMetadataValue('componentId', $componentId);
+        $this->setMetadataValue(self::KEY_COMPONENT, $componentId);
     }
 
     /**
@@ -27,7 +32,7 @@ class ConfigurationWrapper extends GenericWrapper
      */
     public function setProjectId($projectId)
     {
-        $this->setMetadataValue('projectId', $projectId);
+        $this->setMetadataValue(self::KEY_PROJECT, $projectId);
     }
 
     /**
@@ -35,7 +40,7 @@ class ConfigurationWrapper extends GenericWrapper
      */
     public function setConfigurationId($configurationId)
     {
-        $this->setMetadataValue('configurationId', $configurationId);
+        $this->setMetadataValue(self::KEY_CONFIGURATION, $configurationId);
     }
 
     /**
@@ -45,20 +50,20 @@ class ConfigurationWrapper extends GenericWrapper
     protected function validateState()
     {
         parent::validateState();
-        if (empty($this->getMetadataValue('stackId')) || empty($this->getMetadataValue('componentId'))) {
-            throw new ApplicationException('Bad init');
+        if (empty($this->getMetadataValue(self::KEY_STACK)) || empty($this->getMetadataValue(self::KEY_COMPONENT))) {
+            throw new ApplicationException('No stack or component id provided.');
         }
-        if (!is_string($this->getMetadataValue('stackId'))) {
-            throw new ApplicationException('Invalid Stack');
+        if (!is_string($this->getMetadataValue(self::KEY_STACK))) {
+            throw new ApplicationException('Stack id is invalid.');
         }
-        if (!is_string($this->getMetadataValue('componentId'))) {
-            throw new ApplicationException('Invalid Component Id.');
+        if (!is_string($this->getMetadataValue(self::KEY_COMPONENT))) {
+            throw new ApplicationException('Component id is invalid.');
         }
-        if (!is_null($this->getMetadataValue('projectId')) && !is_string($this->getMetadataValue('projectId'))) {
-            throw new ApplicationException('Invalid Project Id.');
+        if (!is_null($this->getMetadataValue(self::KEY_PROJECT)) && !is_string($this->getMetadataValue(self::KEY_PROJECT))) {
+            throw new ApplicationException('Project id is invalid.');
         }
-        if (!is_null($this->getMetadataValue('configurationId')) && !is_string($this->getMetadataValue('configurationId'))) {
-            throw new ApplicationException('Invalid Configuration Id.');
+        if (!is_null($this->getMetadataValue(self::KEY_CONFIGURATION)) && !is_string($this->getMetadataValue(self::KEY_CONFIGURATION))) {
+            throw new ApplicationException('Configuration id is invalid.');
         }
     }
 

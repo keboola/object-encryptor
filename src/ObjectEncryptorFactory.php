@@ -141,6 +141,61 @@ class ObjectEncryptorFactory
     }
 
     /**
+     * @param ObjectEncryptor $encryptor
+     * @throws ApplicationException
+     */
+    private function addLegacyWrappers($encryptor)
+    {
+        $wrapper = new BaseWrapper();
+        $wrapper->setKey($this->keyVersion1);
+        $encryptor->pushWrapper($wrapper);
+        if ($this->componentId !== null) {
+            $wrapper = new ComponentWrapper();
+            $wrapper->setKey($this->keyVersion1);
+            $wrapper->setComponentId($this->componentId);
+            $encryptor->pushWrapper($wrapper);
+            if ($this->projectId !== null) {
+                $wrapper = new ComponentProjectWrapper();
+                $wrapper->setKey($this->keyVersion1);
+                $wrapper->setComponentId($this->componentId);
+                $wrapper->setProjectId($this->projectId);
+                $encryptor->pushWrapper($wrapper);
+            }
+        }
+    }
+
+    /**
+     * @param ObjectEncryptor $encryptor
+     * @throws ApplicationException
+     */
+    private function addVersion2Wrappers($encryptor)
+    {
+        $wrapper = new GenericWrapper();
+        $wrapper->setStackKey($this->stackKeyVersion2);
+        $wrapper->setGeneralKey($this->keyVersion2);
+        $encryptor->pushWrapper($wrapper);
+
+        if ($this->componentId) {
+            $wrapper = new ComponentDefinitionWrapper();
+            $wrapper->setStackKey($this->stackKeyVersion2);
+            $wrapper->setGeneralKey($this->keyVersion2);
+            $wrapper->setComponentId($this->componentId);
+            $wrapper->setStackId($this->stackId);
+            $encryptor->pushWrapper($wrapper);
+        }
+        if ($this->componentId && $this->stackId) {
+            $wrapper = new ConfigurationWrapper();
+            $wrapper->setStackKey($this->stackKeyVersion2);
+            $wrapper->setGeneralKey($this->keyVersion2);
+            $wrapper->setComponentId($this->componentId);
+            $wrapper->setStackId($this->stackId);
+            $wrapper->setProjectId($this->projectId);
+            $wrapper->setConfigurationId($this->configurationId);
+            $encryptor->pushWrapper($wrapper);
+        }
+    }
+
+    /**
      * @return ObjectEncryptor Object encryptor instance.
      * @throws ApplicationException
      */
@@ -155,48 +210,11 @@ class ObjectEncryptorFactory
 
         $encryptor = new ObjectEncryptor($legacyEncryptor);
         if ($this->keyVersion1) {
-            $wrapper = new BaseWrapper();
-            $wrapper->setKey($this->keyVersion1);
-            $encryptor->pushWrapper($wrapper);
-            if ($this->componentId !== null) {
-                $wrapper = new ComponentWrapper();
-                $wrapper->setKey($this->keyVersion1);
-                $wrapper->setComponentId($this->componentId);
-                $encryptor->pushWrapper($wrapper);
-                if ($this->projectId !== null) {
-                    $wrapper = new ComponentProjectWrapper();
-                    $wrapper->setKey($this->keyVersion1);
-                    $wrapper->setComponentId($this->componentId);
-                    $wrapper->setProjectId($this->projectId);
-                    $encryptor->pushWrapper($wrapper);
-                }
-            }
+            $this->addLegacyWrappers($encryptor);
         }
 
         if ($this->keyVersion2 && $this->stackKeyVersion2) {
-            $wrapper = new GenericWrapper();
-            $wrapper->setStackKey($this->stackKeyVersion2);
-            $wrapper->setGeneralKey($this->keyVersion2);
-            $encryptor->pushWrapper($wrapper);
-
-            if ($this->componentId) {
-                $wrapper = new ComponentDefinitionWrapper();
-                $wrapper->setStackKey($this->stackKeyVersion2);
-                $wrapper->setGeneralKey($this->keyVersion2);
-                $wrapper->setComponentId($this->componentId);
-                $wrapper->setStackId($this->stackId);
-                $encryptor->pushWrapper($wrapper);
-            }
-            if ($this->componentId && $this->stackId) {
-                $wrapper = new ConfigurationWrapper();
-                $wrapper->setStackKey($this->stackKeyVersion2);
-                $wrapper->setGeneralKey($this->keyVersion2);
-                $wrapper->setComponentId($this->componentId);
-                $wrapper->setStackId($this->stackId);
-                $wrapper->setProjectId($this->projectId);
-                $wrapper->setConfigurationId($this->configurationId);
-                $encryptor->pushWrapper($wrapper);
-            }
+            $this->addVersion2Wrappers($encryptor);
         }
         return $encryptor;
     }

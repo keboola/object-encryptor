@@ -6,12 +6,15 @@ use Keboola\ObjectEncryptor\Exception\ApplicationException;
 
 class ComponentDefinitionWrapper extends GenericWrapper
 {
+    const KEY_STACK = 'stackId';
+    const KEY_COMPONENT = 'componentId';
+
     /**
      * @param string $stackId
      */
     public function setStackId($stackId)
     {
-        $this->setMetadataValue('stackId', $stackId);
+        $this->setMetadataValue(self::KEY_STACK, $stackId);
     }
 
     /**
@@ -19,7 +22,7 @@ class ComponentDefinitionWrapper extends GenericWrapper
      */
     public function setComponentId($componentId)
     {
-        $this->setMetadataValue('componentId', $componentId);
+        $this->setMetadataValue(self::KEY_COMPONENT, $componentId);
     }
 
     /**
@@ -29,14 +32,14 @@ class ComponentDefinitionWrapper extends GenericWrapper
     protected function validateState()
     {
         parent::validateState();
-        if (empty($this->getMetadataValue('componentId'))) {
-            throw new ApplicationException('Bad init');
+        if (empty($this->getMetadataValue(self::KEY_COMPONENT))) {
+            throw new ApplicationException('No component id provided.');
         }
-        if (!is_string($this->getMetadataValue('componentId'))) {
-            throw new ApplicationException('Invalid Component Id.');
+        if (!is_string($this->getMetadataValue(self::KEY_COMPONENT))) {
+            throw new ApplicationException('Component id is invalid.');
         }
-        if (!is_null($this->getMetadataValue('stackId')) && !is_string($this->getMetadataValue('stackId'))) {
-            throw new ApplicationException('Invalid Stack');
+        if (!is_null($this->getMetadataValue(self::KEY_STACK)) && !is_string($this->getMetadataValue(self::KEY_STACK))) {
+            throw new ApplicationException('Stack id is invalid.');
         }
     }
 

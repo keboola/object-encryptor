@@ -134,6 +134,18 @@ class ObjectEncryptor
         return $selectedWrapper;
     }
 
+    private function decryptLegacy($value)
+    {
+        /* @ is intentional to suppress warnings from invalid cipher texts which
+        are handled by checking return === false */
+        $ret = @$this->legacyEncryptor->decrypt($value);
+        if ($ret === false) {
+            throw new UserException('Value is not an encrypted value.');
+        } else {
+            return $ret;
+        }
+    }
+
     /**
      * @param $value
      * @return string
@@ -145,14 +157,7 @@ class ObjectEncryptor
         $wrapper = $this->findWrapper($value);
         if (!$wrapper) {
             if ($this->legacyEncryptor) {
-                /* @ is intentional to suppress warnings from invalid cipher texts which
-                 are handled by checking return === false */
-                $ret = @$this->legacyEncryptor->decrypt($value);
-                if ($ret === false) {
-                    throw new UserException('Value is not an encrypted value.');
-                } else {
-                    return $ret;
-                }
+                return $this->decryptLegacy($value);
             } else {
                 throw new UserException('Value is not an encrypted value.');
             }

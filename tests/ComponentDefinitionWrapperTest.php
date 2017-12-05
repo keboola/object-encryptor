@@ -44,7 +44,7 @@ class ComponentDefinitionWrapperTest extends TestCase
 
     /**
      * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage Bad init
+     * @expectedExceptionMessage Cipher keys are missing.
      */
     public function testInvalidSetupEncrypt1()
     {
@@ -54,7 +54,7 @@ class ComponentDefinitionWrapperTest extends TestCase
 
     /**
      * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage Bad init
+     * @expectedExceptionMessage Cipher keys are missing.
      */
     public function testInvalidSetupEncrypt2()
     {
@@ -65,7 +65,7 @@ class ComponentDefinitionWrapperTest extends TestCase
 
     /**
      * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage Bad init
+     * @expectedExceptionMessage No component id provided.
      */
     public function testInvalidSetupEncrypt3()
     {
@@ -77,7 +77,7 @@ class ComponentDefinitionWrapperTest extends TestCase
 
     /**
      * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage Bad init
+     * @expectedExceptionMessage Cipher keys are missing.
      */
     public function testInvalidSetupDecrypt1()
     {
@@ -87,7 +87,7 @@ class ComponentDefinitionWrapperTest extends TestCase
 
     /**
      * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage Bad init
+     * @expectedExceptionMessage Cipher keys are missing.
      */
     public function testInvalidSetupDecrypt2()
     {
@@ -98,7 +98,7 @@ class ComponentDefinitionWrapperTest extends TestCase
 
     /**
      * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage Bad init
+     * @expectedExceptionMessage No component id provided.
      */
     public function testInvalidSetupDecrypt3()
     {
@@ -110,7 +110,7 @@ class ComponentDefinitionWrapperTest extends TestCase
 
     /**
      * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage Invalid Key
+     * @expectedExceptionMessage Cipher keys are invalid.
      */
     public function testInvalidKey1()
     {
@@ -123,7 +123,7 @@ class ComponentDefinitionWrapperTest extends TestCase
 
     /**
      * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage Invalid Key
+     * @expectedExceptionMessage Cipher keys are invalid.
      */
     public function testInvalidKey2()
     {
@@ -136,7 +136,7 @@ class ComponentDefinitionWrapperTest extends TestCase
 
     /**
      * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage Invalid Component Id
+     * @expectedExceptionMessage Component id is invalid.
      */
     public function testInvalidComponent()
     {
@@ -150,7 +150,7 @@ class ComponentDefinitionWrapperTest extends TestCase
 
     /**
      * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage Invalid Stack
+     * @expectedExceptionMessage Stack id is invalid.
      */
     public function testInvalidStack()
     {
