@@ -382,7 +382,6 @@ class ObjectEncryptorTest extends TestCase
         self::assertEquals('test', $decrypted->{'#key2'});
     }
 
-
     public function testEncryptorNestedArray()
     {
         $encryptor = $this->factory->getEncryptor();
@@ -493,7 +492,6 @@ class ObjectEncryptorTest extends TestCase
         self::assertEquals('someValue2', $decrypted['#key3']['#encryptedNestedKey']);
     }
 
-
     public function testEncryptorNestedObjectWithArrayKeyHashmark()
     {
         $encryptor = $this->factory->getEncryptor();
@@ -509,7 +507,6 @@ class ObjectEncryptorTest extends TestCase
         $nested3->anotherNestedKey = 'someValue';
         $nested3->{'#encryptedNestedKey'} = 'someValue2';
         $object->{'#key3'} = $nested3;
-
 
         $result = $encryptor->encrypt($object);
         self::assertObjectHasAttribute('key1', $result);
@@ -578,7 +575,6 @@ class ObjectEncryptorTest extends TestCase
         self::assertEquals('value3', $decrypted['key2']['nestedKey2']['#finalKey']);
         self::assertEquals('test', $decrypted['key2']['nestedKey2']['#finalKeyEncrypted']);
     }
-
 
     public function testEncryptorNestedObjectEncrypted()
     {
