@@ -66,6 +66,10 @@ class ObjectEncryptorFactory
         $this->keyVersion2 = $keyVersion2;
         $this->keyVersion1 = $keyVersion1;
         $this->keyVersion0 = substr($keyVersion0, 0, 32);
+        if (!$this->keyVersion0) {
+            // For php 5.6 compatibility
+            $this->keyVersion0 = '';
+        }
         $this->stackKeyVersion2 = $stackKeyVersion2;
     }
 
