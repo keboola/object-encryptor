@@ -12,6 +12,7 @@ class GenericWrapper implements CryptoWrapperInterface
 {
     const KEY_METADATA = 'metadata';
     const KEY_VALUE = 'value';
+    const KEY_STACK = 'stackId';
 
     /**
      * @var string
@@ -95,56 +96,6 @@ class GenericWrapper implements CryptoWrapperInterface
     }
 
     /**
-     * @param string $encryptedData
-     * @return string Inner cipher
-     * @throws UserException
-     */
-    private function generalDecipher($encryptedData)
-    {
-        try {
-            $jsonString = Crypto::Decrypt($encryptedData, $this->keyGeneralKey);
-        } catch (\Exception $e) {
-            throw new UserException('Value is not an encrypted value.');
-        }
-        $data = json_decode($jsonString, true);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new UserException('Deserialization of decrypted data failed: ' . json_last_error_msg());
-        }
-        if (!isset($data[self::KEY_METADATA]) || !isset($data[self::KEY_VALUE]) || !is_array($data[self::KEY_METADATA])) {
-            throw new UserException('Invalid cipher data');
-        }
-        foreach ($data[self::KEY_METADATA] as $key => $value) {
-            if (!empty($value) && (empty($this->metadata[$key]) || $value !== $this->metadata[$key])) {
-                throw new UserException('Invalid metadata');
-            }
-        }
-        return $data['value'];
-    }
-
-    /**
-     * @param string $encrypted Cipher value.
-     * @return string Encrypted string.
-     * @throws ApplicationException
-     */
-    private function generalCipher($encrypted)
-    {
-        $result = [self::KEY_METADATA => []];
-        foreach ($this->metadata as $key => $value) {
-            $result[self::KEY_METADATA][$key] = $value;
-        }
-        $result[self::KEY_VALUE] = $encrypted;
-        $jsonString = json_encode($result);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new ApplicationException('Serialization of encrypted data failed: ' . json_last_error_msg());
-        }
-        try {
-            return Crypto::Encrypt($jsonString, $this->keyGeneralKey);
-        } catch (\Exception $e) {
-            throw new ApplicationException("Ciphering failed " . $e->getMessage(), $e);
-        }
-    }
-
-    /**
      * @param $encryptedData string
      * @return string decrypted data
      * @throws UserException
@@ -154,7 +105,29 @@ class GenericWrapper implements CryptoWrapperInterface
     {
         $this->validateState();
         try {
-            return Crypto::Decrypt($this->generalDecipher($encryptedData), $this->keyStackKey);
+            $jsonString = Crypto::Decrypt($encryptedData, $this->keyGeneralKey);
+        } catch (\Exception $e) {
+            throw new UserException('Value is not an encrypted value.');
+        }
+        $data = json_decode($jsonString, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new UserException('Deserialization of decrypted data failed: ' . json_last_error_msg());
+        }
+        // use in_array on KEY_VALUE, because it might be null
+        if (!isset($data[self::KEY_METADATA]) || in_array(self::KEY_VALUE, $data) || !is_array($data[self::KEY_METADATA])) {
+            throw new UserException('Invalid cipher data.');
+        }
+        foreach ($data[self::KEY_METADATA] as $key => $value) {
+            if (!empty($value) && (empty($this->metadata[$key]) || $value !== $this->metadata[$key])) {
+                throw new UserException('Invalid metadata.');
+            }
+        }
+        try {
+            if (!empty($data[self::KEY_METADATA][self::KEY_STACK])) {
+                return Crypto::Decrypt($data[self::KEY_VALUE], $this->keyStackKey);
+            } else {
+                return $data[self::KEY_VALUE];
+            }
         } catch (CryptoException $e) {
             throw new UserException('Invalid cipher');
         }
@@ -172,12 +145,27 @@ class GenericWrapper implements CryptoWrapperInterface
             throw new UserException('Cannot encrypt a non-scalar value');
         }
         $this->validateState();
-        try {
-            $encrypted = Crypto::Encrypt($data, $this->keyStackKey);
-        } catch (\Exception $e) {
-            throw new ApplicationException($e->getMessage());
+        if (!empty($this->metadata[self::KEY_STACK])) {
+            try {
+                $data = Crypto::Encrypt($data, $this->keyStackKey);
+            } catch (\Exception $e) {
+                throw new ApplicationException($e->getMessage());
+            }
         }
-        return $this->generalCipher($encrypted);
+        $result = [self::KEY_METADATA => []];
+        foreach ($this->metadata as $key => $value) {
+            $result[self::KEY_METADATA][$key] = $value;
+        }
+        $result[self::KEY_VALUE] = $data;
+        $jsonString = json_encode($result);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new ApplicationException('Serialization of encrypted data failed: ' . json_last_error_msg());
+        }
+        try {
+            return Crypto::Encrypt($jsonString, $this->keyGeneralKey);
+        } catch (\Exception $e) {
+            throw new ApplicationException("Ciphering failed " . $e->getMessage(), $e);
+        }
     }
 
     /**
