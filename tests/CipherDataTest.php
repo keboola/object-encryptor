@@ -85,7 +85,9 @@ class CipherDataTest extends TestCase
         $inCipher = Crypto::encrypt('fooBar', Key::loadFromAsciiSafeString($keyStack));
         $encrypted = Crypto::encrypt(
             json_encode([
-                GenericWrapper::KEY_METADATA => [],
+                GenericWrapper::KEY_METADATA => [
+                    GenericWrapper::KEY_STACK => 'my-stack'
+                ],
                 GenericWrapper::KEY_VALUE => $inCipher
             ]),
             Key::loadFromAsciiSafeString($keyGeneral)
@@ -93,8 +95,26 @@ class CipherDataTest extends TestCase
         $wrapper = new GenericWrapper();
         $wrapper->setGeneralKey($keyGeneral);
         $wrapper->setStackKey($keyStack);
+        $wrapper->setMetadataValue(GenericWrapper::KEY_STACK, 'my-stack');
         $decrypted = $wrapper->decrypt($encrypted);
         self::assertEquals('fooBar', $decrypted);
+    }
+
+    public function testDecryptWrongStackKeyNoStack()
+    {
+        $keyGeneral = Key::createNewRandomKey()->saveToAsciiSafeString();
+        $keyStack = Key::createNewRandomKey()->saveToAsciiSafeString();
+        $encrypted = Crypto::encrypt(
+            json_encode([
+                GenericWrapper::KEY_METADATA => [],
+                GenericWrapper::KEY_VALUE => 'fooBar'
+            ]),
+            Key::loadFromAsciiSafeString($keyGeneral)
+        );
+        $wrapper = new GenericWrapper();
+        $wrapper->setGeneralKey($keyGeneral);
+        $wrapper->setStackKey($keyStack);
+        self::assertEquals('fooBar', $wrapper->decrypt($encrypted));
     }
 
     /**
@@ -108,7 +128,9 @@ class CipherDataTest extends TestCase
         $inCipher = Crypto::encrypt('fooBar', Key::createNewRandomKey());
         $encrypted = Crypto::encrypt(
             json_encode([
-                GenericWrapper::KEY_METADATA => [],
+                GenericWrapper::KEY_METADATA => [
+                    GenericWrapper::KEY_STACK => 'some-stack'
+                ],
                 GenericWrapper::KEY_VALUE => $inCipher
             ]),
             Key::loadFromAsciiSafeString($keyGeneral)
@@ -116,6 +138,7 @@ class CipherDataTest extends TestCase
         $wrapper = new GenericWrapper();
         $wrapper->setGeneralKey($keyGeneral);
         $wrapper->setStackKey($keyStack);
+        $wrapper->setMetadataValue(GenericWrapper::KEY_STACK, 'some-stack');
         $wrapper->decrypt($encrypted);
     }
 

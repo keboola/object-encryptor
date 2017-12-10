@@ -32,6 +32,45 @@ class ComponentDefinitionWrapperTest extends TestCase
         self::assertEquals($secret, $wrapper->decrypt($encrypted));
     }
 
+    public function testEncryptDifferentStack()
+    {
+        $generalKey = Key::createNewRandomKey()->saveToAsciiSafeString();
+        $wrapper = new ComponentDefinitionWrapper();
+        $wrapper->setGeneralKey($generalKey);
+        $wrapper->setStackKey(Key::createNewRandomKey()->saveToAsciiSafeString());
+        $wrapper->setComponentId('dummy-component');
+        $secret = 'mySecretValue';
+        $encrypted = $wrapper->encrypt($secret);
+        self::assertNotEquals($secret, $encrypted);
+        self::assertEquals($secret, $wrapper->decrypt($encrypted));
+
+        $wrapper = new ComponentDefinitionWrapper();
+        $wrapper->setGeneralKey($generalKey);
+        $wrapper->setStackKey(Key::createNewRandomKey()->saveToAsciiSafeString());
+        $wrapper->setComponentId('dummy-component');
+        self::assertEquals($secret, $wrapper->decrypt($encrypted));
+    }
+
+    public function testEncryptDifferentStack2()
+    {
+        $generalKey = Key::createNewRandomKey()->saveToAsciiSafeString();
+        $wrapper = new ComponentDefinitionWrapper();
+        $wrapper->setGeneralKey($generalKey);
+        $wrapper->setStackKey(Key::createNewRandomKey()->saveToAsciiSafeString());
+        $wrapper->setComponentId('dummy-component');
+        $secret = 'mySecretValue';
+        $encrypted = $wrapper->encrypt($secret);
+        self::assertNotEquals($secret, $encrypted);
+        self::assertEquals($secret, $wrapper->decrypt($encrypted));
+
+        $wrapper = new ComponentDefinitionWrapper();
+        $wrapper->setGeneralKey($generalKey);
+        $wrapper->setStackId('some-stack');
+        $wrapper->setStackKey(Key::createNewRandomKey()->saveToAsciiSafeString());
+        $wrapper->setComponentId('dummy-component');
+        self::assertEquals($secret, $wrapper->decrypt($encrypted));
+    }
+
     public function testEncryptStack()
     {
         $wrapper = $this->getComponentWrapper();

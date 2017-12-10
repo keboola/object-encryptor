@@ -6,7 +6,6 @@ use Keboola\ObjectEncryptor\Exception\ApplicationException;
 
 class ConfigurationWrapper extends GenericWrapper
 {
-    const KEY_STACK = 'stackId';
     const KEY_COMPONENT = 'componentId';
     const KEY_PROJECT = 'projectId';
     const KEY_CONFIGURATION = 'configurationId';

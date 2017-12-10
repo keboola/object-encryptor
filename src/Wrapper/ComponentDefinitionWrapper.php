@@ -6,7 +6,6 @@ use Keboola\ObjectEncryptor\Exception\ApplicationException;
 
 class ComponentDefinitionWrapper extends GenericWrapper
 {
-    const KEY_STACK = 'stackId';
     const KEY_COMPONENT = 'componentId';
 
     /**
