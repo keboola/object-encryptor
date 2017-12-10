@@ -14,12 +14,12 @@ use Keboola\ObjectEncryptor\Wrapper\GenericWrapper;
 class ObjectEncryptorFactory
 {
     /**
-     * @var null|string Stack specific encryption key for KBC::SecureV3 ciphers.
+     * @var null|string Stack specific encryption key for KBC::Secure ciphers.
      */
     private $stackKeyVersion2;
 
     /**
-     * @var null|string Global encryption key for KBC::SecureV3 ciphers.
+     * @var null|string Global encryption key for KBC::Secure ciphers.
      */
     private $keyVersion2 = null;
 
@@ -203,7 +203,7 @@ class ObjectEncryptorFactory
     public function getEncryptor()
     {
         $this->validateState();
-        if ($this->keyVersion0) {
+        if ($this->keyVersion0 && extension_loaded('mcrypt')) {
             $legacyEncryptor = new Encryptor($this->keyVersion0);
         } else {
             $legacyEncryptor = null;

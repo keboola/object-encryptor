@@ -106,7 +106,7 @@ class ObjectEncryptor
      * @return CryptoWrapperInterface|null
      * @throws ApplicationException
      */
-    protected function findWrapper($value)
+    private function findWrapper($value)
     {
         $selectedWrapper = null;
         if (empty($this->wrappers)) {
@@ -138,7 +138,7 @@ class ObjectEncryptor
      * @throws ApplicationException
      * @throws UserException
      */
-    protected function decryptValue($value)
+    private function decryptValue($value)
     {
         $wrapper = $this->findWrapper($value);
         if (!$wrapper) {
@@ -168,7 +168,7 @@ class ObjectEncryptor
      * @return array|string
      * @throws ApplicationException
      */
-    protected function encryptItem($key, $value, CryptoWrapperInterface $wrapper)
+    private function encryptItem($key, $value, CryptoWrapperInterface $wrapper)
     {
         if (is_scalar($value) || is_null($value)) {
             if (substr($key, 0, 1) == '#') {
@@ -193,7 +193,7 @@ class ObjectEncryptor
      * @return string Encrypted value.
      * @throws ApplicationException
      */
-    protected function encryptValue($value, CryptoWrapperInterface $wrapper)
+    private function encryptValue($value, CryptoWrapperInterface $wrapper)
     {
         // return self if already encrypted with any wrapper
         if ($this->findWrapper($value)) {
@@ -213,7 +213,7 @@ class ObjectEncryptor
      * @return array
      * @throws ApplicationException
      */
-    protected function encryptArray(array $data, CryptoWrapperInterface $wrapper)
+    private function encryptArray(array $data, CryptoWrapperInterface $wrapper)
     {
         $result = [];
         foreach ($data as $key => $value) {
@@ -228,7 +228,7 @@ class ObjectEncryptor
      * @return \stdClass
      * @throws ApplicationException
      */
-    protected function encryptObject(\stdClass $data, CryptoWrapperInterface $wrapper)
+    private function encryptObject(\stdClass $data, CryptoWrapperInterface $wrapper)
     {
         $result = new \stdClass();
         foreach (get_object_vars($data) as $key => $value) {
@@ -244,7 +244,7 @@ class ObjectEncryptor
      * @throws ApplicationException
      * @throws UserException
      */
-    protected function decryptItem($key, $value)
+    private function decryptItem($key, $value)
     {
         try {
             if (is_scalar($value) || is_null($value)) {
@@ -273,7 +273,7 @@ class ObjectEncryptor
      * @throws ApplicationException
      * @throws UserException
      */
-    protected function decryptObject(\stdClass $data)
+    private function decryptObject(\stdClass $data)
     {
         $result = new \stdClass();
         foreach (get_object_vars($data) as $key => $value) {
@@ -288,7 +288,7 @@ class ObjectEncryptor
      * @throws ApplicationException
      * @throws UserException
      */
-    protected function decryptArray(array $data)
+    private function decryptArray(array $data)
     {
         $result = [];
         foreach ($data as $key => $value) {
