@@ -122,13 +122,18 @@ class GenericWrapper implements CryptoWrapperInterface
     }
 
     /**
-     * @param array $data Cipher data.
+     * @param string $encrypted Cipher value.
      * @return string Encrypted string.
      * @throws ApplicationException
      */
-    private function generalCipher($data)
+    private function generalCipher($encrypted)
     {
-        $jsonString = json_encode($data);
+        $result = [self::KEY_METADATA => []];
+        foreach ($this->metadata as $key => $value) {
+            $result[self::KEY_METADATA][$key] = $value;
+        }
+        $result[self::KEY_VALUE] = $encrypted;
+        $jsonString = json_encode($result);
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new ApplicationException('Serialization of encrypted data failed: ' . json_last_error_msg());
         }
@@ -172,12 +177,7 @@ class GenericWrapper implements CryptoWrapperInterface
         } catch (\Exception $e) {
             throw new ApplicationException($e->getMessage());
         }
-        $result = [self::KEY_METADATA => []];
-        foreach ($this->metadata as $key => $value) {
-            $result[self::KEY_METADATA][$key] = $value;
-        }
-        $result[self::KEY_VALUE] = $encrypted;
-        return $this->generalCipher($result);
+        return $this->generalCipher($encrypted);
     }
 
     /**
