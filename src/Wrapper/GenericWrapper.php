@@ -12,7 +12,6 @@ class GenericWrapper implements CryptoWrapperInterface
 {
     const KEY_METADATA = 'metadata';
     const KEY_VALUE = 'value';
-    const KEY_STACK = 'stackId';
 
     /**
      * @var string
@@ -123,11 +122,7 @@ class GenericWrapper implements CryptoWrapperInterface
             }
         }
         try {
-            if (!empty($data[self::KEY_METADATA][self::KEY_STACK])) {
-                return Crypto::Decrypt($data[self::KEY_VALUE], $this->keyStackKey);
-            } else {
-                return $data[self::KEY_VALUE];
-            }
+            return Crypto::Decrypt($data[self::KEY_VALUE], $this->keyStackKey);
         } catch (CryptoException $e) {
             throw new UserException('Invalid cipher');
         }
@@ -145,12 +140,10 @@ class GenericWrapper implements CryptoWrapperInterface
             throw new UserException('Cannot encrypt a non-scalar value');
         }
         $this->validateState();
-        if (!empty($this->metadata[self::KEY_STACK])) {
-            try {
-                $data = Crypto::Encrypt($data, $this->keyStackKey);
-            } catch (\Exception $e) {
-                throw new ApplicationException($e->getMessage());
-            }
+        try {
+            $data = Crypto::Encrypt($data, $this->keyStackKey);
+        } catch (\Exception $e) {
+            throw new ApplicationException($e->getMessage());
         }
         $result = [self::KEY_METADATA => []];
         foreach ($this->metadata as $key => $value) {

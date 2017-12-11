@@ -120,9 +120,11 @@ class ObjectEncryptorFactoryTest extends TestCase
         $secret = 'secret';
         $factory = new ObjectEncryptorFactory($globalKey, $legacyKey, $aesKey, $stackKey);
         $factory->setComponentId('dummy-component');
+        $factory->setStackId('my-stack');
         $wrapper = new ComponentDefinitionWrapper();
         $wrapper->setStackKey($stackKey);
         $wrapper->setGeneralKey($globalKey);
+        $wrapper->setStackId('my-stack');
         $wrapper->setComponentId('dummy-component');
         $encrypted = $wrapper->encrypt($secret);
         self::assertEquals($secret, $wrapper->decrypt($encrypted));
@@ -215,6 +217,7 @@ class ObjectEncryptorFactoryTest extends TestCase
         $wrapper = new ComponentDefinitionWrapper();
         $wrapper->setStackKey($stackKey);
         $wrapper->setGeneralKey($globalKey);
+        $wrapper->setStackId('my-stack');
         $wrapper->setComponentId('dummy-component');
         $encrypted = $wrapper->encrypt($secret);
         self::assertEquals($secret, $wrapper->decrypt($encrypted));
@@ -235,6 +238,7 @@ class ObjectEncryptorFactoryTest extends TestCase
         $wrapper = new ComponentDefinitionWrapper();
         $wrapper->setStackKey($stackKey);
         $wrapper->setGeneralKey($globalKey);
+        $wrapper->setStackId('my-stack');
         $wrapper->setComponentId('dummy-component');
         $encrypted = $wrapper->encrypt($secret);
         self::assertEquals($secret, $wrapper->decrypt($encrypted));

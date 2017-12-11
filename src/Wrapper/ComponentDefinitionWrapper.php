@@ -7,6 +7,7 @@ use Keboola\ObjectEncryptor\Exception\ApplicationException;
 class ComponentDefinitionWrapper extends GenericWrapper
 {
     const KEY_COMPONENT = 'componentId';
+    const KEY_STACK = 'stackId';
 
     /**
      * @param string $stackId
@@ -31,14 +32,14 @@ class ComponentDefinitionWrapper extends GenericWrapper
     protected function validateState()
     {
         parent::validateState();
-        if (empty($this->getMetadataValue(self::KEY_COMPONENT))) {
-            throw new ApplicationException('No component id provided.');
+        if (empty($this->getMetadataValue(self::KEY_STACK)) || empty($this->getMetadataValue(self::KEY_COMPONENT))) {
+            throw new ApplicationException('No stack or component id provided.');
+        }
+        if (!is_string($this->getMetadataValue(self::KEY_STACK))) {
+            throw new ApplicationException('Stack id is invalid.');
         }
         if (!is_string($this->getMetadataValue(self::KEY_COMPONENT))) {
             throw new ApplicationException('Component id is invalid.');
-        }
-        if (!is_null($this->getMetadataValue(self::KEY_STACK)) && !is_string($this->getMetadataValue(self::KEY_STACK))) {
-            throw new ApplicationException('Stack id is invalid.');
         }
     }
 
