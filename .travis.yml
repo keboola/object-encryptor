@@ -1,11 +1,17 @@
 language: php
 php:
-  - 5.6
-  - 7.0
-before_script: 
-  - composer install
+- 5.6
+- 7.0
+
+before_script:
+- composer install
 script:
-  - php ./vendor/bin/phpcs --standard=psr2 --ignore=vendor -n .  
-  - php ./vendor/bin/phpunit --coverage-clover build/logs/clover.xml
+- php ./vendor/bin/phpcs --standard=psr2 --ignore=vendor -n .
+- php ./vendor/bin/phpunit --coverage-clover build/logs/clover.xml
 after_success:
-  - ./vendor/bin/test-reporter
+- "./vendor/bin/test-reporter"
+
+notifications:
+  slack:
+    secure: OlJ7CmesQyn20r8nHd0Exmi/7GY28fTj5Z+BiHUyv/jhvGDlLlMMhl654dF4j+Oo3QQrrXKpzaaSp+WytZ35Qp7chVsIWkZ+LgAAwSOAtjPfxMjA8EvfWsDSC61bUXunHfMAlOxkINZ6tfGEaknDNs+Y64EbENXNYvfPwhCYMnztL0nTBx3eJa01b/lOq4nIDp7FDWYVhhnPc2yUyq05A8ylguO04PScnmUiTi34VkRzlXYS17Qo9mw0Di/J/RewYK1ifrVZZDncIIxFGRHV5wOGDLjKcyOtS7/A2lKqsZkMVRKEDBztGKqM/h4DIHB3uYIu9MSaJQ0BF3PlJr/J6sI0C5FreSHuwLSuAamq8d+sw7M2sDtJnkD/a9mOq74Xq7Rar4vHlfe2IF+sqqrsKetiu4fAWs8HhDNMHsecjd6h2kUI6jldh7sM0EJQVZmNCwSUKYORjw6DHBBMxf/2kQySK5SXkxAgw4bqwgev2xvvTRb85J8XQ7cN1vrqTL/4CPUVcEjVLsnrr+OJ68b5iO2lJC8TJCVTuMGK2K6FSOPKqOBdQWidY4ZK7LAr2o2EVyZ2ralkX+FnZv1Uwk7KcVlgeHDUGmVA8uo3zVwM5vPngSjiDSVKuxGhrsQIoDxw+ZPeaSWlmSAtiZtN+QuYL7tZcLGIfQHjngeTA56IauM=
+  email: false

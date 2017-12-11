@@ -41,8 +41,8 @@ Depending on the provided keys and parameters, the following wrappers will be av
 - `ComponentWrapper` - legacy wrapper for `KBC::ComponentEncrypted==` ciphers, requires `keyVersion1` and `componentId`
 - `ComponentProjectWrapper` - legacy wrapper for `KBC::ComponentProjectEncrypted==` ciphers, requires `keyVersion1` and `componentId` and `projectId`
 - `GenericWrapper` - current wrapper for `KBC::Secure::` ciphers, requires `keyVersion2`
-- `ComponentDefinitionWrapper` - current wrapper for `KBC::ComponentSecure::` ciphers, requires `keyVersion2`, `stackKeyVersion2` `componentId`, `stackId` is optional
-- `ConfigurationWrapper` - current wrapper for `KBC::ConfigSecure::` ciphers, requires `keyVersion2`, `stackKeyVersion2` ,`componentId` and `stackId`, `projectId` and `configurationId` are optional
+- `ComponentDefinitionWrapper` - current wrapper for `KBC::ComponentSecure::` ciphers, requires `keyVersion2`, `stackKeyVersion2` and `componentId`; `stackId` is optional
+- `ConfigurationWrapper` - current wrapper for `KBC::ConfigSecure::` ciphers, requires `keyVersion2`, `stackKeyVersion2` ,`componentId` and `stackId`; `projectId` and `configurationId` are optional
 
 During encryption, the wrapper has to be specified (or `BaseWrapper` is used). During decryption, the wrapper is chosen automatically by the 
 cipher prefix. If the wrapper is not available (key or parameters are not set or equal to those in the cipher), the value cannot be deciphered.
