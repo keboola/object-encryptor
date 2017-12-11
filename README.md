@@ -1,7 +1,5 @@
 [![Build Status](https://travis-ci.org/keboola/object-encryptor.svg?branch=master)](https://travis-ci.org/keboola/object-encryptor)
-
 [![Test Coverage](https://api.codeclimate.com/v1/badges/a08caf5f9ff2116fd497/test_coverage)](https://codeclimate.com/github/keboola/object-encryptor/test_coverage)
-
 [![Maintainability](https://api.codeclimate.com/v1/badges/a08caf5f9ff2116fd497/maintainability)](https://codeclimate.com/github/keboola/object-encryptor/maintainability)
 
 # Object Encryptor
@@ -25,10 +23,9 @@ Initialize the library using the factory class:
 
 ```
 $keyVersion2 = Key::createNewRandomKey()->saveToAsciiSafeString();
-$stackKeyVersion2 = Key::createNewRandomKey()->saveToAsciiSafeString();
 $keyVersion1 = '1234567890123456';
 $keyVersion0 = '123456789012345678901234567890ab';
-$factory = new ObjectEncryptorFactory($keyVersion2, $keyVersion1, $keyVersion0, $stackKeyVersion2);
+$factory = new ObjectEncryptorFactory($keyVersion2, $keyVersion1, $keyVersion0);
 ```
 
 Additional parameteters may be set with `setComponentId`, `setConfigurationId`, `setProjectId` and `setStackId` methods.
@@ -41,8 +38,8 @@ Depending on the provided keys and parameters, the following wrappers will be av
 - `ComponentWrapper` - legacy wrapper for `KBC::ComponentEncrypted==` ciphers, requires `keyVersion1` and `componentId`
 - `ComponentProjectWrapper` - legacy wrapper for `KBC::ComponentProjectEncrypted==` ciphers, requires `keyVersion1` and `componentId` and `projectId`
 - `GenericWrapper` - current wrapper for `KBC::Secure::` ciphers, requires `keyVersion2`
-- `ComponentDefinitionWrapper` - current wrapper for `KBC::ComponentSecure::` ciphers, requires `keyVersion2`, `stackKeyVersion2` and `componentId`; `stackId` is optional
-- `ConfigurationWrapper` - current wrapper for `KBC::ConfigSecure::` ciphers, requires `keyVersion2`, `stackKeyVersion2` ,`componentId` and `stackId`; `projectId` and `configurationId` are optional
+- `ComponentDefinitionWrapper` - current wrapper for `KBC::ComponentSecure::` ciphers, requires `keyVersion2`, `componentId` and `stackId`
+- `ConfigurationWrapper` - current wrapper for `KBC::ConfigSecure::` ciphers, requires `keyVersion2`, `componentId` and `stackId`; `projectId` and `configurationId` are optional
 
 During encryption, the wrapper has to be specified (or `BaseWrapper` is used). During decryption, the wrapper is chosen automatically by the 
 cipher prefix. If the wrapper is not available (key or parameters are not set or equal to those in the cipher), the value cannot be deciphered.
@@ -51,13 +48,11 @@ cipher prefix. If the wrapper is not available (key or parameters are not set or
 
 ```
 // intialize factory
-$globalKey = Key::createNewRandomKey()->saveToAsciiSafeString();
-$stackKey = Key::createNewRandomKey()->saveToAsciiSafeString();
+$key = Key::createNewRandomKey()->saveToAsciiSafeString();
 $legacyKey = '1234567890123456';
-$factory = new ObjectEncryptorFactory($globalKey, $legacyKey, '', $stackKey);
+$factory = new ObjectEncryptorFactory($key, $legacyKey, '');
 $factory->setComponentId('dummy-component');
 // get encryptor
 $factory->getEncryptor()->encrypt('secret', GenericWrapper::class);
 $secret = $factory->getEncryptor()->decrypt($encrypted);
 ```
-

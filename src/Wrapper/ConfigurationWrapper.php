@@ -9,6 +9,7 @@ class ConfigurationWrapper extends GenericWrapper
     const KEY_COMPONENT = 'componentId';
     const KEY_PROJECT = 'projectId';
     const KEY_CONFIGURATION = 'configurationId';
+    const KEY_STACK = 'stackId';
 
     /**
      * @param string $stackId

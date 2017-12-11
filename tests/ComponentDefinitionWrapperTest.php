@@ -19,6 +19,7 @@ class ComponentDefinitionWrapperTest extends TestCase
         $wrapper = new ComponentDefinitionWrapper();
         $wrapper->setGeneralKey($generalKey);
         $wrapper->setStackKey($stackKey);
+        $wrapper->setStackId('my-stack');
         $wrapper->setComponentId('dummy-component');
         return $wrapper;
     }
@@ -32,6 +33,10 @@ class ComponentDefinitionWrapperTest extends TestCase
         self::assertEquals($secret, $wrapper->decrypt($encrypted));
     }
 
+    /**
+     * @expectedException \Keboola\ObjectEncryptor\Exception\UserException
+     * @expectedExceptionMessage Invalid cipher
+     */
     public function testEncryptDifferentStack()
     {
         $generalKey = Key::createNewRandomKey()->saveToAsciiSafeString();
@@ -39,6 +44,7 @@ class ComponentDefinitionWrapperTest extends TestCase
         $wrapper->setGeneralKey($generalKey);
         $wrapper->setStackKey(Key::createNewRandomKey()->saveToAsciiSafeString());
         $wrapper->setComponentId('dummy-component');
+        $wrapper->setStackId('my-stack');
         $secret = 'mySecretValue';
         $encrypted = $wrapper->encrypt($secret);
         self::assertNotEquals($secret, $encrypted);
@@ -48,9 +54,14 @@ class ComponentDefinitionWrapperTest extends TestCase
         $wrapper->setGeneralKey($generalKey);
         $wrapper->setStackKey(Key::createNewRandomKey()->saveToAsciiSafeString());
         $wrapper->setComponentId('dummy-component');
+        $wrapper->setStackId('my-stack');
         self::assertEquals($secret, $wrapper->decrypt($encrypted));
     }
 
+    /**
+     * @expectedException \Keboola\ObjectEncryptor\Exception\UserException
+     * @expectedExceptionMessage Invalid metadata.
+     */
     public function testEncryptDifferentStack2()
     {
         $generalKey = Key::createNewRandomKey()->saveToAsciiSafeString();
@@ -58,6 +69,7 @@ class ComponentDefinitionWrapperTest extends TestCase
         $wrapper->setGeneralKey($generalKey);
         $wrapper->setStackKey(Key::createNewRandomKey()->saveToAsciiSafeString());
         $wrapper->setComponentId('dummy-component');
+        $wrapper->setStackId('my-stack');
         $secret = 'mySecretValue';
         $encrypted = $wrapper->encrypt($secret);
         self::assertNotEquals($secret, $encrypted);
@@ -104,13 +116,26 @@ class ComponentDefinitionWrapperTest extends TestCase
 
     /**
      * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage No component id provided.
+     * @expectedExceptionMessage No stack or component id provided.
      */
     public function testInvalidSetupEncrypt3()
     {
         $wrapper = new ComponentDefinitionWrapper();
         $wrapper->setGeneralKey(Key::createNewRandomKey()->saveToAsciiSafeString());
         $wrapper->setStackKey(Key::createNewRandomKey()->saveToAsciiSafeString());
+        $wrapper->encrypt('mySecretValue');
+    }
+
+    /**
+     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
+     * @expectedExceptionMessage No stack or component id provided.
+     */
+    public function testInvalidSetupEncrypt4()
+    {
+        $wrapper = new ComponentDefinitionWrapper();
+        $wrapper->setGeneralKey(Key::createNewRandomKey()->saveToAsciiSafeString());
+        $wrapper->setStackKey(Key::createNewRandomKey()->saveToAsciiSafeString());
+        $wrapper->setStackId('my-stack');
         $wrapper->encrypt('mySecretValue');
     }
 
@@ -137,13 +162,26 @@ class ComponentDefinitionWrapperTest extends TestCase
 
     /**
      * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage No component id provided.
+     * @expectedExceptionMessage No stack or component id provided.
      */
     public function testInvalidSetupDecrypt3()
     {
         $wrapper = new ComponentDefinitionWrapper();
         $wrapper->setGeneralKey(Key::createNewRandomKey()->saveToAsciiSafeString());
         $wrapper->setStackKey(Key::createNewRandomKey()->saveToAsciiSafeString());
+        $wrapper->decrypt('mySecretValue');
+    }
+
+    /**
+     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
+     * @expectedExceptionMessage No stack or component id provided.
+     */
+    public function testInvalidSetupDecrypt4()
+    {
+        $wrapper = new ComponentDefinitionWrapper();
+        $wrapper->setGeneralKey(Key::createNewRandomKey()->saveToAsciiSafeString());
+        $wrapper->setStackKey(Key::createNewRandomKey()->saveToAsciiSafeString());
+        $wrapper->setStackId('my-stack');
         $wrapper->decrypt('mySecretValue');
     }
 
