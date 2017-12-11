@@ -12,6 +12,9 @@ which limits the conditions under which it may be decrypted. The library support
 - [keboola-legacy/php-encryption](https://github.com/keboola/legacy-php-encryption) -- legacy version of [defuse/php-encryption](https://github.com/defuse/php-encryption), currently default
 - [defuse/php-encryption](https://github.com/defuse/php-encryption) -- future encryption method
 
+## Requirements
+The library requires PHP 5.6 or PHP 7.0. Versions 7.1+ are not supported until legacy mcrypt is dropped.
+
 ## Usage
 Entry point to the library is the `ObjectEncryptorFactory` class which creates instances of `ObjectEncryptor` class which
 has `encrypt` and `decrypt` methods. The actual encryption and decryption mechanisms are implemented using **Crypto Wrappers**.
