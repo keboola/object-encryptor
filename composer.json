@@ -15,15 +15,9 @@
             "Keboola\\ObjectEncryptor\\Tests\\": "tests"
         }
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/keboola/legacy-php-encryption"
-        }
-    ],
     "require": {
         "keboola-legacy/php-encryption": "^0.0",
-		"keboola/php-encryption": "~0.2",
+		"keboola/php-encryption": "^0.2",
         "defuse/php-encryption": "^2.1",
         "php": ">=5.6"
     },
