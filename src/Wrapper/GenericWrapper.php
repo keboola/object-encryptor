@@ -113,8 +113,8 @@ class GenericWrapper implements CryptoWrapperInterface
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new UserException('Deserialization of decrypted data failed: ' . json_last_error_msg());
         }
-        // use in_array on KEY_VALUE, because it might be null
-        if (!isset($data[self::KEY_METADATA]) || in_array(self::KEY_VALUE, $data) || !is_array($data[self::KEY_METADATA])) {
+        // use array_key_exists on KEY_VALUE, because it might be null
+        if (!isset($data[self::KEY_METADATA]) || !array_key_exists(self::KEY_VALUE, $data) || !is_array($data[self::KEY_METADATA])) {
             throw new UserException('Invalid cipher data.');
         }
         foreach ($data[self::KEY_METADATA] as $key => $value) {

@@ -69,7 +69,25 @@ class CipherDataTest extends TestCase
         $keyGeneral = Key::createNewRandomKey()->saveToAsciiSafeString();
         $keyStack = Key::createNewRandomKey()->saveToAsciiSafeString();
         $encrypted = Crypto::encrypt(
-            json_encode(['value' => 'foo']),
+            json_encode([GenericWrapper::KEY_VALUE => 'foo']),
+            Key::loadFromAsciiSafeString($keyGeneral)
+        );
+        $wrapper = new GenericWrapper();
+        $wrapper->setGeneralKey($keyGeneral);
+        $wrapper->setStackKey($keyStack);
+        $wrapper->decrypt($encrypted);
+    }
+
+    /**
+     * @expectedException \Keboola\ObjectEncryptor\Exception\UserException
+     * @expectedExceptionMessage Invalid cipher data
+     */
+    public function testDecryptInvalidJson4()
+    {
+        $keyGeneral = Key::createNewRandomKey()->saveToAsciiSafeString();
+        $keyStack = Key::createNewRandomKey()->saveToAsciiSafeString();
+        $encrypted = Crypto::encrypt(
+            json_encode([GenericWrapper::KEY_METADATA => []]),
             Key::loadFromAsciiSafeString($keyGeneral)
         );
         $wrapper = new GenericWrapper();
