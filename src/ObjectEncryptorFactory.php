@@ -6,23 +6,14 @@ use Keboola\ObjectEncryptor\Exception\ApplicationException;
 use Keboola\ObjectEncryptor\Legacy\Encryptor;
 use Keboola\ObjectEncryptor\Legacy\Wrapper\BaseWrapper;
 use Keboola\ObjectEncryptor\Legacy\Wrapper\ComponentProjectWrapper;
-use Keboola\ObjectEncryptor\Legacy\Wrapper\ComponentWrapper;
-use Keboola\ObjectEncryptor\Wrapper\ComponentDefinitionWrapper;
+use Keboola\ObjectEncryptor\Legacy\Wrapper\ComponentWrapper as LegacyComponentWrapper;
+use Keboola\ObjectEncryptor\Wrapper\ComponentWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ConfigurationWrapper;
-use Keboola\ObjectEncryptor\Wrapper\GenericWrapper;
+use Keboola\ObjectEncryptor\Wrapper\ProjectWrapper;
+use Keboola\ObjectEncryptor\Wrapper\GenericKMSWrapper;
 
 class ObjectEncryptorFactory
 {
-    /**
-     * @var null|string Stack specific encryption key for KBC::Secure ciphers.
-     */
-    private $stackKeyVersion2;
-
-    /**
-     * @var null|string Global encryption key for KBC::Secure ciphers.
-     */
-    private $keyVersion2 = null;
-
     /**
      * @var null|string Encryption key for KBC::Encrypted ciphers.
      */
@@ -54,19 +45,29 @@ class ObjectEncryptorFactory
     private $configurationId = null;
 
     /**
+     * @var string
+     */
+    private $kmsKeyId;
+
+    /**
+     * @var string
+     */
+    private $kmsKeyRegion;
+
+    /**
      * ObjectEncryptorFactory constructor.
-     * @param string $keyVersion2 Encryption key for KBC::SecureV3 ciphers.
+     * @param string $keyId KMS Key ID Encryption key for KBC::Secure ciphers.
+     * @param string $region KMS Key Region.
      * @param string $keyVersion1 Encryption key for KBC::Encrypted ciphers.
      * @param string $keyVersion0 Encryption key for legacy ciphers.
-     * @param string $stackKeyVersion2 Stack specific encryption key for KBC::SecureV3 ciphers.
      */
-    public function __construct($keyVersion2, $keyVersion1, $keyVersion0, $stackKeyVersion2)
+    public function __construct($keyId, $region, $keyVersion1, $keyVersion0)
     {
         // No logic here, this constructor is exception-less so as not to leak keys in stack trace
-        $this->keyVersion2 = $keyVersion2;
+        $this->kmsKeyId = $keyId;
+        $this->kmsKeyRegion = $region;
         $this->keyVersion1 = $keyVersion1;
         $this->keyVersion0 = $keyVersion0;
-        $this->stackKeyVersion2 = $stackKeyVersion2;
     }
 
     /**
@@ -133,11 +134,11 @@ class ObjectEncryptorFactory
         if (!is_null($this->keyVersion1) && !is_string($this->keyVersion1)) {
             throw new ApplicationException('Invalid key version 1.');
         }
-        if (!is_null($this->keyVersion2) && !is_string($this->keyVersion2)) {
-            throw new ApplicationException('Invalid key version 2.');
+        if (!is_null($this->kmsKeyId) && !is_string($this->kmsKeyId)) {
+            throw new ApplicationException('Invalid KMS key Id.');
         }
-        if (!is_null($this->stackKeyVersion2) && !is_string($this->stackKeyVersion2)) {
-            throw new ApplicationException('Invalid stack key.');
+        if (!is_null($this->kmsKeyRegion) && !is_string($this->kmsKeyRegion)) {
+            throw new ApplicationException('Invalid KMS region.');
         }
     }
 
@@ -151,7 +152,7 @@ class ObjectEncryptorFactory
         $wrapper->setKey($this->keyVersion1);
         $encryptor->pushWrapper($wrapper);
         if ($this->componentId !== null) {
-            $wrapper = new ComponentWrapper();
+            $wrapper = new LegacyComponentWrapper();
             $wrapper->setKey($this->keyVersion1);
             $wrapper->setComponentId($this->componentId);
             $encryptor->pushWrapper($wrapper);
@@ -171,28 +172,37 @@ class ObjectEncryptorFactory
      */
     private function addVersion2Wrappers($encryptor)
     {
-        $wrapper = new GenericWrapper();
-        $wrapper->setStackKey($this->stackKeyVersion2);
-        $wrapper->setGeneralKey($this->keyVersion2);
+        $wrapper = new GenericKMSWrapper();
+        $wrapper->setKMSKeyId($this->kmsKeyId);
+        $wrapper->setKMSRegion($this->kmsKeyRegion);
         $encryptor->pushWrapper($wrapper);
 
-        if ($this->componentId) {
-            $wrapper = new ComponentDefinitionWrapper();
-            $wrapper->setStackKey($this->stackKeyVersion2);
-            $wrapper->setGeneralKey($this->keyVersion2);
-            $wrapper->setComponentId($this->componentId);
-            $wrapper->setStackId($this->stackId);
-            $encryptor->pushWrapper($wrapper);
-        }
         if ($this->componentId && $this->stackId) {
-            $wrapper = new ConfigurationWrapper();
-            $wrapper->setStackKey($this->stackKeyVersion2);
-            $wrapper->setGeneralKey($this->keyVersion2);
+            $wrapper = new ComponentWrapper();
+            $wrapper->setKMSKeyId($this->kmsKeyId);
+            $wrapper->setKMSRegion($this->kmsKeyRegion);
             $wrapper->setComponentId($this->componentId);
             $wrapper->setStackId($this->stackId);
-            $wrapper->setProjectId($this->projectId);
-            $wrapper->setConfigurationId($this->configurationId);
             $encryptor->pushWrapper($wrapper);
+            if ($this->projectId) {
+                $wrapper = new ProjectWrapper();
+                $wrapper->setKMSKeyId($this->kmsKeyId);
+                $wrapper->setKMSRegion($this->kmsKeyRegion);
+                $wrapper->setComponentId($this->componentId);
+                $wrapper->setStackId($this->stackId);
+                $wrapper->setProjectId($this->projectId);
+                $encryptor->pushWrapper($wrapper);
+                if ($this->configurationId) {
+                    $wrapper = new ConfigurationWrapper();
+                    $wrapper->setKMSKeyId($this->kmsKeyId);
+                    $wrapper->setKMSRegion($this->kmsKeyRegion);
+                    $wrapper->setComponentId($this->componentId);
+                    $wrapper->setStackId($this->stackId);
+                    $wrapper->setProjectId($this->projectId);
+                    $wrapper->setConfigurationId($this->configurationId);
+                    $encryptor->pushWrapper($wrapper);
+                }
+            }
         }
     }
 
@@ -214,7 +224,7 @@ class ObjectEncryptorFactory
             $this->addLegacyWrappers($encryptor);
         }
 
-        if ($this->keyVersion2 && $this->stackKeyVersion2) {
+        if ($this->kmsKeyRegion && $this->kmsKeyRegion) {
             $this->addVersion2Wrappers($encryptor);
         }
         return $encryptor;

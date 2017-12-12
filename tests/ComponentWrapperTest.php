@@ -2,10 +2,10 @@
 
 namespace Keboola\ObjectEncryptor\Tests;
 
-use Keboola\ObjectEncryptor\Wrapper\ConfigurationWrapper;
+use Keboola\ObjectEncryptor\Wrapper\ComponentWrapper;
 use PHPUnit\Framework\TestCase;
 
-class ConfigurationWrapperTest extends TestCase
+class ComponentWrapperTest extends TestCase
 {
     public function setUp()
     {
@@ -15,29 +15,27 @@ class ConfigurationWrapperTest extends TestCase
     }
 
     /**
-     * @return ConfigurationWrapper
+     * @return ComponentWrapper
      */
-    private function getConfigurationWrapper()
+    private function getComponentWrapper()
     {
-        $wrapper = new ConfigurationWrapper();
+        $wrapper = new ComponentWrapper();
         $wrapper->setKMSRegion(AWS_DEFAULT_REGION);
         $wrapper->setKMSKeyId(KMS_TEST_KEY);
         $wrapper->setStackId('my-stack');
         $wrapper->setComponentId('dummy-component');
-        $wrapper->setConfigurationId('my-configuration');
-        $wrapper->setProjectId('my-project');
         return $wrapper;
     }
 
     public function testEncrypt()
     {
         $secret = 'mySecretValue';
-        $wrapper = $this->getConfigurationWrapper();
+        $wrapper = $this->getComponentWrapper();
         $encrypted = $wrapper->encrypt($secret);
         self::assertNotEquals($secret, $encrypted);
         self::assertEquals($secret, $wrapper->decrypt($encrypted));
 
-        $wrapper = $this->getConfigurationWrapper();
+        $wrapper = $this->getComponentWrapper();
         self::assertEquals($secret, $wrapper->decrypt($encrypted));
     }
 
@@ -45,16 +43,16 @@ class ConfigurationWrapperTest extends TestCase
      * @expectedException \Keboola\ObjectEncryptor\Exception\UserException
      * @expectedExceptionMessage Invalid metadata.
      */
-    public function testEncryptDifferentConfiguration()
+    public function testEncryptDifferentStack()
     {
-        $wrapper = $this->getConfigurationWrapper();
+        $wrapper = $this->getComponentWrapper();
         $secret = 'mySecretValue';
         $encrypted = $wrapper->encrypt($secret);
         self::assertNotEquals($secret, $encrypted);
         self::assertEquals($secret, $wrapper->decrypt($encrypted));
 
-        $wrapper = $this->getConfigurationWrapper();
-        $wrapper->setConfigurationId('some-other-configuration');
+        $wrapper = $this->getComponentWrapper();
+        $wrapper->setStackId('some-other-stack');
         self::assertEquals($secret, $wrapper->decrypt($encrypted));
     }
 
@@ -62,16 +60,16 @@ class ConfigurationWrapperTest extends TestCase
      * @expectedException \Keboola\ObjectEncryptor\Exception\UserException
      * @expectedExceptionMessage Invalid metadata.
      */
-    public function testEncryptDifferentProject()
+    public function testEncryptDifferentComponent()
     {
-        $wrapper = $this->getConfigurationWrapper();
+        $wrapper = $this->getComponentWrapper();
         $secret = 'mySecretValue';
         $encrypted = $wrapper->encrypt($secret);
         self::assertNotEquals($secret, $encrypted);
         self::assertEquals($secret, $wrapper->decrypt($encrypted));
 
-        $wrapper = $this->getConfigurationWrapper();
-        $wrapper->setProjectId('some-other-project');
+        $wrapper = $this->getComponentWrapper();
+        $wrapper->setComponentId('some-other-component');
         self::assertEquals($secret, $wrapper->decrypt($encrypted));
     }
 
@@ -81,7 +79,7 @@ class ConfigurationWrapperTest extends TestCase
      */
     public function testInvalidSetupEncrypt1()
     {
-        $wrapper = new ConfigurationWrapper();
+        $wrapper = new ComponentWrapper();
         $wrapper->encrypt('mySecretValue');
     }
 
@@ -91,7 +89,7 @@ class ConfigurationWrapperTest extends TestCase
      */
     public function testInvalidSetupEncrypt2()
     {
-        $wrapper = new ConfigurationWrapper();
+        $wrapper = new ComponentWrapper();
         $wrapper->setKMSRegion(AWS_DEFAULT_REGION);
         $wrapper->setKMSKeyId(KMS_TEST_KEY);
         $wrapper->encrypt('mySecretValue');
@@ -99,30 +97,27 @@ class ConfigurationWrapperTest extends TestCase
 
     /**
      * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage No project id provided.
+     * @expectedExceptionMessage No stack or component id provided.
      */
     public function testInvalidSetupEncrypt3()
     {
-        $wrapper = new ConfigurationWrapper();
+        $wrapper = new ComponentWrapper();
         $wrapper->setKMSRegion(AWS_DEFAULT_REGION);
         $wrapper->setKMSKeyId(KMS_TEST_KEY);
         $wrapper->setComponentId('component-id');
-        $wrapper->setStackId('my-stack');
         $wrapper->encrypt('mySecretValue');
     }
 
     /**
      * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage No configuration id provided.
+     * @expectedExceptionMessage No stack or component id provided.
      */
     public function testInvalidSetupEncrypt4()
     {
-        $wrapper = new ConfigurationWrapper();
+        $wrapper = new ComponentWrapper();
         $wrapper->setKMSRegion(AWS_DEFAULT_REGION);
         $wrapper->setKMSKeyId(KMS_TEST_KEY);
-        $wrapper->setComponentId('component-id');
-        $wrapper->setStackId('my-stack');
-        $wrapper->setProjectId('my-project');
+        $wrapper->setComponentId('stack-id');
         $wrapper->encrypt('mySecretValue');
     }
 
@@ -132,7 +127,7 @@ class ConfigurationWrapperTest extends TestCase
      */
     public function testInvalidSetupDecrypt1()
     {
-        $wrapper = new ConfigurationWrapper();
+        $wrapper = new ComponentWrapper();
         $wrapper->decrypt('mySecretValue');
     }
 
@@ -142,7 +137,7 @@ class ConfigurationWrapperTest extends TestCase
      */
     public function testInvalidSetupDecrypt2()
     {
-        $wrapper = new ConfigurationWrapper();
+        $wrapper = new ComponentWrapper();
         $wrapper->setKMSRegion(AWS_DEFAULT_REGION);
         $wrapper->setKMSKeyId(KMS_TEST_KEY);
         $wrapper->decrypt('mySecretValue');
@@ -150,46 +145,55 @@ class ConfigurationWrapperTest extends TestCase
 
     /**
      * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage No project id provided.
+     * @expectedExceptionMessage No stack or component id provided.
      */
     public function testInvalidSetupDecrypt3()
     {
-        $wrapper = new ConfigurationWrapper();
+        $wrapper = new ComponentWrapper();
         $wrapper->setKMSRegion(AWS_DEFAULT_REGION);
         $wrapper->setKMSKeyId(KMS_TEST_KEY);
         $wrapper->setComponentId('component-id');
-        $wrapper->setStackId('my-stack');
         $wrapper->decrypt('mySecretValue');
     }
 
     /**
      * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage No configuration id provided.
+     * @expectedExceptionMessage No stack or component id provided.
      */
     public function testInvalidSetupDecrypt4()
     {
-        $wrapper = new ConfigurationWrapper();
+        $wrapper = new ComponentWrapper();
         $wrapper->setKMSRegion(AWS_DEFAULT_REGION);
         $wrapper->setKMSKeyId(KMS_TEST_KEY);
-        $wrapper->setComponentId('component-id');
-        $wrapper->setStackId('my-stack');
-        $wrapper->setProjectId('my-project');
+        $wrapper->setComponentId('stack-id');
         $wrapper->decrypt('mySecretValue');
     }
 
     /**
      * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage Configuration id is invalid.
+     * @expectedExceptionMessage Component id is invalid.
      */
-    public function testInvalidConfiguration()
+    public function testInvalidComponent()
     {
-        $wrapper = new ConfigurationWrapper();
+        $wrapper = new ComponentWrapper();
         $wrapper->setKMSRegion(AWS_DEFAULT_REGION);
         $wrapper->setKMSKeyId(KMS_TEST_KEY);
         $wrapper->setStackId('my-stack');
-        $wrapper->setComponentId('my-component');
-        $wrapper->setProjectId('my-project');
-        $wrapper->setConfigurationId(new \stdClass());
+        $wrapper->setComponentId(new \stdClass());
+        $wrapper->encrypt('mySecretValue');
+    }
+
+    /**
+     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
+     * @expectedExceptionMessage Stack id is invalid.
+     */
+    public function testInvalidStack()
+    {
+        $wrapper = new ComponentWrapper();
+        $wrapper->setKMSRegion(AWS_DEFAULT_REGION);
+        $wrapper->setKMSKeyId(KMS_TEST_KEY);
+        $wrapper->setStackId(new \stdClass());
+        $wrapper->setComponentId('dummy-component');
         $wrapper->encrypt('mySecretValue');
     }
 }

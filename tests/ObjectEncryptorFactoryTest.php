@@ -2,26 +2,24 @@
 
 namespace Keboola\ObjectEncryptor\Tests;
 
-use Defuse\Crypto\Key;
 use Keboola\ObjectEncryptor\Legacy\Wrapper\BaseWrapper;
 use Keboola\ObjectEncryptor\Legacy\Wrapper\ComponentProjectWrapper;
-use Keboola\ObjectEncryptor\Legacy\Wrapper\ComponentWrapper;
+use Keboola\ObjectEncryptor\Legacy\Wrapper\ComponentWrapper as LegacyComponentWrapper;
 use Keboola\ObjectEncryptor\ObjectEncryptorFactory;
-use Keboola\ObjectEncryptor\Wrapper\ComponentDefinitionWrapper;
+use Keboola\ObjectEncryptor\Wrapper\ComponentWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ConfigurationWrapper;
-use Keboola\ObjectEncryptor\Wrapper\GenericWrapper;
+use Keboola\ObjectEncryptor\Wrapper\GenericKMSWrapper;
+use Keboola\ObjectEncryptor\Wrapper\ProjectWrapper;
 use PHPUnit\Framework\TestCase;
 
 class ObjectEncryptorFactoryTest extends TestCase
 {
     public function testFactoryLegacyComponentProject()
     {
-        $globalKey = Key::createNewRandomKey()->saveToAsciiSafeString();
-        $stackKey = Key::createNewRandomKey()->saveToAsciiSafeString();
         $legacyKey = '1234567890123456';
         $aesKey = '123456789012345678901234567890ab';
         $secret = 'secret';
-        $factory = new ObjectEncryptorFactory($globalKey, $legacyKey, $aesKey, $stackKey);
+        $factory = new ObjectEncryptorFactory(KMS_TEST_KEY, AWS_DEFAULT_REGION, $legacyKey, $aesKey);
         $factory->setComponentId('dummy-component');
         $factory->setConfigurationId('123456');
         $factory->setProjectId('123');
@@ -40,21 +38,19 @@ class ObjectEncryptorFactoryTest extends TestCase
 
     public function testFactoryLegacyComponent()
     {
-        $globalKey = Key::createNewRandomKey()->saveToAsciiSafeString();
-        $stackKey = Key::createNewRandomKey()->saveToAsciiSafeString();
         $legacyKey = '1234567890123456';
         $aesKey = '123456789012345678901234567890ab';
         $secret = 'secret';
-        $factory = new ObjectEncryptorFactory($globalKey, $legacyKey, $aesKey, $stackKey);
+        $factory = new ObjectEncryptorFactory(KMS_TEST_KEY, AWS_DEFAULT_REGION, $legacyKey, $aesKey);
         $factory->setComponentId('dummy-component');
         $factory->setConfigurationId('123456');
         $factory->setProjectId('123');
-        $wrapper = new ComponentWrapper();
+        $wrapper = new LegacyComponentWrapper();
         $wrapper->setComponentId('dummy-component');
         $wrapper->setKey($legacyKey);
         $encrypted = $wrapper->encrypt($secret);
         self::assertEquals($secret, $wrapper->decrypt($encrypted));
-        $encrypted = $factory->getEncryptor()->encrypt($secret, ComponentWrapper::class);
+        $encrypted = $factory->getEncryptor()->encrypt($secret, LegacyComponentWrapper::class);
         self::assertStringStartsWith('KBC::ComponentEncrypted==', $encrypted);
         $encrypted = substr($encrypted, strlen($wrapper->getPrefix()));
         $decrypted = $wrapper->decrypt($encrypted);
@@ -63,12 +59,10 @@ class ObjectEncryptorFactoryTest extends TestCase
 
     public function testFactoryLegacyBase()
     {
-        $globalKey = Key::createNewRandomKey()->saveToAsciiSafeString();
-        $stackKey = Key::createNewRandomKey()->saveToAsciiSafeString();
         $legacyKey = '1234567890123456';
         $aesKey = '123456789012345678901234567890ab';
         $secret = 'secret';
-        $factory = new ObjectEncryptorFactory($globalKey, $legacyKey, $aesKey, $stackKey);
+        $factory = new ObjectEncryptorFactory(KMS_TEST_KEY, AWS_DEFAULT_REGION, $legacyKey, $aesKey);
         $factory->setComponentId('dummy-component');
         $factory->setConfigurationId('123456');
         $factory->setProjectId('123');
@@ -85,20 +79,18 @@ class ObjectEncryptorFactoryTest extends TestCase
 
     public function testConfigurationWrapper()
     {
-        $globalKey = Key::createNewRandomKey()->saveToAsciiSafeString();
-        $stackKey = Key::createNewRandomKey()->saveToAsciiSafeString();
         $legacyKey = '1234567890123456';
         $aesKey = '123456789012345678901234567890ab';
         $secret = 'secret';
-        $factory = new ObjectEncryptorFactory($globalKey, $legacyKey, $aesKey, $stackKey);
+        $factory = new ObjectEncryptorFactory(KMS_TEST_KEY, AWS_DEFAULT_REGION, $legacyKey, $aesKey);
         $factory->setStackId('my-stack');
         $factory->setComponentId('dummy-component');
         $factory->setConfigurationId('123456');
         $factory->setProjectId('123');
         $wrapper = new ConfigurationWrapper();
         $wrapper->setStackId('my-stack');
-        $wrapper->setStackKey($stackKey);
-        $wrapper->setGeneralKey($globalKey);
+        $wrapper->setKMSRegion(AWS_DEFAULT_REGION);
+        $wrapper->setKMSKeyId(KMS_TEST_KEY);
         $wrapper->setComponentId('dummy-component');
         $wrapper->setConfigurationId('123456');
         $wrapper->setProjectId('123');
@@ -111,24 +103,46 @@ class ObjectEncryptorFactoryTest extends TestCase
         self::assertEquals($secret, $decrypted);
     }
 
-    public function testComponentWrapper()
+    public function testProjectWrapper()
     {
-        $globalKey = Key::createNewRandomKey()->saveToAsciiSafeString();
-        $stackKey = Key::createNewRandomKey()->saveToAsciiSafeString();
         $legacyKey = '1234567890123456';
         $aesKey = '123456789012345678901234567890ab';
         $secret = 'secret';
-        $factory = new ObjectEncryptorFactory($globalKey, $legacyKey, $aesKey, $stackKey);
+        $factory = new ObjectEncryptorFactory(KMS_TEST_KEY, AWS_DEFAULT_REGION, $legacyKey, $aesKey);
         $factory->setComponentId('dummy-component');
         $factory->setStackId('my-stack');
-        $wrapper = new ComponentDefinitionWrapper();
-        $wrapper->setStackKey($stackKey);
-        $wrapper->setGeneralKey($globalKey);
+        $factory->setProjectId('my-project');
+        $wrapper = new ProjectWrapper();
+        $wrapper->setKMSRegion(AWS_DEFAULT_REGION);
+        $wrapper->setKMSKeyId(KMS_TEST_KEY);
+        $wrapper->setStackId('my-stack');
+        $wrapper->setComponentId('dummy-component');
+        $wrapper->setProjectId('my-project');
+        $encrypted = $wrapper->encrypt($secret);
+        self::assertEquals($secret, $wrapper->decrypt($encrypted));
+        $encrypted = $factory->getEncryptor()->encrypt($secret, ProjectWrapper::class);
+        self::assertStringStartsWith($wrapper->getPrefix(), $encrypted);
+        $encrypted = substr($encrypted, strlen($wrapper->getPrefix()));
+        $decrypted = $wrapper->decrypt($encrypted);
+        self::assertEquals($secret, $decrypted);
+    }
+
+    public function testComponentWrapper()
+    {
+        $legacyKey = '1234567890123456';
+        $aesKey = '123456789012345678901234567890ab';
+        $secret = 'secret';
+        $factory = new ObjectEncryptorFactory(KMS_TEST_KEY, AWS_DEFAULT_REGION, $legacyKey, $aesKey);
+        $factory->setComponentId('dummy-component');
+        $factory->setStackId('my-stack');
+        $wrapper = new ComponentWrapper();
+        $wrapper->setKMSRegion(AWS_DEFAULT_REGION);
+        $wrapper->setKMSKeyId(KMS_TEST_KEY);
         $wrapper->setStackId('my-stack');
         $wrapper->setComponentId('dummy-component');
         $encrypted = $wrapper->encrypt($secret);
         self::assertEquals($secret, $wrapper->decrypt($encrypted));
-        $encrypted = $factory->getEncryptor()->encrypt($secret, ComponentDefinitionWrapper::class);
+        $encrypted = $factory->getEncryptor()->encrypt($secret, ComponentWrapper::class);
         self::assertStringStartsWith($wrapper->getPrefix(), $encrypted);
         $encrypted = substr($encrypted, strlen($wrapper->getPrefix()));
         $decrypted = $wrapper->decrypt($encrypted);
@@ -137,18 +151,16 @@ class ObjectEncryptorFactoryTest extends TestCase
 
     public function testGenericWrapper()
     {
-        $globalKey = Key::createNewRandomKey()->saveToAsciiSafeString();
-        $stackKey = Key::createNewRandomKey()->saveToAsciiSafeString();
         $legacyKey = '1234567890123456';
         $aesKey = '123456789012345678901234567890ab';
         $secret = 'secret';
-        $factory = new ObjectEncryptorFactory($globalKey, $legacyKey, $aesKey, $stackKey);
-        $wrapper = new GenericWrapper();
-        $wrapper->setStackKey($stackKey);
-        $wrapper->setGeneralKey($globalKey);
+        $factory = new ObjectEncryptorFactory(KMS_TEST_KEY, AWS_DEFAULT_REGION, $legacyKey, $aesKey);
+        $wrapper = new GenericKMSWrapper();
+        $wrapper->setKMSRegion(AWS_DEFAULT_REGION);
+        $wrapper->setKMSKeyId(KMS_TEST_KEY);
         $encrypted = $wrapper->encrypt($secret);
         self::assertEquals($secret, $wrapper->decrypt($encrypted));
-        $encrypted = $factory->getEncryptor()->encrypt($secret, GenericWrapper::class);
+        $encrypted = $factory->getEncryptor()->encrypt($secret, GenericKMSWrapper::class);
         self::assertStringStartsWith($wrapper->getPrefix(), $encrypted);
         $encrypted = substr($encrypted, strlen($wrapper->getPrefix()));
         $decrypted = $wrapper->decrypt($encrypted);
@@ -157,25 +169,27 @@ class ObjectEncryptorFactoryTest extends TestCase
 
     /**
      * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
+     * @expectedExceptionMessage Ciphering failed: Failed to obtain encryption key.
+     */
+    public function testGenericWrapperInvalidCredentials()
+    {
+        $legacyKey = '1234567890123456';
+        $aesKey = '123456789012345678901234567890ab';
+        $secret = 'secret';
+        $factory = new ObjectEncryptorFactory('non-existent', AWS_DEFAULT_REGION, $legacyKey, $aesKey);
+        $factory->getEncryptor()->encrypt($secret, GenericKMSWrapper::class);
+    }
+
+    /**
+     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
      * @expectedExceptionMessage Invalid crypto wrapper
      */
     public function testConfigurationWrapperInvalid1()
     {
-        $globalKey = Key::createNewRandomKey()->saveToAsciiSafeString();
-        $stackKey = Key::createNewRandomKey()->saveToAsciiSafeString();
         $legacyKey = '1234567890123456';
         $aesKey = '123456789012345678901234567890ab';
         $secret = 'secret';
-        $factory = new ObjectEncryptorFactory($globalKey, $legacyKey, $aesKey, $stackKey);
-        $wrapper = new ConfigurationWrapper();
-        $wrapper->setStackKey($stackKey);
-        $wrapper->setStackId('my-stack');
-        $wrapper->setGeneralKey($globalKey);
-        $wrapper->setComponentId('dummy-component');
-        $wrapper->setConfigurationId('123456');
-        $wrapper->setProjectId('123');
-        $encrypted = $wrapper->encrypt($secret);
-        self::assertEquals($secret, $wrapper->decrypt($encrypted));
+        $factory = new ObjectEncryptorFactory(KMS_TEST_KEY, AWS_DEFAULT_REGION, $legacyKey, $aesKey);
         $factory->getEncryptor()->encrypt($secret, ConfigurationWrapper::class);
     }
 
@@ -185,15 +199,13 @@ class ObjectEncryptorFactoryTest extends TestCase
      */
     public function testConfigurationWrapperInvalid2()
     {
-        $globalKey = Key::createNewRandomKey()->saveToAsciiSafeString();
-        $stackKey = Key::createNewRandomKey()->saveToAsciiSafeString();
         $legacyKey = '1234567890123456';
         $secret = 'secret';
-        $factory = new ObjectEncryptorFactory($globalKey, $legacyKey, '', $stackKey);
+        $factory = new ObjectEncryptorFactory(KMS_TEST_KEY, AWS_DEFAULT_REGION, $legacyKey, '');
         $wrapper = new ConfigurationWrapper();
         $wrapper->setStackId('my-stack');
-        $wrapper->setStackKey($stackKey);
-        $wrapper->setGeneralKey($globalKey);
+        $wrapper->setKMSRegion(AWS_DEFAULT_REGION);
+        $wrapper->setKMSKeyId(KMS_TEST_KEY);
         $wrapper->setComponentId('dummy-component');
         $wrapper->setConfigurationId('123456');
         $wrapper->setProjectId('123');
@@ -206,22 +218,46 @@ class ObjectEncryptorFactoryTest extends TestCase
      * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
      * @expectedExceptionMessage Invalid crypto wrapper
      */
-    public function testComponentWrapperInvalid1()
+    public function testProjectWrapperInvalid1()
     {
-        $globalKey = Key::createNewRandomKey()->saveToAsciiSafeString();
-        $stackKey = Key::createNewRandomKey()->saveToAsciiSafeString();
         $legacyKey = '1234567890123456';
         $aesKey = '123456789012345678901234567890ab';
         $secret = 'secret';
-        $factory = new ObjectEncryptorFactory($globalKey, $legacyKey, $aesKey, $stackKey);
-        $wrapper = new ComponentDefinitionWrapper();
-        $wrapper->setStackKey($stackKey);
-        $wrapper->setGeneralKey($globalKey);
+        $factory = new ObjectEncryptorFactory(KMS_TEST_KEY, AWS_DEFAULT_REGION, $legacyKey, $aesKey);
+        $factory->getEncryptor()->encrypt($secret, ProjectWrapper::class);
+    }
+
+    /**
+     * @expectedException \Keboola\ObjectEncryptor\Exception\UserException
+     * @expectedExceptionMessage Value is not an encrypted value.
+     */
+    public function testProjectWrapperInvalid2()
+    {
+        $legacyKey = '1234567890123456';
+        $secret = 'secret';
+        $factory = new ObjectEncryptorFactory(KMS_TEST_KEY, AWS_DEFAULT_REGION, $legacyKey, '');
+        $wrapper = new ProjectWrapper();
+        $wrapper->setKMSRegion(AWS_DEFAULT_REGION);
+        $wrapper->setKMSKeyId(KMS_TEST_KEY);
         $wrapper->setStackId('my-stack');
         $wrapper->setComponentId('dummy-component');
+        $wrapper->setProjectId('my-project');
         $encrypted = $wrapper->encrypt($secret);
         self::assertEquals($secret, $wrapper->decrypt($encrypted));
-        $factory->getEncryptor()->encrypt($secret, ComponentDefinitionWrapper::class);
+        $factory->getEncryptor()->decrypt($encrypted);
+    }
+
+    /**
+     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
+     * @expectedExceptionMessage Invalid crypto wrapper
+     */
+    public function testComponentWrapperInvalid1()
+    {
+        $legacyKey = '1234567890123456';
+        $aesKey = '123456789012345678901234567890ab';
+        $secret = 'secret';
+        $factory = new ObjectEncryptorFactory(KMS_TEST_KEY, AWS_DEFAULT_REGION, $legacyKey, $aesKey);
+        $factory->getEncryptor()->encrypt($secret, ComponentWrapper::class);
     }
 
     /**
@@ -230,14 +266,12 @@ class ObjectEncryptorFactoryTest extends TestCase
      */
     public function testComponentWrapperInvalid2()
     {
-        $globalKey = Key::createNewRandomKey()->saveToAsciiSafeString();
-        $stackKey = Key::createNewRandomKey()->saveToAsciiSafeString();
         $legacyKey = '1234567890123456';
         $secret = 'secret';
-        $factory = new ObjectEncryptorFactory($globalKey, $legacyKey, '', $stackKey);
-        $wrapper = new ComponentDefinitionWrapper();
-        $wrapper->setStackKey($stackKey);
-        $wrapper->setGeneralKey($globalKey);
+        $factory = new ObjectEncryptorFactory(KMS_TEST_KEY, AWS_DEFAULT_REGION, $legacyKey, '');
+        $wrapper = new ComponentWrapper();
+        $wrapper->setKMSRegion(AWS_DEFAULT_REGION);
+        $wrapper->setKMSKeyId(KMS_TEST_KEY);
         $wrapper->setStackId('my-stack');
         $wrapper->setComponentId('dummy-component');
         $encrypted = $wrapper->encrypt($secret);
@@ -251,34 +285,18 @@ class ObjectEncryptorFactoryTest extends TestCase
      */
     public function testInvalidKeys1()
     {
-        $globalKey = Key::createNewRandomKey()->saveToAsciiSafeString();
-        $stackKey = Key::createNewRandomKey()->saveToAsciiSafeString();
-        $factory = new ObjectEncryptorFactory($globalKey, 'short', '', $stackKey);
+        $factory = new ObjectEncryptorFactory(KMS_TEST_KEY, AWS_DEFAULT_REGION, 'short', '');
         $factory->getEncryptor();
     }
 
     /**
      * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage Invalid key version 2.
+     * @expectedExceptionMessage Invalid KMS key Id.
      */
     public function testInvalidKeys2()
     {
-        $stackKey = Key::createNewRandomKey()->saveToAsciiSafeString();
         $legacyKey = '1234567890123456';
-        $factory = new ObjectEncryptorFactory(Key::createNewRandomKey(), $legacyKey, '', $stackKey);
-        $factory->getEncryptor();
-    }
-
-    /**
-     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage Invalid stack key.
-     */
-    public function testInvalidKeys3()
-    {
-        $globalKey = Key::createNewRandomKey()->saveToAsciiSafeString();
-        $legacyKey = '1234567890123456';
-        /** @noinspection PhpParamsInspection */
-        $factory = new ObjectEncryptorFactory($globalKey, $legacyKey, '', ['a' => 'b']);
+        $factory = new ObjectEncryptorFactory(new \stdClass(), AWS_DEFAULT_REGION, $legacyKey, '');
         $factory->getEncryptor();
     }
 
@@ -288,10 +306,8 @@ class ObjectEncryptorFactoryTest extends TestCase
      */
     public function testInvalidKeys4()
     {
-        $globalKey = Key::createNewRandomKey()->saveToAsciiSafeString();
-        $legacyKey = '1234567890123456';
         /** @noinspection PhpParamsInspection */
-        $factory = new ObjectEncryptorFactory($globalKey, ['a' => 'b'], '', '');
+        $factory = new ObjectEncryptorFactory(KMS_TEST_KEY, AWS_DEFAULT_REGION, ['a' => 'b'], '');
         $factory->getEncryptor();
     }
 
@@ -301,10 +317,9 @@ class ObjectEncryptorFactoryTest extends TestCase
      */
     public function testInvalidKeys5()
     {
-        $globalKey = Key::createNewRandomKey()->saveToAsciiSafeString();
         $legacyKey = '1234567890123456';
         /** @noinspection PhpParamsInspection */
-        $factory = new ObjectEncryptorFactory($globalKey, $legacyKey, ['a' => 'b'], '');
+        $factory = new ObjectEncryptorFactory(KMS_TEST_KEY, AWS_DEFAULT_REGION, $legacyKey, ['a' => 'b']);
         $factory->getEncryptor();
     }
 
@@ -314,10 +329,8 @@ class ObjectEncryptorFactoryTest extends TestCase
      */
     public function testInvalidParams4()
     {
-        $globalKey = Key::createNewRandomKey()->saveToAsciiSafeString();
-        $stackKey = Key::createNewRandomKey()->saveToAsciiSafeString();
         $legacyKey = '1234567890123456';
-        $factory = new ObjectEncryptorFactory($globalKey, $legacyKey, '', $stackKey);
+        $factory = new ObjectEncryptorFactory(KMS_TEST_KEY, AWS_DEFAULT_REGION, $legacyKey, '');
         /** @noinspection PhpParamsInspection */
         $factory->setStackId(['a' => 'b']);
         $factory->getEncryptor();
@@ -329,10 +342,8 @@ class ObjectEncryptorFactoryTest extends TestCase
      */
     public function testInvalidParams5()
     {
-        $globalKey = Key::createNewRandomKey()->saveToAsciiSafeString();
-        $stackKey = Key::createNewRandomKey()->saveToAsciiSafeString();
         $legacyKey = '1234567890123456';
-        $factory = new ObjectEncryptorFactory($globalKey, $legacyKey, '', $stackKey);
+        $factory = new ObjectEncryptorFactory(KMS_TEST_KEY, AWS_DEFAULT_REGION, $legacyKey, '');
         /** @noinspection PhpParamsInspection */
         $factory->setComponentId(['a' => 'b']);
         $factory->getEncryptor();
@@ -340,31 +351,27 @@ class ObjectEncryptorFactoryTest extends TestCase
 
     /**
      * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage Invalid configuration id.
+     * @expectedExceptionMessage Invalid project id.
      */
     public function testInvalidParams6()
     {
-        $globalKey = Key::createNewRandomKey()->saveToAsciiSafeString();
-        $stackKey = Key::createNewRandomKey()->saveToAsciiSafeString();
         $legacyKey = '1234567890123456';
-        $factory = new ObjectEncryptorFactory($globalKey, $legacyKey, '', $stackKey);
+        $factory = new ObjectEncryptorFactory(KMS_TEST_KEY, AWS_DEFAULT_REGION, $legacyKey, '');
         /** @noinspection PhpParamsInspection */
-        $factory->setConfigurationId(['a' => 'b']);
+        $factory->setProjectId(['a' => 'b']);
         $factory->getEncryptor();
     }
 
     /**
      * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage Invalid project id.
+     * @expectedExceptionMessage Invalid configuration id.
      */
     public function testInvalidParams7()
     {
-        $globalKey = Key::createNewRandomKey()->saveToAsciiSafeString();
-        $stackKey = Key::createNewRandomKey()->saveToAsciiSafeString();
         $legacyKey = '1234567890123456';
-        $factory = new ObjectEncryptorFactory($globalKey, $legacyKey, '', $stackKey);
+        $factory = new ObjectEncryptorFactory(KMS_TEST_KEY, AWS_DEFAULT_REGION, $legacyKey, '');
         /** @noinspection PhpParamsInspection */
-        $factory->setProjectId(['a' => 'b']);
+        $factory->setConfigurationId(['a' => 'b']);
         $factory->getEncryptor();
     }
 }

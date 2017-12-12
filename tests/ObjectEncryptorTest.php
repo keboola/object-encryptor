@@ -8,7 +8,7 @@ use Keboola\ObjectEncryptor\Exception\UserException;
 use Keboola\ObjectEncryptor\Legacy\Encryptor;
 use Keboola\ObjectEncryptor\ObjectEncryptor;
 use Keboola\ObjectEncryptor\ObjectEncryptorFactory;
-use Keboola\ObjectEncryptor\Wrapper\GenericWrapper;
+use Keboola\ObjectEncryptor\Wrapper\GenericKMSWrapper;
 use PHPUnit\Framework\TestCase;
 
 class ObjectEncryptorTest extends TestCase
@@ -26,15 +26,15 @@ class ObjectEncryptorTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-        $globalKey = Key::createNewRandomKey()->saveToAsciiSafeString();
-        $stackKey = Key::createNewRandomKey()->saveToAsciiSafeString();
         $legacyKey = '1234567890123456';
         $this->aesKey = '123456789012345678901234567890ab';
-        $this->factory = new ObjectEncryptorFactory($globalKey, $legacyKey, $this->aesKey, $stackKey);
+        $this->factory = new ObjectEncryptorFactory(KMS_TEST_KEY, AWS_DEFAULT_REGION, $legacyKey, $this->aesKey);
         $this->factory->setStackId('my-stack');
         $this->factory->setComponentId('dummy-component');
         $this->factory->setConfigurationId('123456');
         $this->factory->setProjectId('123');
+        putenv('AWS_ACCESS_KEY_ID=' . AWS_ACCESS_KEY_ID);
+        putenv('AWS_SECRET_ACCESS_KEY='. AWS_SECRET_ACCESS_KEY);
     }
 
     public function testEncryptorScalar()
@@ -50,10 +50,23 @@ class ObjectEncryptorTest extends TestCase
     {
         $encryptor = $this->factory->getEncryptor();
         $originalText = 'secret';
-        $encrypted = $encryptor->encrypt($originalText, GenericWrapper::class);
+        $encrypted = $encryptor->encrypt($originalText, GenericKMSWrapper::class);
         self::assertStringStartsWith('KBC::Secure::', $encrypted);
         self::assertEquals($originalText, $encryptor->decrypt($encrypted));
     }
+
+    /**
+     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
+     * @expectedExceptionMessage Encryption failed: Ciphering failed: Failed to obtain encryption key.
+     */
+    public function testEncryptorStackNoCredentials()
+    {
+        putenv('AWS_ACCESS_KEY_ID=');
+        putenv('AWS_SECRET_ACCESS_KEY=');
+        $encryptor = $this->factory->getEncryptor();
+        $originalText = 'secret';
+        $encryptor->encrypt($originalText, GenericKMSWrapper::class);
+   }
 
     public function testEncryptorInvalidService()
     {
