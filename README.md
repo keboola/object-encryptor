@@ -8,7 +8,7 @@ which limits the conditions under which it may be decrypted. The library support
 
 - [keboola/php-encryption](https://github.com/keboola/php-encryption) -- legacy, allows only deciphering
 - [keboola-legacy/php-encryption](https://github.com/keboola/legacy-php-encryption) -- legacy version of [defuse/php-encryption](https://github.com/defuse/php-encryption), currently default
-- [defuse/php-encryption](https://github.com/defuse/php-encryption) -- future encryption method
+- [defuse/php-encryption](https://github.com/defuse/php-encryption) -- future encryption method with KMS managed keys
 
 ## Requirements
 The library requires PHP 5.6 or PHP 7.0. Versions 7.1+ are not supported until legacy mcrypt is dropped.
@@ -22,10 +22,11 @@ Crypto wrappers implement different verification methods using cypher metadata.
 Initialize the library using the factory class:
 
 ```
-$keyVersion2 = Key::createNewRandomKey()->saveToAsciiSafeString();
+$kmsKeyId = 'alias/my-key';
+$kmsRegion = 'us-east-1';
 $keyVersion1 = '1234567890123456';
 $keyVersion0 = '123456789012345678901234567890ab';
-$factory = new ObjectEncryptorFactory($keyVersion2, $keyVersion1, $keyVersion0);
+$factory = new ObjectEncryptorFactory($kmsKeyId, $kmsRegion, $keyVersion1, $keyVersion0);
 ```
 
 Additional parameteters may be set with `setComponentId`, `setConfigurationId`, `setProjectId` and `setStackId` methods.
@@ -37,9 +38,10 @@ Depending on the provided keys and parameters, the following wrappers will be av
 - `BaseWrapper` - legacy wrapper for `KBC::Encrypted` ciphers, requires `keyVersion1`
 - `ComponentWrapper` - legacy wrapper for `KBC::ComponentEncrypted==` ciphers, requires `keyVersion1` and `componentId`
 - `ComponentProjectWrapper` - legacy wrapper for `KBC::ComponentProjectEncrypted==` ciphers, requires `keyVersion1` and `componentId` and `projectId`
-- `GenericWrapper` - current wrapper for `KBC::Secure::` ciphers, requires `keyVersion2`
-- `ComponentDefinitionWrapper` - current wrapper for `KBC::ComponentSecure::` ciphers, requires `keyVersion2`, `componentId` and `stackId`
-- `ConfigurationWrapper` - current wrapper for `KBC::ConfigSecure::` ciphers, requires `keyVersion2`, `componentId` and `stackId`; `projectId` and `configurationId` are optional
+- `GenericKMSWrapper` - current wrapper for `KBC::Secure::` ciphers, requires `kmsKeyId` and `kmsRegion`. Also the runner must have AWS credentials avaialable (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`)
+- `ComponentWrapper` - current wrapper for `KBC::ComponentSecure::` ciphers, requires `kmsKeyId`, `kmsRegion`, `stackId` and `componentId`
+- `ProjectWrapper` - current wrapper for `KBC::ProjectSecure::` ciphers, requires `kmsKeyId`, `kmsRegion`, `stackId`, `componentId` and `projectId`.
+- `ConfigurationWrapper` - current wrapper for `KBC::ConfigSecure::` ciphers, requires `kmsKeyId`, `kmsRegion`, `stackId`, `componentId`, `projectId` and `configurationId`.
 
 During encryption, the wrapper has to be specified (or `BaseWrapper` is used). During decryption, the wrapper is chosen automatically by the 
 cipher prefix. If the wrapper is not available (key or parameters are not set or equal to those in the cipher), the value cannot be deciphered.
@@ -48,9 +50,12 @@ cipher prefix. If the wrapper is not available (key or parameters are not set or
 
 ```
 // intialize factory
-$key = Key::createNewRandomKey()->saveToAsciiSafeString();
+putenv('AWS_ACCESS_KEY_ID=AKIA...');
+putenv('AWS_SECRET_ACCESS_KEY=secret);
+$keyId = 'alias/some-key';
+$keyRegion = 'us-east-1';
 $legacyKey = '1234567890123456';
-$factory = new ObjectEncryptorFactory($key, $legacyKey, '');
+$factory = new ObjectEncryptorFactory($keyId, $keyRegion, $legacyKey, '');
 $factory->setComponentId('dummy-component');
 // get encryptor
 $factory->getEncryptor()->encrypt('secret', GenericWrapper::class);
