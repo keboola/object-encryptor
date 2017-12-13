@@ -66,7 +66,7 @@ class ObjectEncryptorTest extends TestCase
         $encryptor = $this->factory->getEncryptor();
         $originalText = 'secret';
         $encryptor->encrypt($originalText, GenericKMSWrapper::class);
-   }
+    }
 
     public function testEncryptorInvalidService()
     {
