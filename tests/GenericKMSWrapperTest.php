@@ -93,7 +93,7 @@ class GenericKMSWrapperTest extends TestCase
             ->getMock();
         $callNo = 0;
         $mockKmsClient->method('execute')
-            ->willReturnCallback(function(CommandInterface $command) use (&$callNo, $mockKmsClient) {
+            ->willReturnCallback(function (CommandInterface $command) use (&$callNo, $mockKmsClient) {
                 $callNo++;
                 if ($callNo < 3) {
                     throw new ConnectException('mock failed to connect', new Request('GET', 'some-uri'));
@@ -127,7 +127,7 @@ class GenericKMSWrapperTest extends TestCase
             ->getMock();
         $callNo = 0;
         $mockKmsClient->method('execute')
-            ->willReturnCallback(function(CommandInterface $command) use (&$callNo, $mockKmsClient) {
+            ->willReturnCallback(function (CommandInterface $command) use (&$callNo, $mockKmsClient) {
                 $callNo++;
                 if ($callNo < 3) {
                     throw new ConnectException('mock failed to connect', new Request('GET', 'some-uri'));
