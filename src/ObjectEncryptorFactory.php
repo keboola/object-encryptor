@@ -224,7 +224,7 @@ class ObjectEncryptorFactory
             $this->addLegacyWrappers($encryptor);
         }
 
-        if ($this->kmsKeyRegion && $this->kmsKeyRegion) {
+        if ($this->kmsKeyRegion && $this->kmsKeyId) {
             $this->addVersion2Wrappers($encryptor);
         }
         return $encryptor;
