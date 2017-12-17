@@ -51,7 +51,7 @@ class ObjectEncryptor
             throw new ApplicationException('Invalid crypto wrapper ' . $wrapperName);
         }
         if (is_scalar($data)) {
-            return $this->encryptValue($data, $wrapper);
+            return $this->encryptValue((string)$data, $wrapper);
         }
         if (is_array($data)) {
             return $this->encryptArray($data, $wrapper);
@@ -80,7 +80,7 @@ class ObjectEncryptor
         if (is_array($data)) {
             return $this->decryptArray($data);
         }
-        if (is_object($data) && get_class($data) == \stdClass::class) {
+        if (is_a($data, \stdClass::class)) {
             return $this->decryptObject($data);
         }
         throw new ApplicationException('Only stdClass, array and string are supported types for decryption.');
@@ -124,17 +124,21 @@ class ObjectEncryptor
     {
         /* @ is intentional to suppress warnings from invalid cipher texts which
         are handled by checking return === false */
-        $ret = @$this->legacyEncryptor->decrypt($value);
-        if ($ret === false) {
-            throw new UserException('Value is not an encrypted value.');
+        if ($this->legacyEncryptor) {
+            $ret = @$this->legacyEncryptor->decrypt($value);
+            if ($ret === false) {
+                throw new UserException('Value is not an encrypted value.');
+            } else {
+                return $ret;
+            }
         } else {
-            return $ret;
+            throw new UserException('Value is not an encrypted value.');
         }
     }
 
     /**
-     * @param $value
-     * @return string
+     * @param string $value Value to decrypt.
+     * @return string Decrypted value.
      * @throws ApplicationException
      * @throws UserException
      */
@@ -142,37 +146,34 @@ class ObjectEncryptor
     {
         $wrapper = $this->findWrapper($value);
         if (!$wrapper) {
-            if ($this->legacyEncryptor) {
-                return $this->decryptLegacy($value);
-            } else {
-                throw new UserException('Value is not an encrypted value.');
+            $this->decryptLegacy($value);
+        } else {
+            try {
+                return $wrapper->decrypt(substr($value, mb_strlen($wrapper->getPrefix())));
+            } catch (\InvalidCiphertextException $e) {
+                // this is for legacy wrappers
+                throw new UserException("Value $value is not an encrypted value.");
+            } catch (UserException $e) {
+                throw new UserException("Value $value is not an encrypted value.");
+            } catch (\Exception $e) {
+                // decryption failed for more serious reasons
+                throw new ApplicationException('Decryption failed: ' . $e->getMessage(), $e);
             }
-        }
-        try {
-            return $wrapper->decrypt(substr($value, mb_strlen($wrapper->getPrefix())));
-        } catch (\InvalidCiphertextException $e) {
-            // this is for legacy wrappers
-            throw new UserException("Value $value is not an encrypted value.");
-        } catch (UserException $e) {
-            throw new UserException("Value $value is not an encrypted value.");
-        } catch (\Exception $e) {
-            // decryption failed for more serious reasons
-            throw new ApplicationException('Decryption failed: ' . $e->getMessage(), $e);
         }
     }
 
     /**
-     * @param $key
-     * @param $value
+     * @param string $key Array key
+     * @param array|string|\stdClass|null $value Value to encrypt.
      * @param CryptoWrapperInterface $wrapper
-     * @return array|string
+     * @return array|string|\stdClass|null
      * @throws ApplicationException
      */
     private function encryptItem($key, $value, CryptoWrapperInterface $wrapper)
     {
         if (is_scalar($value) || is_null($value)) {
             if (substr($key, 0, 1) == '#') {
-                return $this->encryptValue($value, $wrapper);
+                return $this->encryptValue((string)$value, $wrapper);
             } else {
                 return $value;
             }
@@ -238,9 +239,9 @@ class ObjectEncryptor
     }
 
     /**
-     * @param $key
-     * @param $value
-     * @return array|string
+     * @param string $key Key in array.
+     * @param array|string|\stdClass|null $value Value to decrypt.
+     * @return array|string|\stdClass|null Decrypted value.
      * @throws ApplicationException
      * @throws UserException
      */
@@ -249,7 +250,7 @@ class ObjectEncryptor
         try {
             if (is_scalar($value) || is_null($value)) {
                 if (substr($key, 0, 1) == '#') {
-                    return $this->decryptValue($value);
+                    return $this->decryptValue((string)$value);
                 } else {
                     return $value;
                 }

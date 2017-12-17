@@ -12,14 +12,14 @@ interface CryptoWrapperInterface
     public function getPrefix();
 
     /**
-     * @param $data string data to encrypt
-     * @return string encrypted data
+     * @param string $data Data to encrypt.
+     * @return string Encrypted data.
      */
     public function encrypt($data);
 
     /**
-     * @param $encryptedData string
-     * @return string decrypted data
+     * @param string $encryptedData Encrypted data.
+     * @return string Decrypted data.
      */
     public function decrypt($encryptedData);
 }

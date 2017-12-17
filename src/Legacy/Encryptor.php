@@ -7,8 +7,7 @@ use Keboola\Encryption\EncryptorInterface;
 
 /**
  * Class Encryptor
- * @package Keboola\Syrup\Encryption
- * @deprecated Use ObjectEncryptor service
+ * @deprecated Use ObjectEncryptorFactory
  */
 class Encryptor implements EncryptorInterface
 {
@@ -21,8 +20,7 @@ class Encryptor implements EncryptorInterface
     }
 
     /**
-     * @param $data string data to encrypt
-     * @return string encrypted data
+     * @inheritdoc
      * @deprecated
      */
     public function encrypt($data)
@@ -31,8 +29,7 @@ class Encryptor implements EncryptorInterface
     }
 
     /**
-     * @param $encryptedData string
-     * @return string decrypted data
+     * @inheritdoc
      * @deprecated
      */
     public function decrypt($encryptedData)

@@ -45,14 +45,14 @@ class ObjectEncryptorFactory
     private $configurationId = null;
 
     /**
-     * @var string
+     * @var string|null AWS KMS Key id (ARN) or alias (prefix with 'alias/').
      */
-    private $kmsKeyId;
+    private $kmsKeyId = null;
 
     /**
-     * @var string
+     * @var string|null AWS KMS region.
      */
-    private $kmsKeyRegion;
+    private $kmsKeyRegion = null;
 
     /**
      * ObjectEncryptorFactory constructor.
@@ -71,7 +71,7 @@ class ObjectEncryptorFactory
     }
 
     /**
-     * @param string $componentId Id of current component.
+     * @param string|null $componentId Id of current component.
      * @throws ApplicationException
      */
     public function setComponentId($componentId)
@@ -83,7 +83,7 @@ class ObjectEncryptorFactory
     }
 
     /**
-     * @param string $configurationId Id of current configuration.
+     * @param string|null $configurationId Id of current configuration.
      * @throws ApplicationException
      */
     public function setConfigurationId($configurationId)
@@ -95,7 +95,7 @@ class ObjectEncryptorFactory
     }
 
     /**
-     * @param string $projectId Id of KBC Project.
+     * @param string|null $projectId Id of KBC Project.
      * @throws ApplicationException
      */
     public function setProjectId($projectId)
@@ -107,7 +107,7 @@ class ObjectEncryptorFactory
     }
 
     /**
-     * @param string $stackId Id of KBC Stack.
+     * @param string|null $stackId Id of KBC Stack.
      * @throws ApplicationException
      */
     public function setStackId($stackId)
@@ -149,16 +149,16 @@ class ObjectEncryptorFactory
     private function addLegacyWrappers($encryptor)
     {
         $wrapper = new BaseWrapper();
-        $wrapper->setKey($this->keyVersion1);
+        $wrapper->setKey((string)$this->keyVersion1);
         $encryptor->pushWrapper($wrapper);
         if ($this->componentId !== null) {
             $wrapper = new LegacyComponentWrapper();
-            $wrapper->setKey($this->keyVersion1);
+            $wrapper->setKey((string)$this->keyVersion1);
             $wrapper->setComponentId($this->componentId);
             $encryptor->pushWrapper($wrapper);
             if ($this->projectId !== null) {
                 $wrapper = new ComponentProjectWrapper();
-                $wrapper->setKey($this->keyVersion1);
+                $wrapper->setKey((string)$this->keyVersion1);
                 $wrapper->setComponentId($this->componentId);
                 $wrapper->setProjectId($this->projectId);
                 $encryptor->pushWrapper($wrapper);
@@ -173,29 +173,29 @@ class ObjectEncryptorFactory
     private function addVersion2Wrappers($encryptor)
     {
         $wrapper = new GenericKMSWrapper();
-        $wrapper->setKMSKeyId($this->kmsKeyId);
-        $wrapper->setKMSRegion($this->kmsKeyRegion);
+        $wrapper->setKMSKeyId((string)$this->kmsKeyId);
+        $wrapper->setKMSRegion((string)$this->kmsKeyRegion);
         $encryptor->pushWrapper($wrapper);
 
         if ($this->componentId && $this->stackId) {
             $wrapper = new ComponentWrapper();
-            $wrapper->setKMSKeyId($this->kmsKeyId);
-            $wrapper->setKMSRegion($this->kmsKeyRegion);
+            $wrapper->setKMSKeyId((string)$this->kmsKeyId);
+            $wrapper->setKMSRegion((string)$this->kmsKeyRegion);
             $wrapper->setComponentId($this->componentId);
             $wrapper->setStackId($this->stackId);
             $encryptor->pushWrapper($wrapper);
             if ($this->projectId) {
                 $wrapper = new ProjectWrapper();
-                $wrapper->setKMSKeyId($this->kmsKeyId);
-                $wrapper->setKMSRegion($this->kmsKeyRegion);
+                $wrapper->setKMSKeyId((string)$this->kmsKeyId);
+                $wrapper->setKMSRegion((string)$this->kmsKeyRegion);
                 $wrapper->setComponentId($this->componentId);
                 $wrapper->setStackId($this->stackId);
                 $wrapper->setProjectId($this->projectId);
                 $encryptor->pushWrapper($wrapper);
                 if ($this->configurationId) {
                     $wrapper = new ConfigurationWrapper();
-                    $wrapper->setKMSKeyId($this->kmsKeyId);
-                    $wrapper->setKMSRegion($this->kmsKeyRegion);
+                    $wrapper->setKMSKeyId((string)$this->kmsKeyId);
+                    $wrapper->setKMSRegion((string)$this->kmsKeyRegion);
                     $wrapper->setComponentId($this->componentId);
                     $wrapper->setStackId($this->stackId);
                     $wrapper->setProjectId($this->projectId);
