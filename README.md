@@ -29,16 +29,16 @@ $keyVersion0 = '123456789012345678901234567890ab';
 $factory = new ObjectEncryptorFactory($kmsKeyId, $kmsRegion, $keyVersion1, $keyVersion0);
 ```
 
-Additional parameteters may be set with `setComponentId`, `setConfigurationId`, `setProjectId` and `setStackId` methods.
+Additional parameters may be set with `setComponentId`, `setConfigurationId`, `setProjectId` and `setStackId` methods.
 
 ### Wrappers
 Depending on the provided keys and parameters, the following wrappers will be available:
 
-- `Encryptor` - legacy decryptor for unprefixed ciphers, requires `keyVersion0` 
+- `Encryptor` - legacy decryptor for un-prefixed ciphers, requires `keyVersion0` 
 - `BaseWrapper` - legacy wrapper for `KBC::Encrypted` ciphers, requires `keyVersion1`
 - `ComponentWrapper` - legacy wrapper for `KBC::ComponentEncrypted==` ciphers, requires `keyVersion1` and `componentId`
 - `ComponentProjectWrapper` - legacy wrapper for `KBC::ComponentProjectEncrypted==` ciphers, requires `keyVersion1` and `componentId` and `projectId`
-- `GenericKMSWrapper` - current wrapper for `KBC::Secure::` ciphers, requires `kmsKeyId` and `kmsRegion`. Also the runner must have AWS credentials avaialable (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`)
+- `GenericKMSWrapper` - current wrapper for `KBC::Secure::` ciphers, requires `kmsKeyId` and `kmsRegion`. Also the runner must have AWS credentials available (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`)
 - `ComponentWrapper` - current wrapper for `KBC::ComponentSecure::` ciphers, requires `kmsKeyId`, `kmsRegion`, `stackId` and `componentId`
 - `ProjectWrapper` - current wrapper for `KBC::ProjectSecure::` ciphers, requires `kmsKeyId`, `kmsRegion`, `stackId`, `componentId` and `projectId`.
 - `ConfigurationWrapper` - current wrapper for `KBC::ConfigSecure::` ciphers, requires `kmsKeyId`, `kmsRegion`, `stackId`, `componentId`, `projectId` and `configurationId`.

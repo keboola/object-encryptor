@@ -98,6 +98,7 @@ class GenericKMSWrapperTest extends TestCase
                 if ($callNo < 3) {
                     throw new ConnectException('mock failed to connect', new Request('GET', 'some-uri'));
                 } else {
+                    /** @var KmsClient $mockKmsClient */
                     return $mockKmsClient->executeAsync($command)->wait();
                 }
             });
@@ -132,6 +133,7 @@ class GenericKMSWrapperTest extends TestCase
                 if ($callNo < 3) {
                     throw new ConnectException('mock failed to connect', new Request('GET', 'some-uri'));
                 } else {
+                    /** @var KmsClient $mockKmsClient */
                     return $mockKmsClient->executeAsync($command)->wait();
                 }
             });
@@ -378,5 +380,55 @@ class GenericKMSWrapperTest extends TestCase
         $wrapper->setKMSKeyId(KMS_TEST_KEY);
         $wrapper->setKMSRegion('non-existent');
         $wrapper->encrypt('mySecretValue');
+    }
+
+    /**
+     * @expectedException  \Keboola\ObjectEncryptor\Exception\UserException
+     * @expectedExceptionMessage Cipher is malformed
+     */
+    public function testDecryptInvalid1()
+    {
+        $wrapper = $this->getWrapper();
+        $wrapper->decrypt("some garbage");
+    }
+
+    /**
+     * @expectedException  \Keboola\ObjectEncryptor\Exception\UserException
+     * @expectedExceptionMessage Cipher is malformed
+     */
+    public function testDecryptInvalid2()
+    {
+        $wrapper = $this->getWrapper();
+        $wrapper->decrypt(base64_encode("some garbage"));
+    }
+
+    /**
+     * @expectedException  \Keboola\ObjectEncryptor\Exception\UserException
+     * @expectedExceptionMessage Cipher is malformed
+     */
+    public function testDecryptInvalid3()
+    {
+        $wrapper = $this->getWrapper();
+        $wrapper->decrypt(base64_encode(gzcompress("some garbage")));
+    }
+
+    /**
+     * @expectedException  \Keboola\ObjectEncryptor\Exception\UserException
+     * @expectedExceptionMessage Cipher is malformed
+     */
+    public function testDecryptInvalid4()
+    {
+        $wrapper = $this->getWrapper();
+        $wrapper->decrypt(base64_encode(gzcompress(serialize("some garbage"))));
+    }
+
+    /**
+     * @expectedException  \Keboola\ObjectEncryptor\Exception\UserException
+     * @expectedExceptionMessage Invalid metadata
+     */
+    public function testDecryptInvalid5()
+    {
+        $wrapper = $this->getWrapper();
+        $wrapper->decrypt(base64_encode(gzcompress(serialize(["some", "garbage"]))));
     }
 }

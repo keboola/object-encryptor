@@ -2,7 +2,6 @@
 
 namespace Keboola\ObjectEncryptor\Tests;
 
-use Defuse\Crypto\Key;
 use Keboola\ObjectEncryptor\Exception\ApplicationException;
 use Keboola\ObjectEncryptor\Exception\UserException;
 use Keboola\ObjectEncryptor\Legacy\Encryptor;

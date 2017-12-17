@@ -177,7 +177,7 @@ class GenericKMSWrapper implements CryptoWrapperInterface
     {
         $this->validateState();
         try {
-            $encrypted = unserialize(gzuncompress(base64_decode($encryptedData)));
+            $encrypted = @unserialize(gzuncompress(base64_decode($encryptedData)));
         } catch (\Exception $e) {
             throw new UserException("Cipher is malformed.", $e);
         }
