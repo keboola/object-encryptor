@@ -80,7 +80,7 @@ class ObjectEncryptor
         if (is_array($data)) {
             return $this->decryptArray($data);
         }
-        if (is_a($data, \stdClass::class)) {
+        if (is_a($data, \stdClass::class) && (get_class($data) == \stdClass::class)) {
             return $this->decryptObject($data);
         }
         throw new ApplicationException('Only stdClass, array and string are supported types for decryption.');
@@ -146,7 +146,7 @@ class ObjectEncryptor
     {
         $wrapper = $this->findWrapper($value);
         if (!$wrapper) {
-            $this->decryptLegacy($value);
+            return $this->decryptLegacy($value);
         } else {
             try {
                 return $wrapper->decrypt(substr($value, mb_strlen($wrapper->getPrefix())));
