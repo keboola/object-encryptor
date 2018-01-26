@@ -1,0 +1,135 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "Stack for testing Object Encryptor",
+    "Parameters": {
+        "KeboolaStack": {
+            "Type": "String",
+            "Description": "All resources will be tagged by this value."
+        }
+    },
+    "Resources": {
+        "ObjectEncryptorUser": {
+            "Type": "AWS::IAM::User",
+            "DeletionPolicy": "Delete",
+            "Properties": {
+                "Path": "/",
+                "Policies": [
+                    {
+                        "PolicyName": "Owner",
+                        "PolicyDocument": {
+                            "Statement": [
+                                {
+                                    "Sid": "UseKMSKeys",
+                                    "Action": [
+                                        "kms:Encrypt",
+                                        "kms:Decrypt",
+                                        "kms:ReEncrypt*",
+                                        "kms:GenerateDataKey*",
+                                        "kms:DescribeKey"
+                                    ],
+                                    "Resource": [
+                                        {
+                                            "Fn::GetAtt": ["ObjectEncryptorKMSKey", "Arn"]
+                                        }
+                                    ],
+                                    "Effect": "Allow"
+                                }                
+                            ]
+                        }
+                    }
+                ]
+            },
+            "DependsOn": [
+                "ObjectEncryptorKMSKey"
+            ]
+        },
+        "AccessKey": {
+            "Type": "AWS::IAM::AccessKey",
+            "DeletionPolicy": "Delete",
+            "Properties": {
+                "UserName": {
+                    "Ref": "ObjectEncryptorUser"
+                }
+            },
+            "DependsOn": [
+                "ObjectEncryptorUser"
+            ]
+        },
+        "ObjectEncryptorKMSKey": {
+            "Type": "AWS::KMS::Key",
+            "Properties": {
+                "Description" : "Object Encryptor Test Key",
+                "KeyPolicy": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Sid": "Enable IAM User Permissions",
+                            "Effect": "Allow",
+                            "Principal": {
+                                "AWS": {
+                                    "Fn::Join": [
+                                        "", 
+                                        [
+                                            "arn:aws:iam::", 
+                                            {
+                                                "Ref": "AWS::AccountId"
+                                            }, 
+                                            ":root"
+                                        ]
+                                    ]
+                                }
+                            },
+                            "Action": "kms:*",
+                            "Resource": "*"
+                        }
+                    ]
+                }
+            }
+        },
+        "ObjectEncryptorKMSKeyAlias": {
+            "Type": "AWS::KMS::Alias",
+            "Properties": {
+                "AliasName": {
+                    "Fn::Join": [
+                        "", 
+                        [
+                            "alias/", 
+                            {
+                                "Ref": "KeboolaStack"
+                            },
+                            "-object-encryptor"
+                        ]
+                    ]
+                },
+                "TargetKeyId" : {
+                    "Ref": "ObjectEncryptorKMSKey"
+                }
+            },
+            "DependsOn": [
+                "ObjectEncryptorKMSKey"
+            ]
+        }
+    },
+    "Outputs": {
+        "Region": {
+            "Value": {
+                "Ref": "AWS::Region"
+            }
+        },
+        "AccessKeyId": {
+            "Value": {
+                "Ref": "AccessKey"
+            }
+        },        
+        "AccessKeySecret": {
+            "Value": {
+                "Fn::GetAtt": ["AccessKey", "SecretAccessKey"]
+            }
+        },
+        "KMSKeyAlias": {
+            "Value": {
+                "Ref": "ObjectEncryptorKMSKeyAlias"
+            }
+        }
+    }
+}
