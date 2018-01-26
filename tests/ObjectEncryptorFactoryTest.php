@@ -280,6 +280,29 @@ class ObjectEncryptorFactoryTest extends TestCase
     }
 
     /**
+     * @expectedException \Keboola\ObjectEncryptor\Exception\UserException
+     * @expectedExceptionMessage Invalid cipher text for key #d Value KBC::ComponentSecure::
+     */
+    public function testCipherError()
+    {
+        $legacyKey = '1234567890123456';
+        $secret = [
+            'a' => 'b',
+            'c' => [
+                '#d' => 'secret'
+            ]
+        ];
+        $factory = new ObjectEncryptorFactory(KMS_TEST_KEY, AWS_DEFAULT_REGION, $legacyKey, '');
+        $factory->setStackId('my-stack');
+        $factory->setComponentId('dummy-component');
+        $secret = $factory->getEncryptor()->encrypt($secret, ComponentWrapper::class);
+        $factory = new ObjectEncryptorFactory(KMS_TEST_KEY, AWS_DEFAULT_REGION, $legacyKey, '');
+        $factory->setStackId('my-stack');
+        $factory->setComponentId('different-dummy-component');
+        $factory->getEncryptor()->decrypt($secret);
+    }
+
+    /**
      * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
      * @expectedExceptionMessage Encryption key too short. Minimum is 16 bytes.
      */

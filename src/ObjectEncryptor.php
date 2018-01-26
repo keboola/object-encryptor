@@ -247,24 +247,24 @@ class ObjectEncryptor
      */
     private function decryptItem($key, $value)
     {
-        try {
-            if (is_scalar($value) || is_null($value)) {
-                if (substr($key, 0, 1) == '#') {
+        if (is_scalar($value) || is_null($value)) {
+            if (substr($key, 0, 1) == '#') {
+                try {
                     return $this->decryptValue((string)$value);
-                } else {
-                    return $value;
+                } catch (UserException $e) {
+                    throw new UserException("Invalid cipher text for key $key " . $e->getMessage(), $e);
                 }
-            } elseif (is_array($value)) {
-                return $this->decryptArray($value);
-            } elseif (is_object($value) && get_class($value) == \stdClass::class) {
-                return $this->decryptObject($value);
             } else {
-                throw new ApplicationException(
-                    "Invalid item $key - only stdClass, array and scalar can be decrypted."
-                );
+                return $value;
             }
-        } catch (UserException $e) {
-            throw new UserException("Invalid cipher text for key $key " . $e->getMessage(), $e);
+        } elseif (is_array($value)) {
+            return $this->decryptArray($value);
+        } elseif (is_object($value) && get_class($value) == \stdClass::class) {
+            return $this->decryptObject($value);
+        } else {
+            throw new ApplicationException(
+                "Invalid item $key - only stdClass, array and scalar can be decrypted."
+            );
         }
     }
 
