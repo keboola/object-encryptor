@@ -152,9 +152,9 @@ class ObjectEncryptor
                 return $wrapper->decrypt(substr($value, mb_strlen($wrapper->getPrefix())));
             } catch (\InvalidCiphertextException $e) {
                 // this is for legacy wrappers
-                throw new UserException("Value $value is not an encrypted value.");
+                throw new UserException("Value $value is not an encrypted value.", $e);
             } catch (UserException $e) {
-                throw new UserException("Value $value is not an encrypted value.");
+                throw new UserException("Value $value is not an encrypted value.", $e);
             } catch (\Exception $e) {
                 // decryption failed for more serious reasons
                 throw new ApplicationException('Decryption failed: ' . $e->getMessage(), $e);
