@@ -161,7 +161,7 @@ class GenericKMSWrapper implements CryptoWrapperInterface
         }
         try {
             $key = $this->getEncryptKey();
-            $payload = Crypto::encrypt($data, $key['local'], true);
+            $payload = Crypto::encrypt((string)$data, $key['local'], true);
             $resultBinary = [$payload, $key['kms']];
             $result = base64_encode(gzcompress(serialize($resultBinary)));
             return $result;
