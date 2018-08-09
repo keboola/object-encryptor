@@ -855,6 +855,9 @@ class ObjectEncryptorTest extends TestCase
 
     public function testEncryptorLegacy()
     {
+        if (!extension_loaded('mcrypt')) {
+            self::markTestSkipped("Mcrypt not available");
+        }
         $encryptor = $this->factory->getEncryptor();
         $legacyEncryptor = new Encryptor($this->aesKey);
 
