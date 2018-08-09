@@ -840,6 +840,19 @@ class ObjectEncryptorTest extends TestCase
         self::assertEquals(json_encode($decrypted), json_encode(json_decode($json)));
     }
 
+    public function testEncryptorLegacyNoMCrypt()
+    {
+        $encryptor = $this->factory->getEncryptor();
+        $prop = new \ReflectionProperty($encryptor, 'legacyEncryptor');
+        $prop->setAccessible(true);
+        $legacyEncryptor = $prop->getValue($encryptor);
+        if (!extension_loaded('mcrypt')) {
+            self::assertNull($legacyEncryptor);
+        } else {
+            self::assertNotNull($legacyEncryptor);
+        }
+    }
+
     public function testEncryptorLegacy()
     {
         $encryptor = $this->factory->getEncryptor();

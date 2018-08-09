@@ -213,7 +213,7 @@ class ObjectEncryptorFactory
     public function getEncryptor()
     {
         $this->validateState();
-        if ($this->keyVersion0) {
+        if ($this->keyVersion0 && extension_loaded('mcrypt')) {
             $legacyEncryptor = new Encryptor($this->keyVersion0);
         } else {
             $legacyEncryptor = null;
