@@ -11,7 +11,7 @@ which limits the conditions under which it may be decrypted. The library support
 - [defuse/php-encryption](https://github.com/defuse/php-encryption) -- future encryption method with KMS managed keys
 
 ## Requirements
-The library requires PHP 5.6 or PHP 7.0. Versions 7.1+ are not supported until legacy mcrypt is dropped.
+The library requires PHP 5.6 or PHP 7.0. Versions 7.1+ are supported through mcrypt polyfill.
 
 ## Usage
 Entry point to the library is the `ObjectEncryptorFactory` class which creates instances of `ObjectEncryptor` class which
