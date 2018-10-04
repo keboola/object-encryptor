@@ -74,6 +74,7 @@ class ObjectEncryptorTest extends TestCase
             $encryptor->encrypt('secret', 'fooBar');
             self::fail('Invalid crypto wrapper must throw exception');
         } catch (ApplicationException $e) {
+            self::assertContains('Invalid crypto wrapper fooBar', $e->getMessage());
         }
     }
 
@@ -89,6 +90,7 @@ class ObjectEncryptorTest extends TestCase
             $encryptor->encrypt($unsupportedInput);
             self::fail('Encryption of invalid data should fail.');
         } catch (ApplicationException $e) {
+            self::assertContains('Only stdClass, array and string are supported types for encryption.', $e->getMessage());
         }
 
         $unsupportedInput = [
@@ -124,6 +126,7 @@ class ObjectEncryptorTest extends TestCase
             $encryptor->decrypt($unsupportedInput);
             self::fail('Encryption of invalid data should fail.');
         } catch (ApplicationException $e) {
+            self::assertContains('Only stdClass, array and string are supported types for decryption.', $e->getMessage());
         }
 
         $unsupportedInput = [
@@ -134,6 +137,7 @@ class ObjectEncryptorTest extends TestCase
             $encryptor->decrypt($unsupportedInput);
             self::fail('Encryption of invalid data should fail.');
         } catch (ApplicationException $e) {
+            self::assertContains('Invalid item key2 - only stdClass, array and scalar can be decrypted.', $e->getMessage());
         }
 
         $unsupportedInput = [
@@ -144,6 +148,7 @@ class ObjectEncryptorTest extends TestCase
             $encryptor->decrypt($unsupportedInput);
             self::fail('Encryption of invalid data should fail.');
         } catch (ApplicationException $e) {
+            self::assertContains('Invalid item #key2 - only stdClass, array and scalar can be decrypted.', $e->getMessage());
         }
     }
 
@@ -241,6 +246,7 @@ class ObjectEncryptorTest extends TestCase
             $encryptor->pushWrapper($wrapper);
             self::fail('Adding crypto wrapper with same prefix must fail.');
         } catch (ApplicationException $e) {
+            self::assertContains('CryptoWrapper prefix KBC::MockCryptoWrapper== is not unique.', $e->getMessage());
         }
     }
 
@@ -768,6 +774,7 @@ class ObjectEncryptorTest extends TestCase
             $encryptor->encrypt('test');
             self::fail('Misconfigured object encryptor must raise exception.');
         } catch (ApplicationException $e) {
+            self::assertContains('Invalid crypto wrapper Keboola\ObjectEncryptor\Legacy\Wrapper\BaseWrapper', $e->getMessage());
         }
     }
 
@@ -840,8 +847,24 @@ class ObjectEncryptorTest extends TestCase
         self::assertEquals(json_encode($decrypted), json_encode(json_decode($json)));
     }
 
+    public function testEncryptorLegacyNoMCrypt()
+    {
+        $encryptor = $this->factory->getEncryptor();
+        $prop = new \ReflectionProperty($encryptor, 'legacyEncryptor');
+        $prop->setAccessible(true);
+        $legacyEncryptor = $prop->getValue($encryptor);
+        if (!extension_loaded('mcrypt')) {
+            self::assertNull($legacyEncryptor);
+        } else {
+            self::assertNotNull($legacyEncryptor);
+        }
+    }
+
     public function testEncryptorLegacy()
     {
+        if (!extension_loaded('mcrypt')) {
+            self::markTestSkipped("Mcrypt not available");
+        }
         $encryptor = $this->factory->getEncryptor();
         $legacyEncryptor = new Encryptor($this->aesKey);
 
