@@ -7,7 +7,6 @@ use Aws\Kms\KmsClient;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Psr7\Request;
 use Keboola\ObjectEncryptor\Exception\ApplicationException;
-use Keboola\ObjectEncryptor\Exception\UserException;
 use Keboola\ObjectEncryptor\Wrapper\GenericKMSWrapper;
 use PHPUnit\Framework\TestCase;
 
@@ -228,7 +227,7 @@ class GenericKMSWrapperTest extends TestCase
         /** @var GenericKMSWrapper $mockWrapper */
         $mockWrapper->setKMSKeyId(KMS_TEST_KEY);
         $mockWrapper->setKMSRegion(AWS_DEFAULT_REGION);
-        self::expectException(UserException::class);
+        self::expectException(ApplicationException::class);
         self::expectExceptionMessage('Deciphering failed.');
         $mockWrapper->decrypt($encrypted);
     }

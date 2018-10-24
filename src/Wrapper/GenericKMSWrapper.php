@@ -199,7 +199,7 @@ class GenericKMSWrapper implements CryptoWrapperInterface
         } catch (KmsException $e) {
             throw new UserException("Invalid metadata.", $e);
         } catch (\Exception $e) {
-            throw new UserException("Deciphering failed.", $e);
+            throw new ApplicationException("Deciphering failed.", $e);
         }
         if (empty($result['Plaintext'])) {
             throw new ApplicationException("Invalid KMS response.");
