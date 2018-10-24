@@ -6,6 +6,8 @@ use Aws\CommandInterface;
 use Aws\Kms\KmsClient;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Psr7\Request;
+use Keboola\ObjectEncryptor\Exception\ApplicationException;
+use Keboola\ObjectEncryptor\Exception\UserException;
 use Keboola\ObjectEncryptor\Wrapper\GenericKMSWrapper;
 use PHPUnit\Framework\TestCase;
 
@@ -83,7 +85,6 @@ class GenericKMSWrapperTest extends TestCase
         self::assertEquals($secret, $wrapper->decrypt($encrypted));
     }
 
-
     public function testRetryEncrypt()
     {
         $mockKmsClient = self::getMockBuilder(KmsClient::class)
@@ -117,6 +118,41 @@ class GenericKMSWrapperTest extends TestCase
         $encrypted = $mockWrapper->encrypt($secret);
         self::assertNotEquals($secret, $encrypted);
         self::assertEquals($secret, $mockWrapper->decrypt($encrypted));
+    }
+
+    public function testRetryEncryptFail()
+    {
+        $mockKmsClient = self::getMockBuilder(KmsClient::class)
+            // Need to pass service explicitly, because AwsClient fails to detect it from mock
+            ->setConstructorArgs([['region' => AWS_DEFAULT_REGION, 'version' => '2014-11-01', 'service' => 'kms']])
+            ->setMethods(['execute'])
+            ->getMock();
+        $callNo = 0;
+        $mockKmsClient->method('execute')
+            ->willReturnCallback(function (CommandInterface $command) use (&$callNo, $mockKmsClient) {
+                $callNo++;
+                if ($callNo < 10) {
+                    throw new ConnectException('mock failed to connect', new Request('GET', 'some-uri'));
+                } else {
+                    /** @var KmsClient $mockKmsClient */
+                    return $mockKmsClient->executeAsync($command)->wait();
+                }
+            });
+
+        /** @var \PHPUnit_Framework_MockObject_MockObject $mockWrapper */
+        $mockWrapper = self::getMockBuilder(GenericKMSWrapper::class)
+            ->setMethods(['getClient'])
+            ->getMock();
+        $mockWrapper->method('getClient')
+            ->willReturn($mockKmsClient);
+
+        $secret = 'secret';
+        /** @var GenericKMSWrapper $mockWrapper */
+        $mockWrapper->setKMSKeyId(KMS_TEST_KEY);
+        $mockWrapper->setKMSRegion(AWS_DEFAULT_REGION);
+        self::expectException(ApplicationException::class);
+        self::expectExceptionMessage('Ciphering failed: Failed to obtain encryption key.');
+        $mockWrapper->encrypt($secret);
     }
 
     public function testRetryDecrypt()
@@ -155,6 +191,46 @@ class GenericKMSWrapperTest extends TestCase
         $mockWrapper->setKMSKeyId(KMS_TEST_KEY);
         $mockWrapper->setKMSRegion(AWS_DEFAULT_REGION);
         self::assertEquals($secret, $mockWrapper->decrypt($encrypted));
+    }
+
+    public function testRetryDecryptFail()
+    {
+        $mockKmsClient = self::getMockBuilder(KmsClient::class)
+            // Need to pass service explicitly, because AwsClient fails to detect it from mock
+            ->setConstructorArgs([['region' => AWS_DEFAULT_REGION, 'version' => '2014-11-01', 'service' => 'kms']])
+            ->setMethods(['execute'])
+            ->getMock();
+        $callNo = 0;
+        $mockKmsClient->method('execute')
+            ->willReturnCallback(function (CommandInterface $command) use (&$callNo, $mockKmsClient) {
+                $callNo++;
+                if ($callNo < 10) {
+                    throw new ConnectException('mock failed to connect', new Request('GET', 'some-uri'));
+                } else {
+                    /** @var KmsClient $mockKmsClient */
+                    return $mockKmsClient->executeAsync($command)->wait();
+                }
+            });
+
+        /** @var \PHPUnit_Framework_MockObject_MockObject $mockWrapper */
+        $mockWrapper = self::getMockBuilder(GenericKMSWrapper::class)
+            ->setMethods(['getClient'])
+            ->getMock();
+        $mockWrapper->method('getClient')
+            ->willReturn($mockKmsClient);
+
+        $secret = 'secret';
+        $wrapper = new GenericKMSWrapper();
+        $wrapper->setKMSKeyId(KMS_TEST_KEY);
+        $wrapper->setKMSRegion(AWS_DEFAULT_REGION);
+        $encrypted = $wrapper->encrypt($secret);
+        self::assertNotEquals($secret, $encrypted);
+        /** @var GenericKMSWrapper $mockWrapper */
+        $mockWrapper->setKMSKeyId(KMS_TEST_KEY);
+        $mockWrapper->setKMSRegion(AWS_DEFAULT_REGION);
+        self::expectException(UserException::class);
+        self::expectExceptionMessage('Deciphering failed.');
+        $mockWrapper->decrypt($encrypted);
     }
 
     /**
