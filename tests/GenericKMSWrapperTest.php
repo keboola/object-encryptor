@@ -126,17 +126,10 @@ class GenericKMSWrapperTest extends TestCase
             ->setConstructorArgs([['region' => AWS_DEFAULT_REGION, 'version' => '2014-11-01', 'service' => 'kms']])
             ->setMethods(['execute'])
             ->getMock();
-        $callNo = 0;
         $mockKmsClient->method('execute')
-            ->willReturnCallback(function (CommandInterface $command) use (&$callNo, $mockKmsClient) {
-                $callNo++;
-                if ($callNo < 10) {
-                    throw new ConnectException('mock failed to connect', new Request('GET', 'some-uri'));
-                } else {
-                    /** @var KmsClient $mockKmsClient */
-                    return $mockKmsClient->executeAsync($command)->wait();
-                }
-            });
+            ->willThrowException(
+                new ConnectException('mock failed to connect', new Request('GET', 'some-uri'))
+            );
 
         /** @var \PHPUnit_Framework_MockObject_MockObject $mockWrapper */
         $mockWrapper = self::getMockBuilder(GenericKMSWrapper::class)
@@ -161,7 +154,6 @@ class GenericKMSWrapperTest extends TestCase
             ->setConstructorArgs([['region' => AWS_DEFAULT_REGION, 'version' => '2014-11-01', 'service' => 'kms']])
             ->setMethods(['execute'])
             ->getMock();
-        $callNo = 0;
         $mockKmsClient->method('execute')
             ->willReturnCallback(function (CommandInterface $command) use (&$callNo, $mockKmsClient) {
                 $callNo++;
@@ -199,17 +191,10 @@ class GenericKMSWrapperTest extends TestCase
             ->setConstructorArgs([['region' => AWS_DEFAULT_REGION, 'version' => '2014-11-01', 'service' => 'kms']])
             ->setMethods(['execute'])
             ->getMock();
-        $callNo = 0;
         $mockKmsClient->method('execute')
-            ->willReturnCallback(function (CommandInterface $command) use (&$callNo, $mockKmsClient) {
-                $callNo++;
-                if ($callNo < 10) {
-                    throw new ConnectException('mock failed to connect', new Request('GET', 'some-uri'));
-                } else {
-                    /** @var KmsClient $mockKmsClient */
-                    return $mockKmsClient->executeAsync($command)->wait();
-                }
-            });
+            ->willThrowException(
+                new ConnectException('mock failed to connect', new Request('GET', 'some-uri'))
+            );
 
         /** @var \PHPUnit_Framework_MockObject_MockObject $mockWrapper */
         $mockWrapper = self::getMockBuilder(GenericKMSWrapper::class)
