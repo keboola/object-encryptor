@@ -207,13 +207,14 @@ class ObjectEncryptorFactory
     }
 
     /**
+     * @param bool $createLegacyEncryptorIfAvailable
      * @return ObjectEncryptor Object encryptor instance.
      * @throws ApplicationException
      */
-    public function getEncryptor()
+    public function getEncryptor($createLegacyEncryptorIfAvailable = false)
     {
         $this->validateState();
-        if ($this->keyVersion0 && function_exists('mcrypt_module_open')) {
+        if ($this->keyVersion0 && function_exists('mcrypt_module_open') && $createLegacyEncryptorIfAvailable) {
             $legacyEncryptor = new Encryptor($this->keyVersion0);
         } else {
             $legacyEncryptor = null;
