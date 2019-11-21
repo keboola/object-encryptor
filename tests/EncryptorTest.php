@@ -9,7 +9,7 @@ class EncryptorTest extends TestCase
 {
     public function testEncryptor()
     {
-        if (!extension_loaded('mcrypt')) {
+        if (!function_exists('mcrypt_module_open')) {
             self::markTestSkipped("Mcrypt not available");
         }
         $encryptor = new Encryptor('123456789012345678901234567890ab');

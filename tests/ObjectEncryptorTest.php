@@ -849,23 +849,32 @@ class ObjectEncryptorTest extends TestCase
 
     public function testEncryptorLegacyNoMCrypt()
     {
-        $encryptor = $this->factory->getEncryptor();
+        $encryptor = $this->factory->getEncryptor(true);
         $prop = new \ReflectionProperty($encryptor, 'legacyEncryptor');
         $prop->setAccessible(true);
         $legacyEncryptor = $prop->getValue($encryptor);
-        if (!extension_loaded('mcrypt')) {
+        if (!function_exists('mcrypt_module_open')) {
             self::assertNull($legacyEncryptor);
         } else {
             self::assertNotNull($legacyEncryptor);
         }
     }
 
+    public function testEncryptorLegacyNoMCryptNoRequire()
+    {
+        $encryptor = $this->factory->getEncryptor();
+        $prop = new \ReflectionProperty($encryptor, 'legacyEncryptor');
+        $prop->setAccessible(true);
+        $legacyEncryptor = $prop->getValue($encryptor);
+        self::assertNull($legacyEncryptor);
+    }
+
     public function testEncryptorLegacy()
     {
-        if (!extension_loaded('mcrypt')) {
+        if (!function_exists('mcrypt_module_open')) {
             self::markTestSkipped("Mcrypt not available");
         }
-        $encryptor = $this->factory->getEncryptor();
+        $encryptor = $this->factory->getEncryptor(true);
         $legacyEncryptor = new Encryptor($this->aesKey);
 
         $originalText = 'secret';
@@ -879,7 +888,7 @@ class ObjectEncryptorTest extends TestCase
         $encryptor = $this->factory->getEncryptor();
         $originalText = 'test';
         try {
-            $encryptor->decrypt($originalText);
+            $result = $encryptor->decrypt($originalText);
             self::fail('Invalid cipher must fail.');
         } catch (UserException $e) {
             self::assertContains('is not an encrypted value', $e->getMessage());
