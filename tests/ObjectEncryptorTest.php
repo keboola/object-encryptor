@@ -70,146 +70,138 @@ class ObjectEncryptorTest extends TestCase
     public function testEncryptorInvalidService()
     {
         $encryptor = $this->factory->getEncryptor();
-        try {
-            $encryptor->encrypt('secret', 'fooBar');
-            self::fail('Invalid crypto wrapper must throw exception');
-        } catch (ApplicationException $e) {
-            self::assertContains('Invalid crypto wrapper fooBar', $e->getMessage());
-        }
+        self::expectExceptionMessage('Invalid crypto wrapper fooBar');
+        self::expectException(ApplicationException::class);
+        $encryptor->encrypt('secret', 'fooBar');
     }
 
-    public function testEncryptorUnsupportedInput()
+    public function unsupportedEncryptionInputProvider()
     {
         $invalidClass = $this->getMockBuilder(\stdClass::class)
-             ->disableOriginalConstructor()
-             ->getMock();
-        $encryptor = $this->factory->getEncryptor();
-
-        $unsupportedInput = $invalidClass;
-        try {
-            $encryptor->encrypt($unsupportedInput);
-            self::fail('Encryption of invalid data should fail.');
-        } catch (ApplicationException $e) {
-            self::assertContains('Only stdClass, array and string are supported types for encryption.', $e->getMessage());
-        }
-
-        $unsupportedInput = [
-            'key' => 'value',
-            'key2' => $invalidClass
+            ->disableOriginalConstructor()
+            ->getMock();
+        return [
+            'invalid class' => [
+                $invalidClass,
+                'Only stdClass, array and string are supported types for encryption.'
+            ],
+            'invalid class in value' => [
+                [
+                    'key' => 'value',
+                    'key2' => $invalidClass,
+                ],
+                'Invalid item $key - only stdClass, array and scalar can be encrypted.'
+            ],
+            'invalid class in encrypted value' => [
+                [
+                    'key' => 'value',
+                    '#key2' => $invalidClass,
+                ],
+                'Invalid item $key - only stdClass, array and scalar can be encrypted.'
+            ],
         ];
-        try {
-            $encryptor->encrypt($unsupportedInput);
-            self::fail('Encryption of invalid data should fail.');
-        } catch (ApplicationException $e) {
-        }
-
-        $unsupportedInput = [
-            'key' => 'value',
-            '#key2' => $invalidClass,
-        ];
-        try {
-            $encryptor->encrypt($unsupportedInput);
-            self::fail('Encryption of invalid data should fail.');
-        } catch (ApplicationException $e) {
-        }
     }
 
-    public function testDecryptorUnsupportedInput()
+    /**
+     * @dataProvider unsupportedEncryptionInputProvider
+     * @param mixed $input
+     * @param string $expectedMessage
+     * @throws ApplicationException
+     */
+    public function testEncryptorUnsupportedInput($input, $expectedMessage)
+    {
+        $encryptor = $this->factory->getEncryptor();
+        self::expectException(ApplicationException::class);
+        self::expectExceptionMessage($expectedMessage);
+        $encryptor->encrypt($input);
+    }
+
+    public function unsupportedDecryptionInputProvider()
     {
         $invalidClass = $this->getMockBuilder(\stdClass::class)
-             ->disableOriginalConstructor()
-             ->getMock();
-        $encryptor = $this->factory->getEncryptor();
-
-        $unsupportedInput = $invalidClass;
-        try {
-            $encryptor->decrypt($unsupportedInput);
-            self::fail('Encryption of invalid data should fail.');
-        } catch (ApplicationException $e) {
-            self::assertContains('Only stdClass, array and string are supported types for decryption.', $e->getMessage());
-        }
-
-        $unsupportedInput = [
-            'key' => 'value',
-            'key2' => $invalidClass,
+            ->disableOriginalConstructor()
+            ->getMock();
+        return [
+            'invalid class' => [
+                $invalidClass,
+                'Only stdClass, array and string are supported types for decryption.'
+            ],
+            'invalid class in value' => [
+                [
+                    'key' => 'value',
+                    'key2' => $invalidClass,
+                ],
+                'Invalid item key2 - only stdClass, array and scalar can be decrypted.'
+            ],
+            'invalid class in encrypted value' => [
+                [
+                    'key' => 'value',
+                    '#key2' => $invalidClass,
+                ],
+                'Invalid item #key2 - only stdClass, array and scalar can be decrypted.'
+            ],
         ];
-        try {
-            $encryptor->decrypt($unsupportedInput);
-            self::fail('Encryption of invalid data should fail.');
-        } catch (ApplicationException $e) {
-            self::assertContains('Invalid item key2 - only stdClass, array and scalar can be decrypted.', $e->getMessage());
-        }
-
-        $unsupportedInput = [
-            'key' => 'value',
-            '#key2' => $invalidClass,
-        ];
-        try {
-            $encryptor->decrypt($unsupportedInput);
-            self::fail('Encryption of invalid data should fail.');
-        } catch (ApplicationException $e) {
-            self::assertContains('Invalid item #key2 - only stdClass, array and scalar can be decrypted.', $e->getMessage());
-        }
     }
 
-    public function testDecryptorInvalidCipherText()
+    /**
+     * @dataProvider unsupportedDecryptionInputProvider
+     * @param mixed $input
+     * @param string $expectedMessage
+     * @throws ApplicationException
+     */
+    public function testDecryptorUnsupportedInput($input, $expectedMessage)
     {
         $encryptor = $this->factory->getEncryptor();
-        $encrypted = 'KBC::Encrypted==yI0sawothis is not a valid cipher but it looks like one N2Jg==';
-        try {
-            self::assertEquals($encrypted, $encryptor->decrypt($encrypted));
-            self::fail('Invalid cipher text must raise exception');
-        } catch (UserException $e) {
-            self::assertContains('KBC::Encrypted==yI0sawothis', $e->getMessage());
-        }
+        self::expectException(ApplicationException::class);
+        self::expectExceptionMessage($expectedMessage);
+        $encryptor->decrypt($input);
     }
 
-    public function testDecryptorInvalidCipherText2()
+    public function decryptorInvalidCipherTextProvider()
     {
-        $encryptor = $this->factory->getEncryptor();
-        $encrypted = 'this does not even look like a cipher text';
-        try {
-            self::assertEquals($encrypted, $encryptor->decrypt($encrypted));
-            self::fail('Invalid cipher text must raise exception');
-        } catch (UserException $e) {
-            self::assertNotContains('this does not even look like a cipher text', $e->getMessage());
-        }
-    }
-
-    public function testDecryptorInvalidCipherStructure()
-    {
-        $encryptor = $this->factory->getEncryptor();
-        $encrypted = [
-            'key1' => 'somevalue',
-            'key2' => [
-                '#anotherKey' => 'KBC::Encrypted==yI0sawothis is not a valid cipher but it looks like one N2Jg=='
-            ]
+        return [
+            'somewhat similar' => [
+                'KBC::Encrypted==yI0sawothis is not a valid cipher but it looks like one N2Jg==',
+                'Value KBC::Encrypted==yI0sawothis is not a valid cipher but it looks like one N2Jg== is not an encrypted value.',
+            ],
+            'completely off' => [
+                'this does not even look like a cipher text',
+                'Value is not an encrypted value.',
+            ],
+            'somewhat similar in key' => [
+                [
+                    'key1' => 'somevalue',
+                    'key2' => [
+                        '#anotherKey' => 'KBC::Encrypted==yI0sawothis is not a valid cipher but it looks like one N2Jg=='
+                    ]
+                ],
+                'Invalid cipher text for key #anotherKey Value KBC::Encrypted==yI0sawothis is not a valid cipher but it looks like one N2Jg== is not an encrypted value.',
+            ],
+            'completely off in key' => [
+                [
+                    'key1' => 'somevalue',
+                    'key2' => [
+                        '#anotherKey' => 'this does not even look like a cipher text'
+                    ]
+                ],
+                'Invalid cipher text for key #anotherKey Value is not an encrypted value.',
+            ],
         ];
-        try {
-            self::assertEquals($encrypted, $encryptor->decrypt($encrypted));
-            self::fail('Invalid cipher text must raise exception');
-        } catch (UserException $e) {
-            self::assertContains('KBC::Encrypted==yI0sawothis', $e->getMessage());
-            self::assertContains('#anotherKey', $e->getMessage());
-        }
     }
 
-    public function testDecryptorInvalidCipherStructure2()
+    /**
+     * @dataProvider decryptorInvalidCipherTextProvider
+     * @param string $encrypted
+     * @param string $expectedMessage
+     * @throws ApplicationException
+     * @throws UserException
+     */
+    public function testDecryptorInvalidCipherText($encrypted, $expectedMessage)
     {
         $encryptor = $this->factory->getEncryptor();
-        $encrypted = [
-            'key1' => 'somevalue',
-            'key2' => [
-                '#anotherKey' => 'this does not even look like a cipher text'
-            ]
-        ];
-        try {
-            self::assertEquals($encrypted, $encryptor->decrypt($encrypted));
-            self::fail('Invalid cipher text must raise exception');
-        } catch (UserException $e) {
-            self::assertNotContains('this does not even look like a cipher text', $e->getMessage());
-            self::assertContains('#anotherKey', $e->getMessage());
-        }
+        self::expectException(UserException::class);
+        self::expectExceptionMessage($expectedMessage);
+        $encryptor->decrypt($encrypted);
     }
 
     public function testEncryptorAlreadyEncrypted()
@@ -242,12 +234,9 @@ class ObjectEncryptorTest extends TestCase
         $encryptor = $this->factory->getEncryptor();
         $wrapper = new MockCryptoWrapper();
         $encryptor->pushWrapper($wrapper);
-        try {
-            $encryptor->pushWrapper($wrapper);
-            self::fail('Adding crypto wrapper with same prefix must fail.');
-        } catch (ApplicationException $e) {
-            self::assertContains('CryptoWrapper prefix KBC::MockCryptoWrapper== is not unique.', $e->getMessage());
-        }
+        self::expectException(ApplicationException::class);
+        self::expectExceptionMessage('CryptoWrapper prefix KBC::MockCryptoWrapper== is not unique.');
+        $encryptor->pushWrapper($wrapper);
     }
 
     public function testEncryptorSimpleArray()
@@ -770,12 +759,9 @@ class ObjectEncryptorTest extends TestCase
     public function testEncryptorNoWrappers()
     {
         $encryptor = new ObjectEncryptor();
-        try {
-            $encryptor->encrypt('test');
-            self::fail('Misconfigured object encryptor must raise exception.');
-        } catch (ApplicationException $e) {
-            self::assertContains('Invalid crypto wrapper Keboola\ObjectEncryptor\Legacy\Wrapper\BaseWrapper', $e->getMessage());
-        }
+        self::expectException(ApplicationException::class);
+        self::expectExceptionMessage('Invalid crypto wrapper Keboola\ObjectEncryptor\Legacy\Wrapper\BaseWrapper');
+        $encryptor->encrypt('test');
     }
 
     public function testEncryptorDecodedJSONObject()
@@ -887,11 +873,8 @@ class ObjectEncryptorTest extends TestCase
     {
         $encryptor = $this->factory->getEncryptor();
         $originalText = 'test';
-        try {
-            $result = $encryptor->decrypt($originalText);
-            self::fail('Invalid cipher must fail.');
-        } catch (UserException $e) {
-            self::assertContains('is not an encrypted value', $e->getMessage());
-        }
+        self::expectException(UserException::class);
+        self::expectExceptionMessage('Value is not an encrypted value.');
+        $encryptor->decrypt($originalText);
     }
 }
