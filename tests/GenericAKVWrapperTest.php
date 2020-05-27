@@ -54,4 +54,24 @@ class GenericAKVWrapperTest extends TestCase
         $wrapper = $this->getWrapper();
         self::assertEquals($secret, $wrapper->decrypt($encrypted));
     }
+
+    public function testEncrypt2()
+    {
+        $secret = 'mySecretValue';
+        $wrapper = $this->getWrapper();
+        $wrapper->setMetadataValue(0, 'keboola.a-very-long-component-id-with-some-extra-characters');
+        $wrapper->setMetadataValue(1, 'a-very-long-coniguration-id-with-some-extra-characters');
+        $wrapper->setMetadataValue(2, 'https://connection.azure.us-east-1.keboola.com');
+        $wrapper->setMetadataValue(3, '123456789');
+        $encrypted = $wrapper->encrypt($secret);
+        self::assertNotEquals($secret, $encrypted);
+        self::assertEquals($secret, $wrapper->decrypt($encrypted));
+
+        $wrapper = $this->getWrapper();
+        $wrapper->setMetadataValue(0, 'keboola.a-very-long-component-id-with-some-extra-characters');
+        $wrapper->setMetadataValue(1, 'a-very-long-coniguration-id-with-some-extra-characters');
+        $wrapper->setMetadataValue(2, 'https://connection.azure.us-east-1.keboola.com');
+        $wrapper->setMetadataValue(3, '123456789');
+        self::assertEquals($secret, $wrapper->decrypt($encrypted));
+    }
 }
