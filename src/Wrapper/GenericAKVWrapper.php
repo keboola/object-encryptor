@@ -144,6 +144,28 @@ class GenericAKVWrapper implements CryptoWrapperInterface
     }
 
     /**
+     * @param mixed $data
+     * @return string
+     */
+    private function encode($data)
+    {
+        return base64_encode(gzcompress(serialize($data)));
+    }
+
+    /**
+     * @param string $data
+     * @return mixed
+     */
+    private function decode($data)
+    {
+        try {
+            return @unserialize(gzuncompress(base64_decode($data)));
+        } catch (Exception $e) {
+            throw new UserException('Cipher is malformed.', $e);
+        }
+    }
+
+    /**
      * @param string $data
      * @return string
      * @throws ApplicationException
@@ -157,11 +179,10 @@ class GenericAKVWrapper implements CryptoWrapperInterface
         }
         try {
             $key = Key::createNewRandomKey();
-            $encryptedPayload = Crypto::encrypt((string) $data, $key, true);
-            $context = base64_encode(gzcompress(serialize([
+            $context = $this->encode([
                 self::METADATA_INDEX => $this->metadata,
                 self::KEY_INDEX => $key->saveToAsciiSafeString()
-            ])));
+            ]);
             $secret = $this->getRetryProxy()->call(function () use ($context) {
                 return $this->getClient()->setSecret(
                     new SetSecretRequest($context, new SecretAttributes()),
@@ -169,11 +190,11 @@ class GenericAKVWrapper implements CryptoWrapperInterface
                 );
             });
             /** @var SecretBundle $secret */
-            return base64_encode(gzcompress(serialize([
-                self::PAYLOAD_INDEX => $encryptedPayload,
+            return $this->encode([
+                self::PAYLOAD_INDEX => Crypto::encrypt((string) $data, $key, true),
                 self::SECRET_NAME => $secret->getName(),
                 self::SECRET_VERSION => $secret->getVersion(),
-            ])));
+            ]);
         } catch (Exception $e) {
             throw new ApplicationException('Ciphering failed: ' . $e->getMessage(), $e);
         }
@@ -188,37 +209,35 @@ class GenericAKVWrapper implements CryptoWrapperInterface
     public function decrypt($encryptedData)
     {
         $this->validateState();
-        try {
-            $encrypted = @unserialize(gzuncompress(base64_decode($encryptedData)));
-        } catch (Exception $e) {
-            throw new UserException('Cipher is malformed.', $e);
-        }
-        if (!is_array($encrypted) || count($encrypted) !== 3 || empty($encrypted[self::PAYLOAD_INDEX]) || empty($encrypted[self::SECRET_NAME]) || empty($encrypted[self::SECRET_VERSION])) {
+        $encrypted = $this->decode($encryptedData);
+        if (!is_array($encrypted) || count($encrypted) !== 3 || empty($encrypted[self::PAYLOAD_INDEX]) ||
+            empty($encrypted[self::SECRET_NAME]) || empty($encrypted[self::SECRET_VERSION])
+        ) {
             throw new UserException('Cipher is malformed.');
         }
         try {
-            $encryptedPayload = $encrypted[self::PAYLOAD_INDEX];
-            $secretName = $encrypted[self::SECRET_NAME];
-            $secretVersion = $encrypted[self::SECRET_VERSION];
-            $decryptedContext = $this->getRetryProxy()->call(function() use ($secretName, $secretVersion) {
-                return $this->getClient()->getSecret($secretName, $secretVersion)->getValue();
+            $decryptedContext = $this->getRetryProxy()->call(function() use ($encrypted) {
+                return $this->getClient()->getSecret(
+                    $encrypted[self::SECRET_NAME],
+                    $encrypted[self::SECRET_VERSION]
+                )->getValue();
             });
-            $decryptedContext = @unserialize(gzuncompress(base64_decode($decryptedContext)));
-            if (!is_array($decryptedContext) || (count($decryptedContext) !== 2) || empty($decryptedContext[self::KEY_INDEX]) || !isset($decryptedContext[self::METADATA_INDEX]) || !is_array($decryptedContext[self::METADATA_INDEX])) {
+            $decryptedContext = $this->decode($decryptedContext);
+            if (!is_array($decryptedContext) || (count($decryptedContext) !== 2) ||
+                empty($decryptedContext[self::KEY_INDEX]) || !isset($decryptedContext[self::METADATA_INDEX]) ||
+                !is_array($decryptedContext[self::METADATA_INDEX])
+            ) {
                 throw new ApplicationException('Cipher is malformed.');
             }
-            $context = $decryptedContext[self::METADATA_INDEX];
-            $safeKey = $decryptedContext[self::KEY_INDEX];
-            $key = Key::loadFromAsciiSafeString($safeKey);
         } catch (Exception $e) {
             throw new ApplicationException('Deciphering failed.', $e);
         }
-        if ($context != $this->metadata) {
+        if ($decryptedContext[self::METADATA_INDEX] != $this->metadata) {
             throw new UserException('Deciphering failed.');
         }
         try {
-            $payload = Crypto::decrypt($encryptedPayload, $key, true);
-            return $payload;
+            $key = Key::loadFromAsciiSafeString($decryptedContext[self::KEY_INDEX]);
+            return Crypto::decrypt($encrypted[self::PAYLOAD_INDEX], $key, true);
         } catch (Exception $e) {
             throw new UserException('Deciphering failed.', $e);
         }
