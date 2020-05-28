@@ -2,11 +2,6 @@
 
 namespace Keboola\ObjectEncryptor\Tests;
 
-use Aws\CommandInterface;
-use Aws\Kms\KmsClient;
-use GuzzleHttp\Exception\ConnectException;
-use GuzzleHttp\Psr7\Request;
-use Keboola\ObjectEncryptor\Exception\ApplicationException;
 use Keboola\ObjectEncryptor\Wrapper\GenericAKVWrapper;
 use Keboola\ObjectEncryptor\Wrapper\GenericKMSWrapper;
 use PHPUnit\Framework\TestCase;
@@ -43,7 +38,7 @@ class GenericAKVWrapperTest extends TestCase
         return $wrapper;
     }
 
-    public function testEncrypt()
+    public function testEncryptNoMetadata()
     {
         $secret = 'mySecretValue';
         $wrapper = $this->getWrapper();
@@ -55,7 +50,7 @@ class GenericAKVWrapperTest extends TestCase
         self::assertEquals($secret, $wrapper->decrypt($encrypted));
     }
 
-    public function testEncrypt2()
+    public function testEncryptMetadata()
     {
         $secret = 'mySecretValue';
         $wrapper = $this->getWrapper();
@@ -72,6 +67,48 @@ class GenericAKVWrapperTest extends TestCase
         $wrapper->setMetadataValue('projectId', '123456789');
         $wrapper->setMetadataValue('componentId', 'keboola.a-very-long-component-id-with-some-extra-characters');
         $wrapper->setMetadataValue('configurationId', 'a-very-long-coniguration-id-with-some-extra-characters');
+        self::assertEquals($secret, $wrapper->decrypt($encrypted));
+    }
+
+    public function testEncryptWrongKey()
+    {
+        $secret = 'mySecretValue';
+        $wrapper = $this->getWrapper();
+        $encrypted = $wrapper->encrypt($secret);
+        self::assertNotEquals($secret, $encrypted);
+        self::assertEquals($secret, $wrapper->decrypt($encrypted));
+
+        $wrapper = new GenericKMSWrapper();
+        $wrapper->setKMSRegion(AWS_DEFAULT_REGION);
+        // This is ok, because KMS key is found automatically during decryption
+        $wrapper->setKMSKeyId('non-existent');
+        self::assertEquals($secret, $wrapper->decrypt($encrypted));
+    }
+
+    public function testEncryptEmptyValue1()
+    {
+        $secret = '';
+        $wrapper = $this->getWrapper();
+        $encrypted = $wrapper->encrypt($secret);
+        self::assertNotEquals($secret, $encrypted);
+        self::assertEquals($secret, $wrapper->decrypt($encrypted));
+    }
+
+    public function testEncryptEmptyValue2()
+    {
+        $secret = '0';
+        $wrapper = $this->getWrapper();
+        $encrypted = $wrapper->encrypt($secret);
+        self::assertNotEquals($secret, $encrypted);
+        self::assertEquals($secret, $wrapper->decrypt($encrypted));
+    }
+
+    public function testEncryptEmptyValue3()
+    {
+        $secret = null;
+        $wrapper = $this->getWrapper();
+        $encrypted = $wrapper->encrypt($secret);
+        self::assertNotEquals($secret, $encrypted);
         self::assertEquals($secret, $wrapper->decrypt($encrypted));
     }
 }

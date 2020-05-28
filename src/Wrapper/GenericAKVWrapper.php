@@ -8,9 +8,6 @@ use Exception;
 use Keboola\AzureKeyVaultClient\Authentication\AuthenticatorFactory;
 use Keboola\AzureKeyVaultClient\Client;
 use Keboola\AzureKeyVaultClient\GuzzleClientFactory;
-use Keboola\AzureKeyVaultClient\Requests\DecryptRequest;
-use Keboola\AzureKeyVaultClient\Requests\EncryptDecryptRequest;
-use Keboola\AzureKeyVaultClient\Requests\EncryptRequest;
 use Keboola\AzureKeyVaultClient\Requests\SecretAttributes;
 use Keboola\AzureKeyVaultClient\Requests\SetSecretRequest;
 use Keboola\AzureKeyVaultClient\Responses\SecretBundle;
@@ -23,7 +20,7 @@ use Retry\RetryProxy;
 
 class GenericAKVWrapper implements CryptoWrapperInterface
 {
-    const ENCRYPTION_ALGORITHM = EncryptDecryptRequest::RSA_OAEP_256;
+    // internal indexes in cipher structures
     const METADATA_INDEX = 0;
     const KEY_INDEX = 1;
     const PAYLOAD_INDEX = 2;
@@ -155,6 +152,7 @@ class GenericAKVWrapper implements CryptoWrapperInterface
     /**
      * @param string $data
      * @return mixed
+     * @throws UserException
      */
     private function decode($data)
     {
@@ -201,6 +199,20 @@ class GenericAKVWrapper implements CryptoWrapperInterface
     }
 
     /**
+     * @param $cipherMetadata
+     * @param $localMetadata
+     * @throws UserException
+     */
+    private function verifyMetadata($cipherMetadata, $localMetadata)
+    {
+        foreach ($cipherMetadata as $key => $value) {
+            if (empty($localMetadata[$key]) || ($cipherMetadata !== $localMetadata[$key])) {
+                throw new UserException('Deciphering failed.');
+            }
+        }
+    }
+
+    /**
      * @param string $encryptedData
      * @return string
      * @throws ApplicationException
@@ -232,9 +244,7 @@ class GenericAKVWrapper implements CryptoWrapperInterface
         } catch (Exception $e) {
             throw new ApplicationException('Deciphering failed.', $e);
         }
-        if ($decryptedContext[self::METADATA_INDEX] != $this->metadata) {
-            throw new UserException('Deciphering failed.');
-        }
+        $this->verifyMetadata($decryptedContext[self::METADATA_INDEX], $this->metadata);
         try {
             $key = Key::loadFromAsciiSafeString($decryptedContext[self::KEY_INDEX]);
             return Crypto::decrypt($encrypted[self::PAYLOAD_INDEX], $key, true);
