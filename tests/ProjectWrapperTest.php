@@ -2,6 +2,8 @@
 
 namespace Keboola\ObjectEncryptor\Tests;
 
+use Keboola\ObjectEncryptor\Exception\ApplicationException;
+use Keboola\ObjectEncryptor\Exception\UserException;
 use Keboola\ObjectEncryptor\Wrapper\ConfigurationWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ProjectWrapper;
 use PHPUnit\Framework\TestCase;
@@ -41,10 +43,6 @@ class ProjectWrapperTest extends TestCase
         self::assertEquals($secret, $wrapper->decrypt($encrypted));
     }
 
-    /**
-     * @expectedException \Keboola\ObjectEncryptor\Exception\UserException
-     * @expectedExceptionMessage Invalid metadata.
-     */
     public function testEncryptDifferentConfiguration()
     {
         $wrapper = $this->getProjectWrapper();
@@ -55,13 +53,11 @@ class ProjectWrapperTest extends TestCase
 
         $wrapper = $this->getProjectWrapper();
         $wrapper->setProjectId('some-other-project');
-        self::assertEquals($secret, $wrapper->decrypt($encrypted));
+        self::expectException(UserException::class);
+        self::expectExceptionMessage('Invalid metadata.');
+        $wrapper->decrypt($encrypted);
     }
 
-    /**
-     * @expectedException \Keboola\ObjectEncryptor\Exception\UserException
-     * @expectedExceptionMessage Invalid metadata.
-     */
     public function testEncryptDifferentComponent()
     {
         $wrapper = $this->getProjectWrapper();
@@ -72,35 +68,29 @@ class ProjectWrapperTest extends TestCase
 
         $wrapper = $this->getProjectWrapper();
         $wrapper->setComponentId('some-other-component');
-        self::assertEquals($secret, $wrapper->decrypt($encrypted));
+        self::expectException(UserException::class);
+        self::expectExceptionMessage('Invalid metadata.');
+        $wrapper->decrypt($encrypted);
     }
 
-    /**
-     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage Cipher key settings are missing.
-     */
     public function testInvalidSetupEncrypt1()
     {
         $wrapper = new ProjectWrapper();
+        self::expectException(ApplicationException::class);
+        self::expectExceptionMessage('Cipher key settings are missing.');
         $wrapper->encrypt('mySecretValue');
     }
 
-    /**
-     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage No stack or component id provided.
-     */
     public function testInvalidSetupEncrypt2()
     {
         $wrapper = new ConfigurationWrapper();
         $wrapper->setKMSRegion(AWS_DEFAULT_REGION);
         $wrapper->setKMSKeyId(KMS_TEST_KEY);
+        self::expectException(ApplicationException::class);
+        self::expectExceptionMessage('No stack or component id provided.');
         $wrapper->encrypt('mySecretValue');
     }
 
-    /**
-     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage No project id provided.
-     */
     public function testInvalidSetupEncrypt3()
     {
         $wrapper = new ProjectWrapper();
@@ -108,35 +98,29 @@ class ProjectWrapperTest extends TestCase
         $wrapper->setKMSKeyId(KMS_TEST_KEY);
         $wrapper->setComponentId('component-id');
         $wrapper->setStackId('my-stack');
+        self::expectException(ApplicationException::class);
+        self::expectExceptionMessage('No project id provided.');
         $wrapper->encrypt('mySecretValue');
     }
 
-    /**
-     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage Cipher key settings are missing.
-     */
     public function testInvalidSetupDecrypt1()
     {
         $wrapper = new ProjectWrapper();
+        self::expectException(ApplicationException::class);
+        self::expectExceptionMessage('Cipher key settings are missing.');
         $wrapper->decrypt('mySecretValue');
     }
 
-    /**
-     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage No stack or component id provided.
-     */
     public function testInvalidSetupDecrypt2()
     {
         $wrapper = new ProjectWrapper();
         $wrapper->setKMSRegion(AWS_DEFAULT_REGION);
         $wrapper->setKMSKeyId(KMS_TEST_KEY);
+        self::expectException(ApplicationException::class);
+        self::expectExceptionMessage('No stack or component id provided.');
         $wrapper->decrypt('mySecretValue');
     }
 
-    /**
-     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage No project id provided.
-     */
     public function testInvalidSetupDecrypt3()
     {
         $wrapper = new ProjectWrapper();
@@ -144,13 +128,11 @@ class ProjectWrapperTest extends TestCase
         $wrapper->setKMSKeyId(KMS_TEST_KEY);
         $wrapper->setComponentId('component-id');
         $wrapper->setStackId('my-stack');
+        self::expectException(ApplicationException::class);
+        self::expectExceptionMessage('No project id provided.');
         $wrapper->decrypt('mySecretValue');
     }
 
-    /**
-     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage Project id is invalid.
-     */
     public function testInvalidConfiguration()
     {
         $wrapper = new ProjectWrapper();
@@ -159,6 +141,8 @@ class ProjectWrapperTest extends TestCase
         $wrapper->setStackId('my-stack');
         $wrapper->setComponentId('my-component');
         $wrapper->setProjectId(new \stdClass());
+        self::expectException(ApplicationException::class);
+        self::expectExceptionMessage('Project id is invalid.');
         $wrapper->encrypt('mySecretValue');
     }
 }

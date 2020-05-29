@@ -2,6 +2,8 @@
 
 namespace Keboola\ObjectEncryptor\Tests;
 
+use Keboola\ObjectEncryptor\Exception\ApplicationException;
+use Keboola\ObjectEncryptor\Exception\UserException;
 use Keboola\ObjectEncryptor\Legacy\Wrapper\BaseWrapper;
 use Keboola\ObjectEncryptor\Legacy\Wrapper\ComponentProjectWrapper;
 use Keboola\ObjectEncryptor\Legacy\Wrapper\ComponentWrapper as LegacyComponentWrapper;
@@ -167,37 +169,29 @@ class ObjectEncryptorFactoryTest extends TestCase
         self::assertEquals($secret, $decrypted);
     }
 
-    /**
-     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage Ciphering failed: Failed to obtain encryption key.
-     */
     public function testGenericWrapperInvalidCredentials()
     {
         $legacyKey = '1234567890123456';
         $aesKey = '123456789012345678901234567890ab';
         $secret = 'secret';
         $factory = new ObjectEncryptorFactory('non-existent', AWS_DEFAULT_REGION, $legacyKey, $aesKey);
+        self::expectException(ApplicationException::class);
+        self::expectExceptionMessage('Ciphering failed: Failed to obtain encryption key.');
         $factory->getEncryptor()->encrypt($secret, GenericKMSWrapper::class);
     }
 
-    /**
-     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage Invalid crypto wrapper
-     */
-    public function testConfigurationWrapperInvalid1()
+    public function testConfigurationWrapperInvalidEncrypt()
     {
         $legacyKey = '1234567890123456';
         $aesKey = '123456789012345678901234567890ab';
         $secret = 'secret';
         $factory = new ObjectEncryptorFactory(KMS_TEST_KEY, AWS_DEFAULT_REGION, $legacyKey, $aesKey);
+        self::expectException(ApplicationException::class);
+        self::expectExceptionMessage('Invalid crypto wrapper');
         $factory->getEncryptor()->encrypt($secret, ConfigurationWrapper::class);
     }
 
-    /**
-     * @expectedException \Keboola\ObjectEncryptor\Exception\UserException
-     * @expectedExceptionMessage Value is not an encrypted value.
-     */
-    public function testConfigurationWrapperInvalid2()
+    public function testConfigurationWrapperInvalidDecrypt()
     {
         $legacyKey = '1234567890123456';
         $secret = 'secret';
@@ -211,27 +205,23 @@ class ObjectEncryptorFactoryTest extends TestCase
         $wrapper->setProjectId('123');
         $encrypted = $wrapper->encrypt($secret);
         self::assertEquals($secret, $wrapper->decrypt($encrypted));
+        self::expectException(UserException::class);
+        self::expectExceptionMessage('Value is not an encrypted value.');
         $factory->getEncryptor()->decrypt($encrypted);
     }
 
-    /**
-     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage Invalid crypto wrapper
-     */
-    public function testProjectWrapperInvalid1()
+    public function testProjectWrapperInvalidEncrypt()
     {
         $legacyKey = '1234567890123456';
         $aesKey = '123456789012345678901234567890ab';
         $secret = 'secret';
         $factory = new ObjectEncryptorFactory(KMS_TEST_KEY, AWS_DEFAULT_REGION, $legacyKey, $aesKey);
+        self::expectException(ApplicationException::class);
+        self::expectExceptionMessage('Invalid crypto wrapper');
         $factory->getEncryptor()->encrypt($secret, ProjectWrapper::class);
     }
 
-    /**
-     * @expectedException \Keboola\ObjectEncryptor\Exception\UserException
-     * @expectedExceptionMessage Value is not an encrypted value.
-     */
-    public function testProjectWrapperInvalid2()
+    public function testProjectWrapperInvalidDecrypt()
     {
         $legacyKey = '1234567890123456';
         $secret = 'secret';
@@ -244,27 +234,23 @@ class ObjectEncryptorFactoryTest extends TestCase
         $wrapper->setProjectId('my-project');
         $encrypted = $wrapper->encrypt($secret);
         self::assertEquals($secret, $wrapper->decrypt($encrypted));
+        self::expectException(UserException::class);
+        self::expectExceptionMessage('Value is not an encrypted value.');
         $factory->getEncryptor()->decrypt($encrypted);
     }
 
-    /**
-     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage Invalid crypto wrapper
-     */
-    public function testComponentWrapperInvalid1()
+    public function testComponentWrapperInvalidEncrypt()
     {
         $legacyKey = '1234567890123456';
         $aesKey = '123456789012345678901234567890ab';
         $secret = 'secret';
         $factory = new ObjectEncryptorFactory(KMS_TEST_KEY, AWS_DEFAULT_REGION, $legacyKey, $aesKey);
+        self::expectException(ApplicationException::class);
+        self::expectExceptionMessage('Invalid crypto wrapper');
         $factory->getEncryptor()->encrypt($secret, ComponentWrapper::class);
     }
 
-    /**
-     * @expectedException \Keboola\ObjectEncryptor\Exception\UserException
-     * @expectedExceptionMessage Value is not an encrypted value.
-     */
-    public function testComponentWrapperInvalid2()
+    public function testComponentWrapperInvalidDecrypt()
     {
         $legacyKey = '1234567890123456';
         $secret = 'secret';
@@ -276,13 +262,11 @@ class ObjectEncryptorFactoryTest extends TestCase
         $wrapper->setComponentId('dummy-component');
         $encrypted = $wrapper->encrypt($secret);
         self::assertEquals($secret, $wrapper->decrypt($encrypted));
+        self::expectException(UserException::class);
+        self::expectExceptionMessage('Value is not an encrypted value.');
         $factory->getEncryptor()->decrypt($encrypted);
     }
 
-    /**
-     * @expectedException \Keboola\ObjectEncryptor\Exception\UserException
-     * @expectedExceptionMessage Invalid cipher text for key #d Value KBC::ComponentSecure::
-     */
     public function testCipherError()
     {
         $legacyKey = '1234567890123456';
@@ -299,102 +283,84 @@ class ObjectEncryptorFactoryTest extends TestCase
         $factory = new ObjectEncryptorFactory(KMS_TEST_KEY, AWS_DEFAULT_REGION, $legacyKey, '');
         $factory->setStackId('my-stack');
         $factory->setComponentId('different-dummy-component');
+        self::expectException(UserException::class);
+        self::expectExceptionMessage('Invalid cipher text for key #d Value KBC::ComponentSecure::');
         $factory->getEncryptor()->decrypt($secret);
     }
 
-    /**
-     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage Encryption key too short. Minimum is 16 bytes.
-     */
-    public function testInvalidKeys1()
+    public function testInvalidKeysLegacyEncryption()
     {
         $factory = new ObjectEncryptorFactory(KMS_TEST_KEY, AWS_DEFAULT_REGION, 'short', '');
+        self::expectException(ApplicationException::class);
+        self::expectExceptionMessage('Encryption key too short. Minimum is 16 bytes.');
         $factory->getEncryptor();
     }
 
-    /**
-     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage Invalid KMS key Id.
-     */
-    public function testInvalidKeys2()
+    public function testInvalidKeysKmsId()
     {
         $legacyKey = '1234567890123456';
         $factory = new ObjectEncryptorFactory(new \stdClass(), AWS_DEFAULT_REGION, $legacyKey, '');
+        self::expectException(ApplicationException::class);
+        self::expectExceptionMessage('Invalid KMS key Id.');
         $factory->getEncryptor();
     }
 
-    /**
-     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage Invalid key version 1.
-     */
-    public function testInvalidKeys4()
+    public function testInvalidKeysVersion1()
     {
         /** @noinspection PhpParamsInspection */
         $factory = new ObjectEncryptorFactory(KMS_TEST_KEY, AWS_DEFAULT_REGION, ['a' => 'b'], '');
+        self::expectException(ApplicationException::class);
+        self::expectExceptionMessage('Invalid key version 1.');
         $factory->getEncryptor();
     }
 
-    /**
-     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage Invalid key version 0.
-     */
-    public function testInvalidKeys5()
+    public function testInvalidKeysVersion0()
     {
         $legacyKey = '1234567890123456';
         /** @noinspection PhpParamsInspection */
         $factory = new ObjectEncryptorFactory(KMS_TEST_KEY, AWS_DEFAULT_REGION, $legacyKey, ['a' => 'b']);
+        self::expectException(ApplicationException::class);
+        self::expectExceptionMessage('Invalid key version 0.');
         $factory->getEncryptor();
     }
 
-    /**
-     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage Invalid stack id.
-     */
-    public function testInvalidParams4()
+    public function testInvalidParamsStackId()
     {
         $legacyKey = '1234567890123456';
         $factory = new ObjectEncryptorFactory(KMS_TEST_KEY, AWS_DEFAULT_REGION, $legacyKey, '');
+        self::expectException(ApplicationException::class);
+        self::expectExceptionMessage('Invalid stack id.');
         /** @noinspection PhpParamsInspection */
         $factory->setStackId(['a' => 'b']);
-        $factory->getEncryptor();
     }
 
-    /**
-     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage Invalid component id.
-     */
-    public function testInvalidParams5()
+    public function testInvalidParamsComponentId()
     {
         $legacyKey = '1234567890123456';
         $factory = new ObjectEncryptorFactory(KMS_TEST_KEY, AWS_DEFAULT_REGION, $legacyKey, '');
+        self::expectException(ApplicationException::class);
+        self::expectExceptionMessage('Invalid component id.');
         /** @noinspection PhpParamsInspection */
         $factory->setComponentId(['a' => 'b']);
-        $factory->getEncryptor();
     }
 
-    /**
-     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage Invalid project id.
-     */
-    public function testInvalidParams6()
+    public function testInvalidParamsProjectId()
     {
         $legacyKey = '1234567890123456';
         $factory = new ObjectEncryptorFactory(KMS_TEST_KEY, AWS_DEFAULT_REGION, $legacyKey, '');
+        self::expectException(ApplicationException::class);
+        self::expectExceptionMessage('Invalid project id.');
         /** @noinspection PhpParamsInspection */
         $factory->setProjectId(['a' => 'b']);
-        $factory->getEncryptor();
     }
 
-    /**
-     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage Invalid configuration id.
-     */
-    public function testInvalidParams7()
+    public function testInvalidParamsConfigurationId()
     {
         $legacyKey = '1234567890123456';
         $factory = new ObjectEncryptorFactory(KMS_TEST_KEY, AWS_DEFAULT_REGION, $legacyKey, '');
+        self::expectException(ApplicationException::class);
+        self::expectExceptionMessage('Invalid configuration id.');
         /** @noinspection PhpParamsInspection */
         $factory->setConfigurationId(['a' => 'b']);
-        $factory->getEncryptor();
     }
 }

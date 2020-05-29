@@ -54,16 +54,14 @@ class ObjectEncryptorTest extends TestCase
         self::assertEquals($originalText, $encryptor->decrypt($encrypted));
     }
 
-    /**
-     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage Encryption failed: Ciphering failed: Failed to obtain encryption key.
-     */
     public function testEncryptorStackNoCredentials()
     {
         putenv('AWS_ACCESS_KEY_ID=');
         putenv('AWS_SECRET_ACCESS_KEY=');
         $encryptor = $this->factory->getEncryptor();
         $originalText = 'secret';
+        self::expectException(ApplicationException::class);
+        self::expectExceptionMessage('Encryption failed: Ciphering failed: Failed to obtain encryption key.');
         $encryptor->encrypt($originalText, GenericKMSWrapper::class);
     }
 

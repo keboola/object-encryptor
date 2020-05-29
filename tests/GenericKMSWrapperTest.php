@@ -7,6 +7,7 @@ use Aws\Kms\KmsClient;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Psr7\Request;
 use Keboola\ObjectEncryptor\Exception\ApplicationException;
+use Keboola\ObjectEncryptor\Exception\UserException;
 use Keboola\ObjectEncryptor\Wrapper\GenericKMSWrapper;
 use PHPUnit\Framework\TestCase;
 
@@ -44,8 +45,8 @@ class GenericKMSWrapperTest extends TestCase
 
     public function testEncryptWrongKey()
     {
-        $secret = 'mySecretValue';
         $wrapper = $this->getWrapper();
+        $secret = 'mySecretValue';
         $encrypted = $wrapper->encrypt($secret);
         self::assertNotEquals($secret, $encrypted);
         self::assertEquals($secret, $wrapper->decrypt($encrypted));
@@ -57,27 +58,32 @@ class GenericKMSWrapperTest extends TestCase
         self::assertEquals($secret, $wrapper->decrypt($encrypted));
     }
 
-    public function testEncryptEmptyValue1()
+    public function emptyValuesProvider()
     {
-        $secret = '';
-        $wrapper = $this->getWrapper();
-        $encrypted = $wrapper->encrypt($secret);
-        self::assertNotEquals($secret, $encrypted);
-        self::assertEquals($secret, $wrapper->decrypt($encrypted));
+        return [
+            [
+                '',
+            ],
+            [
+                '0',
+            ],
+            [
+                0,
+            ],
+            [
+                null,
+            ],
+        ];
     }
 
-    public function testEncryptEmptyValue2()
+    /**
+     * @dataProvider emptyValuesProvider()
+     * @param $secret
+     * @throws ApplicationException
+     * @throws UserException
+     */
+    public function testEncryptEmptyValue($secret)
     {
-        $secret = '0';
-        $wrapper = $this->getWrapper();
-        $encrypted = $wrapper->encrypt($secret);
-        self::assertNotEquals($secret, $encrypted);
-        self::assertEquals($secret, $wrapper->decrypt($encrypted));
-    }
-
-    public function testEncryptEmptyValue3()
-    {
-        $secret = null;
         $wrapper = $this->getWrapper();
         $encrypted = $wrapper->encrypt($secret);
         self::assertNotEquals($secret, $encrypted);
@@ -217,18 +223,15 @@ class GenericKMSWrapperTest extends TestCase
         $mockWrapper->decrypt($encrypted);
     }
 
-    /**
-     * @expectedException \Keboola\ObjectEncryptor\Exception\UserException
-     * @expectedExceptionMessage Cannot encrypt a non-scalar value
-     */
+
     public function testEncryptNonScalar()
     {
         $secret = ['a' => 'b'];
         $wrapper = $this->getWrapper();
+        self::expectException(UserException::class);
+        self::expectExceptionMessage('Cannot encrypt a non-scalar value');
         /** @noinspection PhpParamsInspection */
-        $encrypted = $wrapper->encrypt($secret);
-        self::assertNotEquals($secret, $encrypted);
-        self::assertEquals($secret, $wrapper->decrypt($encrypted));
+        $wrapper->encrypt($secret);
     }
 
     public function testEncryptMetadata()
@@ -289,12 +292,8 @@ class GenericKMSWrapperTest extends TestCase
         $wrapper->decrypt($encrypted2);
         self::assertEquals($secret2, $wrapper->decrypt($encrypted2));
     }
-    /**
-     *
-     * @expectedException \Keboola\ObjectEncryptor\Exception\UserException
-     * @expectedExceptionMessage Invalid metadata.
-     */
-    public function testEncryptMetadataMismatch1()
+
+    public function testEncryptMetadataMismatchNoMetadata()
     {
         $secret = 'mySecretValue';
         $wrapper = $this->getWrapper();
@@ -304,15 +303,12 @@ class GenericKMSWrapperTest extends TestCase
         self::assertEquals($secret, $wrapper->decrypt($encrypted));
 
         $wrapper = $this->getWrapper();
+        self::expectException(UserException::class);
+        self::expectExceptionMessage('Invalid metadata.');
         $wrapper->decrypt($encrypted);
-        self::assertEquals($secret, $wrapper->decrypt($encrypted));
     }
 
-    /**
-     * @expectedException \Keboola\ObjectEncryptor\Exception\UserException
-     * @expectedExceptionMessage Invalid metadata.
-     */
-    public function testEncryptMetadataMismatch2()
+    public function testEncryptMetadataMismatchBadMetadata()
     {
         $secret = 'mySecretValue';
         $wrapper = $this->getWrapper();
@@ -323,172 +319,148 @@ class GenericKMSWrapperTest extends TestCase
 
         $wrapper = $this->getWrapper();
         $wrapper->setMetadataValue('key', 'value-bad');
+        self::expectException(UserException::class);
+        self::expectExceptionMessage('Invalid metadata.');
         $wrapper->decrypt($encrypted);
-        self::assertEquals($secret, $wrapper->decrypt($encrypted));
     }
 
-    /**
-     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage Cipher key settings are missing.
-     */
-    public function testInvalidSetupEncrypt1()
+
+    public function testInvalidSetupEncryptMissingAll()
     {
         $wrapper = new GenericKMSWrapper();
+        self::expectException(ApplicationException::class);
+        self::expectExceptionMessage('Cipher key settings are missing.');
         $wrapper->encrypt('mySecretValue');
     }
 
-    /**
-     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage Cipher key settings are missing.
-     */
-    public function testInvalidSetupEncrypt2()
+    public function testInvalidSetupEncryptMissingKeyId()
     {
         $wrapper = new GenericKMSWrapper();
         $wrapper->setKMSRegion('my-region');
+        self::expectException(ApplicationException::class);
+        self::expectExceptionMessage('Cipher key settings are missing.');
         $wrapper->encrypt('mySecretValue');
     }
 
-    /**
-     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage Cipher key settings are missing.
-     */
-    public function testInvalidSetupEncrypt3()
+    public function testInvalidSetupEncryptMissingRegion()
     {
         $wrapper = new GenericKMSWrapper();
         $wrapper->setKMSKeyId('my-key');
+        self::expectException(ApplicationException::class);
+        self::expectExceptionMessage('Cipher key settings are missing.');
         $wrapper->encrypt('mySecretValue');
     }
 
-    /**
-     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage Cipher key settings are missing.
-     */
-    public function testInvalidSetupDecrypt1()
+    public function testInvalidSetupDecryptMissingAll()
     {
         $wrapper = new GenericKMSWrapper();
+        self::expectException(ApplicationException::class);
+        self::expectExceptionMessage('Cipher key settings are missing.');
         $wrapper->decrypt('mySecretValue');
     }
 
-    /**
-     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage Cipher key settings are missing.
-     */
-    public function testInvalidSetupDecrypt2()
+    public function testInvalidSetupDecryptMissingKeyId()
     {
         $wrapper = new GenericKMSWrapper();
         $wrapper->setKMSRegion('my-region');
+        self::expectException(ApplicationException::class);
+        self::expectExceptionMessage('Cipher key settings are missing.');
         $wrapper->decrypt('mySecretValue');
     }
 
-    /**
-     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage Cipher key settings are missing.
-     */
-    public function testInvalidSetupDecrypt3()
+    public function testInvalidSetupDecryptMissingRegion()
     {
         $wrapper = new GenericKMSWrapper();
         $wrapper->setKMSKeyId('my-key');
+        self::expectException(ApplicationException::class);
+        self::expectExceptionMessage('Cipher key settings are missing.');
         $wrapper->decrypt('mySecretValue');
     }
 
-    /**
-     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage Cipher key settings are invalid.
-     */
-    public function testInvalidValue1()
+    public function testInvalidKeyId()
     {
         $wrapper = new GenericKMSWrapper();
         $wrapper->setKMSKeyId(new \stdClass());
         $wrapper->setKMSRegion('my-region');
+        self::expectException(ApplicationException::class);
+        self::expectExceptionMessage('Cipher key settings are invalid.');
         $wrapper->encrypt('mySecretValue');
     }
 
-    /**
-     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage Cipher key settings are invalid.
-     */
-    public function testInvalidValue2()
+    public function testInvalidRegion()
     {
         $wrapper = new GenericKMSWrapper();
         $wrapper->setKMSKeyId('my-key');
         /** @noinspection PhpParamsInspection */
         $wrapper->setKMSRegion(['a' => 'b']);
+        self::expectException(ApplicationException::class);
+        self::expectExceptionMessage('Cipher key settings are invalid.');
         $wrapper->encrypt('mySecretValue');
     }
 
-    /**
-     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage Ciphering failed: Failed to obtain encryption key.
-     */
-    public function testInvalidKeys1()
+    public function testInvalidCredentials()
     {
         putenv('AWS_ACCESS_KEY_ID=' . AWS_ACCESS_KEY_ID);
         putenv('AWS_SECRET_ACCESS_KEY=some-garbage');
         $wrapper = new GenericKMSWrapper();
         $wrapper->setKMSKeyId(KMS_TEST_KEY);
         $wrapper->setKMSRegion(AWS_DEFAULT_REGION);
+        self::expectException(ApplicationException::class);
+        self::expectExceptionMessage('Ciphering failed: Failed to obtain encryption key.');
         $wrapper->encrypt('mySecretValue');
     }
 
-    /**
-     * @expectedException \Keboola\ObjectEncryptor\Exception\ApplicationException
-     * @expectedExceptionMessage Ciphering failed: Failed to obtain encryption key.
-     */
-    public function testInvalidKeys2()
+    public function testInvalidNonExistentRegion()
     {
         $wrapper = new GenericKMSWrapper();
         $wrapper->setKMSKeyId(KMS_TEST_KEY);
         $wrapper->setKMSRegion('non-existent');
+        self::expectException(ApplicationException::class);
+        self::expectExceptionMessage('Ciphering failed: Failed to obtain encryption key.');
         $wrapper->encrypt('mySecretValue');
     }
 
     /**
-     * @expectedException  \Keboola\ObjectEncryptor\Exception\UserException
-     * @expectedExceptionMessage Cipher is malformed
+     * @return \string[][]
      */
-    public function testDecryptInvalid1()
+    public function invalidCipherProvider()
     {
-        $wrapper = $this->getWrapper();
-        $wrapper->decrypt("some garbage");
+        return [
+            [
+                'some garbage',
+                'Cipher is malformed',
+            ],
+            [
+                base64_encode('some garbage'),
+                'Cipher is malformed',
+            ],
+            [
+                base64_encode(gzcompress('some garbage')),
+                'Cipher is malformed',
+            ],
+            [
+                base64_encode(gzcompress(serialize('some garbage'))),
+                'Cipher is malformed',
+            ],
+            [
+                base64_encode(gzcompress(serialize(['some', 'garbage']))),
+                'Invalid metadata',
+            ]
+        ];
     }
 
     /**
-     * @expectedException  \Keboola\ObjectEncryptor\Exception\UserException
-     * @expectedExceptionMessage Cipher is malformed
+     * @dataProvider invalidCipherProvider()
+     * @param string $cipher
+     * @param string $message
+     * @throws ApplicationException
+     * @throws UserException
      */
-    public function testDecryptInvalid2()
+    public function testDecryptInvalidCiphers($cipher, $message)
     {
         $wrapper = $this->getWrapper();
-        $wrapper->decrypt(base64_encode("some garbage"));
-    }
-
-    /**
-     * @expectedException  \Keboola\ObjectEncryptor\Exception\UserException
-     * @expectedExceptionMessage Cipher is malformed
-     */
-    public function testDecryptInvalid3()
-    {
-        $wrapper = $this->getWrapper();
-        $wrapper->decrypt(base64_encode(gzcompress("some garbage")));
-    }
-
-    /**
-     * @expectedException  \Keboola\ObjectEncryptor\Exception\UserException
-     * @expectedExceptionMessage Cipher is malformed
-     */
-    public function testDecryptInvalid4()
-    {
-        $wrapper = $this->getWrapper();
-        $wrapper->decrypt(base64_encode(gzcompress(serialize("some garbage"))));
-    }
-
-    /**
-     * @expectedException  \Keboola\ObjectEncryptor\Exception\UserException
-     * @expectedExceptionMessage Invalid metadata
-     */
-    public function testDecryptInvalid5()
-    {
-        $wrapper = $this->getWrapper();
-        $wrapper->decrypt(base64_encode(gzcompress(serialize(["some", "garbage"]))));
+        self::expectException(UserException::class);
+        self::expectExceptionMessage($message);
+        $wrapper->decrypt($cipher);
     }
 }
