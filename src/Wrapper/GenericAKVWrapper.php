@@ -135,7 +135,7 @@ class GenericAKVWrapper implements CryptoWrapperInterface
     }
 
     /**
-     * @param string $data
+     * @param ?string $data
      * @return string
      * @throws ApplicationException
      * @throws UserException
@@ -170,8 +170,8 @@ class GenericAKVWrapper implements CryptoWrapperInterface
     }
 
     /**
-     * @param $cipherMetadata
-     * @param $localMetadata
+     * @param array $cipherMetadata
+     * @param array $localMetadata
      * @throws UserException
      */
     private function verifyMetadata($cipherMetadata, $localMetadata)
