@@ -153,10 +153,11 @@ class GenericAKVWrapperTest extends TestCase
         $callNoGet = 0;
         $secretInternal = '';
         $mockClient->expects(self::exactly(3))->method('setSecret')
-            ->willReturnCallback(function (
-                SetSecretRequest $setSecretRequest,
-                $secretName
-            ) use (&$callNoSet, $mockClient, &$secretInternal) {
+            ->willReturnCallback(function (SetSecretRequest $setSecretRequest, $secretName) use (
+                &$callNoSet,
+                $mockClient,
+                &$secretInternal
+            ) {
                 $callNoSet++;
                 $secretInternal = $setSecretRequest->getArray()['value'];
                 if ($callNoSet < 3) {
@@ -172,10 +173,11 @@ class GenericAKVWrapperTest extends TestCase
             });
         $secret = 'secret';
         $mockClient->expects(self::exactly(3))->method('getSecret')
-            ->willReturnCallback(function (
-                $secretName,
-                $secretVersion
-            ) use (&$callNoGet, $mockClient, &$secretInternal) {
+            ->willReturnCallback(function ($secretName, $secretVersion) use (
+                &$callNoGet,
+                $mockClient,
+                &$secretInternal
+            ) {
                 $callNoGet++;
                 if ($callNoGet < 3) {
                     throw new ConnectException('mock failed to connect', new Request('GET', 'some-uri'));
@@ -294,10 +296,10 @@ class GenericAKVWrapperTest extends TestCase
             ->getMock();
         $secretInternal = '';
         $mockClient->method('setSecret')
-            ->willReturnCallback(function (
-                SetSecretRequest $setSecretRequest,
-                $secretName
-            ) use ($mockClient, &$secretInternal) {
+            ->willReturnCallback(function (SetSecretRequest $setSecretRequest, $secretName) use (
+                $mockClient,
+                &$secretInternal
+            ) {
                 $secretInternal = $setSecretRequest->getArray()['value'];
                 /** @var Client $mockClient */
                 return new SecretBundle([
