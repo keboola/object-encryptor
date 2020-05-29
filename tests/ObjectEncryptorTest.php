@@ -7,6 +7,8 @@ use Keboola\ObjectEncryptor\Exception\UserException;
 use Keboola\ObjectEncryptor\Legacy\Encryptor;
 use Keboola\ObjectEncryptor\ObjectEncryptor;
 use Keboola\ObjectEncryptor\ObjectEncryptorFactory;
+use Keboola\ObjectEncryptor\Wrapper\CryptoWrapperInterface;
+use Keboola\ObjectEncryptor\Wrapper\GenericAKVWrapper;
 use Keboola\ObjectEncryptor\Wrapper\GenericKMSWrapper;
 use PHPUnit\Framework\TestCase;
 
@@ -27,13 +29,16 @@ class ObjectEncryptorTest extends TestCase
         parent::setUp();
         $legacyKey = '1234567890123456';
         $this->aesKey = '123456789012345678901234567890ab';
-        $this->factory = new ObjectEncryptorFactory(KMS_TEST_KEY, AWS_DEFAULT_REGION, $legacyKey, $this->aesKey);
+        $this->factory = new ObjectEncryptorFactory(KMS_TEST_KEY, AWS_DEFAULT_REGION, $legacyKey, $this->aesKey, getenv('TEST_KEY_VAULT_URL'));
         $this->factory->setStackId('my-stack');
         $this->factory->setComponentId('dummy-component');
         $this->factory->setConfigurationId('123456');
         $this->factory->setProjectId('123');
         putenv('AWS_ACCESS_KEY_ID=' . AWS_ACCESS_KEY_ID);
         putenv('AWS_SECRET_ACCESS_KEY='. AWS_SECRET_ACCESS_KEY);
+        putenv('AZURE_TENANT_ID=' . getenv('TEST_TENANT_ID'));
+        putenv('AZURE_CLIENT_ID=' . getenv('TEST_CLIENT_ID'));
+        putenv('AZURE_CLIENT_SECRET=' . getenv('TEST_CLIENT_SECRET'));
     }
 
     public function testEncryptorScalar()
@@ -45,12 +50,34 @@ class ObjectEncryptorTest extends TestCase
         self::assertEquals($originalText, $encryptor->decrypt($encrypted));
     }
 
-    public function testEncryptorStack()
+    public function cryptoWrapperProvider()
+    {
+        return [
+            [
+                GenericKMSWrapper::class,
+                'KBC::Secure::',
+            ],
+            [
+                GenericAKVWrapper::class,
+                'KBC::SecureKV::',
+            ],
+        ];
+    }
+
+
+    /**
+     * @param string $wrapper
+     * @param $prefix
+     * @throws ApplicationException
+     * @throws UserException
+     * @dataProvider cryptoWrapperProvider
+     */
+    public function testEncryptorStack($wrapper, $prefix)
     {
         $encryptor = $this->factory->getEncryptor();
         $originalText = 'secret';
-        $encrypted = $encryptor->encrypt($originalText, GenericKMSWrapper::class);
-        self::assertStringStartsWith('KBC::Secure::', $encrypted);
+        $encrypted = $encryptor->encrypt($originalText, $wrapper);
+        self::assertStringStartsWith($prefix, $encrypted);
         self::assertEquals($originalText, $encryptor->decrypt($encrypted));
     }
 

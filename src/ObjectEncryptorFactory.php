@@ -7,7 +7,6 @@ use Keboola\ObjectEncryptor\Legacy\Encryptor;
 use Keboola\ObjectEncryptor\Legacy\Wrapper\BaseWrapper;
 use Keboola\ObjectEncryptor\Legacy\Wrapper\ComponentProjectWrapper;
 use Keboola\ObjectEncryptor\Legacy\Wrapper\ComponentWrapper as LegacyComponentWrapper;
-use Keboola\ObjectEncryptor\Tests\ComponentAKVWrapperTest;
 use Keboola\ObjectEncryptor\Wrapper\ComponentAKVWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ComponentWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ConfigurationAKVWrapper;
@@ -62,17 +61,7 @@ class ObjectEncryptorFactory
     /**
      * @var string|null AKV Vault URL.
      */
-    private $akvUrl;
-
-    /**
-     * @var string|null AKV Key name.
-     */
-    private $akvKeyName;
-
-    /**
-     * @var string|null AKV Key version.
-     */
-    private $akvKeyVersion;
+    private $akvUrl = null;
 
     /**
      * ObjectEncryptorFactory constructor.
@@ -81,10 +70,8 @@ class ObjectEncryptorFactory
      * @param string $keyVersion1 Encryption key for KBC::Encrypted ciphers.
      * @param string $keyVersion0 Encryption key for legacy ciphers.
      * @param string $akvUrl Azure Key Vault URL.
-     * @param string $akvKeyName Azure Key vault key name.
-     * @param string $akvKeyVersion Azure Key vault key version.
      */
-    public function __construct($kmsKeyId, $kmsRegion, $keyVersion1, $keyVersion0, $akvUrl, $akvKeyName, $akvKeyVersion)
+    public function __construct($kmsKeyId, $kmsRegion, $keyVersion1, $keyVersion0, $akvUrl)
     {
         // No logic here, this constructor is exception-less so as not to leak keys in stack trace
         $this->kmsKeyId = $kmsKeyId;
@@ -92,8 +79,6 @@ class ObjectEncryptorFactory
         $this->keyVersion1 = $keyVersion1;
         $this->keyVersion0 = $keyVersion0;
         $this->akvUrl = $akvUrl;
-        $this->akvKeyName = $akvKeyName;
-        $this->akvKeyVersion = $akvKeyVersion;
     }
 
     /**
@@ -169,12 +154,6 @@ class ObjectEncryptorFactory
         if (!is_null($this->akvUrl) && !is_string($this->akvUrl)) {
             throw new ApplicationException('Invalid AKV URL.');
         }
-        if (!is_null($this->akvKeyName) && !is_string($this->akvKeyName)) {
-            throw new ApplicationException('Invalid AKV key name.');
-        }
-        if (!is_null($this->akvKeyVersion) && !is_string($this->akvKeyVersion)) {
-            throw new ApplicationException('Invalid AKV key version.');
-        }
     }
 
     /**
@@ -249,23 +228,17 @@ class ObjectEncryptorFactory
     {
         $wrapper = new GenericAKVWrapper();
         $wrapper->setKeyVaultUrl((string) $this->akvUrl);
-        $wrapper->setKeyName((string) $this->akvKeyName);
-        $wrapper->setKeyVersion((string) $this->akvKeyVersion);
         $encryptor->pushWrapper($wrapper);
 
         if ($this->componentId && $this->stackId) {
             $wrapper = new ComponentAKVWrapper();
             $wrapper->setKeyVaultUrl((string) $this->akvUrl);
-            $wrapper->setKeyName((string) $this->akvKeyName);
-            $wrapper->setKeyVersion((string) $this->akvKeyVersion);
             $wrapper->setComponentId($this->componentId);
             $wrapper->setStackId($this->stackId);
             $encryptor->pushWrapper($wrapper);
             if ($this->projectId) {
                 $wrapper = new ProjectAKVWrapper();
                 $wrapper->setKeyVaultUrl((string) $this->akvUrl);
-                $wrapper->setKeyName((string) $this->akvKeyName);
-                $wrapper->setKeyVersion((string) $this->akvKeyVersion);
                 $wrapper->setComponentId($this->componentId);
                 $wrapper->setStackId($this->stackId);
                 $wrapper->setProjectId($this->projectId);
@@ -273,8 +246,6 @@ class ObjectEncryptorFactory
                 if ($this->configurationId) {
                     $wrapper = new ConfigurationAKVWrapper();
                     $wrapper->setKeyVaultUrl((string) $this->akvUrl);
-                    $wrapper->setKeyName((string) $this->akvKeyName);
-                    $wrapper->setKeyVersion((string) $this->akvKeyVersion);
                     $wrapper->setComponentId($this->componentId);
                     $wrapper->setStackId($this->stackId);
                     $wrapper->setProjectId($this->projectId);
@@ -308,7 +279,7 @@ class ObjectEncryptorFactory
             $this->addKMSWrappers($encryptor);
         }
 
-        if ($this->akvUrl && $this->akvKeyName && $this->akvKeyVersion) {
+        if ($this->akvUrl) {
             $this->addAKVWrappers($encryptor);
         }
         return $encryptor;

@@ -338,14 +338,6 @@ class GenericAKVWrapperTest extends TestCase
         $wrapper->decrypt($cipher);
     }
 
-    public function testDecryptInvalidCipherContents()
-    {
-        $wrapper = $this->getWrapper();
-        self::expectException(UserException::class);
-        self::expectExceptionMessage('Cipher is malformed.');
-        $wrapper->decrypt(base64_encode(gzcompress(serialize(['some', 'garbage']))));
-    }
-
     public function testInvalidSetupMissingUrl()
     {
         $wrapper = new GenericAKVWrapper();

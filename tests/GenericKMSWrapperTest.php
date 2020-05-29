@@ -287,7 +287,7 @@ class GenericKMSWrapperTest extends TestCase
 
         $wrapper = $this->getWrapper();
         self::expectException(UserException::class);
-        self::expectExceptionMessage('Invalid metadata.');
+        self::expectExceptionMessage('Deciphering failed.');
         $wrapper->decrypt($encrypted);
     }
 
@@ -303,10 +303,9 @@ class GenericKMSWrapperTest extends TestCase
         $wrapper = $this->getWrapper();
         $wrapper->setMetadataValue('key', 'value-bad');
         self::expectException(UserException::class);
-        self::expectExceptionMessage('Invalid metadata.');
+        self::expectExceptionMessage('Deciphering failed.');
         $wrapper->decrypt($encrypted);
     }
-
 
     public function testInvalidSetupEncryptMissingAll()
     {
@@ -416,13 +415,5 @@ class GenericKMSWrapperTest extends TestCase
         self::expectException(UserException::class);
         self::expectExceptionMessage($message);
         $wrapper->decrypt($cipher);
-    }
-
-    public function testDecryptInvalidMetadata($cipher, $message)
-    {
-        $wrapper = $this->getWrapper();
-        self::expectException(UserException::class);
-        self::expectExceptionMessage('Invalid metadata');
-        $wrapper->decrypt(base64_encode(gzcompress(serialize(['some', 'garbage']))));
     }
 }

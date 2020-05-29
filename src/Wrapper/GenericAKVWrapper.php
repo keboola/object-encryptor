@@ -196,7 +196,7 @@ class GenericAKVWrapper implements CryptoWrapperInterface
         if (!is_array($encrypted) || count($encrypted) !== 3 || empty($encrypted[self::PAYLOAD_INDEX]) ||
             empty($encrypted[self::SECRET_NAME]) || empty($encrypted[self::SECRET_VERSION])
         ) {
-            throw new UserException('Cipher is malformed.');
+            throw new UserException('Deciphering failed.');
         }
         try {
             $decryptedContext = $this->getRetryProxy()->call(function() use ($encrypted) {
@@ -210,7 +210,7 @@ class GenericAKVWrapper implements CryptoWrapperInterface
                 empty($decryptedContext[self::KEY_INDEX]) || !isset($decryptedContext[self::METADATA_INDEX]) ||
                 !is_array($decryptedContext[self::METADATA_INDEX])
             ) {
-                throw new ApplicationException('Cipher is malformed.');
+                throw new ApplicationException('Deciphering failed.');
             }
         } catch (Exception $e) {
             throw new ApplicationException('Deciphering failed.', $e);

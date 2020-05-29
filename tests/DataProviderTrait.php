@@ -30,19 +30,23 @@ trait DataProviderTrait
         return [
             [
                 'some garbage',
-                'Cipher is malformed',
+                'Deciphering failed.',
             ],
             [
                 base64_encode('some garbage'),
-                'Cipher is malformed',
+                'Deciphering failed.',
             ],
             [
                 base64_encode(gzcompress('some garbage')),
-                'Cipher is malformed',
+                'Deciphering failed.',
             ],
             [
                 base64_encode(gzcompress(serialize('some garbage'))),
-                'Cipher is malformed',
+                'Deciphering failed.',
+            ],
+            [
+                base64_encode(gzcompress(serialize(['some', 'garbage']))),
+                'Deciphering failed.',
             ],
         ];
     }
