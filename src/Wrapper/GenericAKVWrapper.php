@@ -38,16 +38,6 @@ class GenericAKVWrapper implements CryptoWrapperInterface
     private $keyVaultURL;
 
     /**
-     * @var string
-     */
-    private $keyName;
-
-    /**
-     * @var string
-     */
-    private $keyVersion;
-
-    /**
      * @var Client
      */
     private $client;
@@ -82,10 +72,7 @@ class GenericAKVWrapper implements CryptoWrapperInterface
      */
     protected function validateState()
     {
-        if (empty($this->keyVaultURL) || empty($this->keyName) || empty($this->keyVersion)) {
-            throw new ApplicationException('Cipher key settings are missing.');
-        }
-        if (!is_string($this->keyVaultURL) || !is_string($this->keyName) || !is_string($this->keyVersion)) {
+        if (empty($this->keyVaultURL) || !is_string($this->keyVaultURL)) {
             throw new ApplicationException('Cipher key settings are invalid.');
         }
     }
@@ -96,22 +83,6 @@ class GenericAKVWrapper implements CryptoWrapperInterface
     public function setKeyVaultUrl($keyVaultURL)
     {
         $this->keyVaultURL = $keyVaultURL;
-    }
-
-    /**
-     * @param string $keyName
-     */
-    public function setKeyName($keyName)
-    {
-        $this->keyName = $keyName;
-    }
-
-    /**
-     * @param string $keyVersion
-     */
-    public function setKeyVersion($keyVersion)
-    {
-        $this->keyVersion = $keyVersion;
     }
 
     /**
@@ -184,7 +155,7 @@ class GenericAKVWrapper implements CryptoWrapperInterface
             $secret = $this->getRetryProxy()->call(function () use ($context) {
                 return $this->getClient()->setSecret(
                     new SetSecretRequest($context, new SecretAttributes()),
-                    uniqid('generated-object-encryptor')
+                    uniqid('gen-encryptor')
                 );
             });
             /** @var SecretBundle $secret */
@@ -206,7 +177,7 @@ class GenericAKVWrapper implements CryptoWrapperInterface
     private function verifyMetadata($cipherMetadata, $localMetadata)
     {
         foreach ($cipherMetadata as $key => $value) {
-            if (empty($localMetadata[$key]) || ($cipherMetadata !== $localMetadata[$key])) {
+            if (empty($localMetadata[$key]) || ($cipherMetadata[$key] !== $localMetadata[$key])) {
                 throw new UserException('Deciphering failed.');
             }
         }
@@ -249,7 +220,7 @@ class GenericAKVWrapper implements CryptoWrapperInterface
             $key = Key::loadFromAsciiSafeString($decryptedContext[self::KEY_INDEX]);
             return Crypto::decrypt($encrypted[self::PAYLOAD_INDEX], $key, true);
         } catch (Exception $e) {
-            throw new UserException('Deciphering failed.', $e);
+            throw new ApplicationException('Deciphering failed.', $e);
         }
     }
 

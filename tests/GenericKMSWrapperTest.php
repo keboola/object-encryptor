@@ -13,6 +13,8 @@ use PHPUnit\Framework\TestCase;
 
 class GenericKMSWrapperTest extends TestCase
 {
+    use DataProviderTrait;
+
     public function setUp()
     {
         parent::setUp();
@@ -56,24 +58,6 @@ class GenericKMSWrapperTest extends TestCase
         // This is ok, because KMS key is found automatically during decryption
         $wrapper->setKMSKeyId('non-existent');
         self::assertEquals($secret, $wrapper->decrypt($encrypted));
-    }
-
-    public function emptyValuesProvider()
-    {
-        return [
-            [
-                '',
-            ],
-            [
-                '0',
-            ],
-            [
-                0,
-            ],
-            [
-                null,
-            ],
-        ];
     }
 
     /**
@@ -222,7 +206,6 @@ class GenericKMSWrapperTest extends TestCase
         self::expectExceptionMessage('Deciphering failed.');
         $mockWrapper->decrypt($encrypted);
     }
-
 
     public function testEncryptNonScalar()
     {
@@ -421,35 +404,6 @@ class GenericKMSWrapperTest extends TestCase
     }
 
     /**
-     * @return \string[][]
-     */
-    public function invalidCipherProvider()
-    {
-        return [
-            [
-                'some garbage',
-                'Cipher is malformed',
-            ],
-            [
-                base64_encode('some garbage'),
-                'Cipher is malformed',
-            ],
-            [
-                base64_encode(gzcompress('some garbage')),
-                'Cipher is malformed',
-            ],
-            [
-                base64_encode(gzcompress(serialize('some garbage'))),
-                'Cipher is malformed',
-            ],
-            [
-                base64_encode(gzcompress(serialize(['some', 'garbage']))),
-                'Invalid metadata',
-            ]
-        ];
-    }
-
-    /**
      * @dataProvider invalidCipherProvider()
      * @param string $cipher
      * @param string $message
@@ -462,5 +416,13 @@ class GenericKMSWrapperTest extends TestCase
         self::expectException(UserException::class);
         self::expectExceptionMessage($message);
         $wrapper->decrypt($cipher);
+    }
+
+    public function testDecryptInvalidMetadata($cipher, $message)
+    {
+        $wrapper = $this->getWrapper();
+        self::expectException(UserException::class);
+        self::expectExceptionMessage('Invalid metadata');
+        $wrapper->decrypt(base64_encode(gzcompress(serialize(['some', 'garbage']))));
     }
 }
