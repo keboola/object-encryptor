@@ -199,7 +199,7 @@ class GenericAKVWrapper implements CryptoWrapperInterface
             throw new UserException('Deciphering failed.');
         }
         try {
-            $decryptedContext = $this->getRetryProxy()->call(function() use ($encrypted) {
+            $decryptedContext = $this->getRetryProxy()->call(function () use ($encrypted) {
                 return $this->getClient()->getSecret(
                     $encrypted[self::SECRET_NAME],
                     $encrypted[self::SECRET_VERSION]
