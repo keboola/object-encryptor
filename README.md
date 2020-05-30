@@ -61,3 +61,45 @@ $factory->setComponentId('dummy-component');
 $factory->getEncryptor()->encrypt('secret', GenericWrapper::class);
 $secret = $factory->getEncryptor()->decrypt($encrypted);
 ```
+
+## Development
+
+Run tests with:
+
+    phpunit
+
+### Resources Setup
+
+Create a resource group:
+
+	az group create --name testing-object-encryptor --location "East US"
+
+Create a service principal:
+
+	az ad sp create-for-rbac --name testing-object-encryptor
+
+Use the response to set values `TEST_CLIENT_ID`, `TEST_CLIENT_SECRET` and `TEST_TENANT_ID` in the `.env.` file:
+
+```json	
+{
+  "appId": "268a6f05-xxxxxxxxxxxxxxxxxxxxxxxxxxx", //-> TEST_CLIENT_ID
+  "displayName": "testing-azure-key-vault-php-client",
+  "name": "http://testing-azure-key-vault-php-client",
+  "password": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", //-> TEST_CLIENT_SECRET
+  "tenant": "9b85ee6f-xxxxxxxxxxxxxxxxxxxxxxxxxxx" //-> TEST_TENANT_ID
+}
+```
+
+Get ID of the service principal:
+
+	az ad sp list --filter "displayname eq 'testing-object-sencryptor'" --query [].objectId
+
+Get ID of a group to which the current user belongs (e.g. "Developers"):
+
+	az ad group list --filter "displayname eq 'Developers'" --query [].objectId
+
+Deploy the key vault, provide tentant ID, service principal ID and group ID from the previous commands:
+
+	az deployment group create --resource-group testing-object-encryptor --template-file arm-template.json --parameters vault_name=testing-object-encryptor tenant_id=9b85ee6f-xxxxxxxxxxxxxxxxxxxxxxxxxxx service_principal_object_id=7f7a8a4c-xxxxxxxxxxxxxxxxxxxxxxxxxxx group_object_id=a1e8da73-xxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+Set the key vault URL - e.g. `https://testing-object-encryptor.vault.azure.net/` as `TEST_KEY_VAULT_URL` environment variable.
