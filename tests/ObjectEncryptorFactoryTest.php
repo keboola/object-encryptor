@@ -501,9 +501,9 @@ class ObjectEncryptorFactoryTest extends TestCase
     public function testInvalidKeysVaultUrl()
     {
         $legacyKey = '1234567890123456';
-        $factory = new ObjectEncryptorFactory(new \stdClass(), AWS_DEFAULT_REGION, $legacyKey, '', new \stdClass());
+        $factory = new ObjectEncryptorFactory('', AWS_DEFAULT_REGION, $legacyKey, '', new \stdClass());
         self::expectException(ApplicationException::class);
-        self::expectExceptionMessage('Invalid KMS key Id.');
+        self::expectExceptionMessage('Invalid AKV URL.');
         $factory->getEncryptor();
     }
 

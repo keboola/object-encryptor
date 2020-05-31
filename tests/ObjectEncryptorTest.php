@@ -7,7 +7,6 @@ use Keboola\ObjectEncryptor\Exception\UserException;
 use Keboola\ObjectEncryptor\Legacy\Encryptor;
 use Keboola\ObjectEncryptor\ObjectEncryptor;
 use Keboola\ObjectEncryptor\ObjectEncryptorFactory;
-use Keboola\ObjectEncryptor\Wrapper\CryptoWrapperInterface;
 use Keboola\ObjectEncryptor\Wrapper\GenericAKVWrapper;
 use Keboola\ObjectEncryptor\Wrapper\GenericKMSWrapper;
 use PHPUnit\Framework\TestCase;
@@ -41,6 +40,15 @@ class ObjectEncryptorTest extends TestCase
         putenv('AZURE_CLIENT_SECRET=' . getenv('TEST_CLIENT_SECRET'));
     }
 
+    public function testEncryptorEmpty()
+    {
+        $factory = new ObjectEncryptorFactory('', '', '', '', '');
+        $encryptor = $factory->getEncryptor();
+        self::expectException(ApplicationException::class);
+        self::expectExceptionMessage('There are no wrappers registered for the encryptor.');
+        $encrypted = $encryptor->decrypt('secret');
+    }
+
     public function testEncryptorScalar()
     {
         $encryptor = $this->factory->getEncryptor();
@@ -49,6 +57,7 @@ class ObjectEncryptorTest extends TestCase
         self::assertStringStartsWith('KBC::Encrypted==', $encrypted);
         self::assertEquals($originalText, $encryptor->decrypt($encrypted));
     }
+
 
     public function cryptoWrapperProvider()
     {
