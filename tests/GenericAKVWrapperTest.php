@@ -35,6 +35,19 @@ class GenericAKVWrapperTest extends TestCase
         putenv('AZURE_TENANT_ID=' . getenv('TEST_TENANT_ID'));
         putenv('AZURE_CLIENT_ID=' . getenv('TEST_CLIENT_ID'));
         putenv('AZURE_CLIENT_SECRET=' . getenv('TEST_CLIENT_SECRET'));
+        $this->clearSecrets();
+    }
+
+    private function clearSecrets()
+    {
+        $client = new Client(
+            new GuzzleClientFactory(new NullLogger()),
+            new AuthenticatorFactory(),
+            getenv('TEST_KEY_VAULT_URL')
+        );
+        foreach ($client->getAllSecrets() as $secret) {
+            $client->deleteSecret($secret->getName());
+        }
     }
 
     /**
