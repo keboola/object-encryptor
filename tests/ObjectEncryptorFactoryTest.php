@@ -9,14 +9,14 @@ use Keboola\ObjectEncryptor\Legacy\Wrapper\ComponentProjectWrapper;
 use Keboola\ObjectEncryptor\Legacy\Wrapper\ComponentWrapper as LegacyComponentWrapper;
 use Keboola\ObjectEncryptor\ObjectEncryptorFactory;
 use Keboola\ObjectEncryptor\Wrapper\ComponentAKVWrapper;
-use Keboola\ObjectEncryptor\Wrapper\ComponentWrapper;
+use Keboola\ObjectEncryptor\Wrapper\ComponentKMSWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ConfigurationAKVWrapper;
-use Keboola\ObjectEncryptor\Wrapper\ConfigurationWrapper;
+use Keboola\ObjectEncryptor\Wrapper\ConfigurationKMSWrapper;
 use Keboola\ObjectEncryptor\Wrapper\CryptoWrapperInterface;
 use Keboola\ObjectEncryptor\Wrapper\GenericAKVWrapper;
 use Keboola\ObjectEncryptor\Wrapper\GenericKMSWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ProjectAKVWrapper;
-use Keboola\ObjectEncryptor\Wrapper\ProjectWrapper;
+use Keboola\ObjectEncryptor\Wrapper\ProjectKMSWrapper;
 use PHPUnit\Framework\TestCase;
 
 class ObjectEncryptorFactoryTest extends TestCase
@@ -99,7 +99,7 @@ class ObjectEncryptorFactoryTest extends TestCase
      */
     public function configurationWrapperProvider()
     {
-        $configurationKMSWrapper = new ConfigurationWrapper();
+        $configurationKMSWrapper = new ConfigurationKMSWrapper();
         $configurationKMSWrapper->setKMSRegion(AWS_DEFAULT_REGION);
         $configurationKMSWrapper->setKMSKeyId(KMS_TEST_KEY);
         $configurationAKVWrapper = new ConfigurationAKVWrapper();
@@ -148,7 +148,7 @@ class ObjectEncryptorFactoryTest extends TestCase
      */
     public function projectWrapperProvider()
     {
-        $projectKMSWrapper = new ProjectWrapper();
+        $projectKMSWrapper = new ProjectKMSWrapper();
         $projectKMSWrapper->setKMSRegion(AWS_DEFAULT_REGION);
         $projectKMSWrapper->setKMSKeyId(KMS_TEST_KEY);
         $projectAKVWrapper = new ProjectAKVWrapper();
@@ -195,7 +195,7 @@ class ObjectEncryptorFactoryTest extends TestCase
      */
     public function componentWrapperProvider()
     {
-        $componentKMSWrapper = new ComponentWrapper();
+        $componentKMSWrapper = new ComponentKMSWrapper();
         $componentKMSWrapper->setKMSRegion(AWS_DEFAULT_REGION);
         $componentKMSWrapper->setKMSKeyId(KMS_TEST_KEY);
         $componentAKVWrapper = new ComponentAKVWrapper();
@@ -311,7 +311,7 @@ class ObjectEncryptorFactoryTest extends TestCase
     {
         return [
             [
-                ConfigurationWrapper::class,
+                ConfigurationKMSWrapper::class,
             ],
             [
                 ConfigurationAKVWrapper::class,
@@ -364,7 +364,7 @@ class ObjectEncryptorFactoryTest extends TestCase
     {
         return [
             [
-                ProjectWrapper::class,
+                ProjectKMSWrapper::class,
             ],
             [
                 ProjectAKVWrapper::class,
@@ -416,7 +416,7 @@ class ObjectEncryptorFactoryTest extends TestCase
     {
         return [
             [
-                ComponentWrapper::class,
+                ComponentKMSWrapper::class,
             ],
             [
                 ComponentAKVWrapper::class,
@@ -472,7 +472,7 @@ class ObjectEncryptorFactoryTest extends TestCase
         $factory = new ObjectEncryptorFactory(KMS_TEST_KEY, AWS_DEFAULT_REGION, $legacyKey, '', getenv('TEST_KEY_VAULT_URL'));
         $factory->setStackId('my-stack');
         $factory->setComponentId('dummy-component');
-        $secret = $factory->getEncryptor()->encrypt($secret, ComponentWrapper::class);
+        $secret = $factory->getEncryptor()->encrypt($secret, ComponentKMSWrapper::class);
         $factory = new ObjectEncryptorFactory(KMS_TEST_KEY, AWS_DEFAULT_REGION, $legacyKey, '', getenv('TEST_KEY_VAULT_URL'));
         $factory->setStackId('my-stack');
         $factory->setComponentId('different-dummy-component');

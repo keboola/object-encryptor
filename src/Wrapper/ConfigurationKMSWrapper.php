@@ -4,7 +4,7 @@ namespace Keboola\ObjectEncryptor\Wrapper;
 
 use Keboola\ObjectEncryptor\Exception\ApplicationException;
 
-class ConfigurationWrapper extends ProjectWrapper
+class ConfigurationKMSWrapper extends ProjectKMSWrapper
 {
     const KEY_CONFIGURATION = 'configurationId';
 

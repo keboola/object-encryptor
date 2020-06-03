@@ -4,7 +4,7 @@ namespace Keboola\ObjectEncryptor\Wrapper;
 
 use Keboola\ObjectEncryptor\Exception\ApplicationException;
 
-class ProjectWrapper extends ComponentWrapper
+class ProjectKMSWrapper extends ComponentKMSWrapper
 {
     const KEY_PROJECT = 'projectId';
 

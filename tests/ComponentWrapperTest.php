@@ -5,7 +5,7 @@ namespace Keboola\ObjectEncryptor\Tests;
 use Keboola\ObjectEncryptor\Exception\ApplicationException;
 use Keboola\ObjectEncryptor\Exception\UserException;
 use Keboola\ObjectEncryptor\Wrapper\ComponentAKVWrapper;
-use Keboola\ObjectEncryptor\Wrapper\ComponentWrapper;
+use Keboola\ObjectEncryptor\Wrapper\ComponentKMSWrapper;
 use Keboola\ObjectEncryptor\Wrapper\CryptoWrapperInterface;
 use PHPUnit\Framework\TestCase;
 
@@ -26,7 +26,7 @@ class ComponentWrapperTest extends TestCase
      */
     public function wrapperProvider()
     {
-        $componentWrapperKMS = new ComponentWrapper();
+        $componentWrapperKMS = new ComponentKMSWrapper();
         $componentWrapperKMS->setKMSRegion(AWS_DEFAULT_REGION);
         $componentWrapperKMS->setKMSKeyId(KMS_TEST_KEY);
         $componentWrapperAKV = new ComponentAKVWrapper();
@@ -98,7 +98,7 @@ class ComponentWrapperTest extends TestCase
 
     public function testInvalidSetupEncryptKMS()
     {
-        $wrapper = new ComponentWrapper();
+        $wrapper = new ComponentKMSWrapper();
         self::expectException(ApplicationException::class);
         self::expectExceptionMessage('Cipher key settings are missing.');
         $wrapper->encrypt('mySecretValue');
@@ -149,7 +149,7 @@ class ComponentWrapperTest extends TestCase
 
     public function testInvalidSetupDecryptKMS()
     {
-        $wrapper = new ComponentWrapper();
+        $wrapper = new ComponentKMSWrapper();
         self::expectException(ApplicationException::class);
         self::expectExceptionMessage('Cipher key settings are missing.');
         $wrapper->decrypt('mySecretValue');

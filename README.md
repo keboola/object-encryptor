@@ -6,12 +6,12 @@
 Library provides interface for encrypting PHP arrays, stdclass objects and scalars. A cipher may contain additional metadata
 which limits the conditions under which it may be decrypted. The library supports three encryption methods:
 
-- [keboola/php-encryption](https://github.com/keboola/php-encryption) -- legacy, allows only deciphering
-- [keboola-legacy/php-encryption](https://github.com/keboola/legacy-php-encryption) -- legacy version of [defuse/php-encryption](https://github.com/defuse/php-encryption), currently default
-- [defuse/php-encryption](https://github.com/defuse/php-encryption) -- future encryption method with KMS managed keys
+- [keboola/php-encryption](https://github.com/keboola/php-encryption) -- legacy, allows only deciphering.
+- [keboola-legacy/php-encryption](https://github.com/keboola/legacy-php-encryption) -- legacy version of [defuse/php-encryption](https://github.com/defuse/php-encryption), currently default.
+- [defuse/php-encryption](https://github.com/defuse/php-encryption) -- current encryption method with AWS KMS or Azure Key Vault managed keys.
 
 ## Requirements
-The library requires PHP 5.6 or PHP 7.0. Versions 7.1+ are supported through mcrypt polyfill.
+The library supports PHP 5.6, 7.0, 7.1, 7.2, 7.3, 7.4. Versions 7.1+ are supported through mcrypt polyfill.
 
 ## Usage
 Entry point to the library is the `ObjectEncryptorFactory` class which creates instances of `ObjectEncryptor` class which
@@ -24,6 +24,7 @@ Initialize the library using the factory class:
 ```
 $kmsKeyId = 'alias/my-key';
 $kmsRegion = 'us-east-1';
+$akvUrl = 'https://my-test.vault.azure.net
 $keyVersion1 = '1234567890123456';
 $keyVersion0 = '123456789012345678901234567890ab';
 $factory = new ObjectEncryptorFactory($kmsKeyId, $kmsRegion, $keyVersion1, $keyVersion0);
@@ -38,10 +39,14 @@ Depending on the provided keys and parameters, the following wrappers will be av
 - `BaseWrapper` - legacy wrapper for `KBC::Encrypted` ciphers, requires `keyVersion1`
 - `ComponentWrapper` - legacy wrapper for `KBC::ComponentEncrypted==` ciphers, requires `keyVersion1` and `componentId`
 - `ComponentProjectWrapper` - legacy wrapper for `KBC::ComponentProjectEncrypted==` ciphers, requires `keyVersion1` and `componentId` and `projectId`
-- `GenericKMSWrapper` - current wrapper for `KBC::Secure::` ciphers, requires `kmsKeyId` and `kmsRegion`. Also the runner must have AWS credentials available (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`)
-- `ComponentWrapper` - current wrapper for `KBC::ComponentSecure::` ciphers, requires `kmsKeyId`, `kmsRegion`, `stackId` and `componentId`
-- `ProjectWrapper` - current wrapper for `KBC::ProjectSecure::` ciphers, requires `kmsKeyId`, `kmsRegion`, `stackId`, `componentId` and `projectId`.
-- `ConfigurationWrapper` - current wrapper for `KBC::ConfigSecure::` ciphers, requires `kmsKeyId`, `kmsRegion`, `stackId`, `componentId`, `projectId` and `configurationId`.
+- `GenericKMSWrapper` - current AWS wrapper for `KBC::Secure::` ciphers, requires `kmsKeyId` and `kmsRegion`. Also, the runner must have AWS credentials available (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`)
+- `ComponentKMSWrapper` - current AWS wrapper for `KBC::ComponentSecure::` ciphers, requires `kmsKeyId`, `kmsRegion`, `stackId` and `componentId`
+- `ProjectKMSWrapper` - current AWS wrapper for `KBC::ProjectSecure::` ciphers, requires `kmsKeyId`, `kmsRegion`, `stackId`, `componentId` and `projectId`.
+- `ConfigurationKMSWrapper` - current AWS wrapper for `KBC::ConfigSecure::` ciphers, requires `kmsKeyId`, `kmsRegion`, `stackId`, `componentId`, `projectId` and `configurationId`.
+- `GenericAKVWrapper` - current Azure wrapper for `KBC::SecureKV::` ciphers, requires `akvUrl`. Also, the runner must have AWS credentials available (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`)
+- `ComponentAKVWrapper` - current Azure wrapper for `KBC::ComponentSecureKV::` ciphers, requires `akvUrl`, `stackId` and `componentId`
+- `ProjectAKVWrapper` - current Azure wrapper for `KBC::ProjectSecureKV::` ciphers, requires `akvUrl`, `stackId`, `componentId` and `projectId`.
+- `ConfigurationAKVWrapper` - current Azure wrapper for `KBC::ConfigSecureKV::` ciphers, requires `akvUrl`, `stackId`, `componentId`, `projectId` and `configurationId`.
 
 During encryption, the wrapper has to be specified (or `BaseWrapper` is used). During decryption, the wrapper is chosen automatically by the 
 cipher prefix. If the wrapper is not available (key or parameters are not set or equal to those in the cipher), the value cannot be deciphered.

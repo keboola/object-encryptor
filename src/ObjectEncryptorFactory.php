@@ -8,12 +8,12 @@ use Keboola\ObjectEncryptor\Legacy\Wrapper\BaseWrapper;
 use Keboola\ObjectEncryptor\Legacy\Wrapper\ComponentProjectWrapper;
 use Keboola\ObjectEncryptor\Legacy\Wrapper\ComponentWrapper as LegacyComponentWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ComponentAKVWrapper;
-use Keboola\ObjectEncryptor\Wrapper\ComponentWrapper;
+use Keboola\ObjectEncryptor\Wrapper\ComponentKMSWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ConfigurationAKVWrapper;
-use Keboola\ObjectEncryptor\Wrapper\ConfigurationWrapper;
+use Keboola\ObjectEncryptor\Wrapper\ConfigurationKMSWrapper;
 use Keboola\ObjectEncryptor\Wrapper\GenericAKVWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ProjectAKVWrapper;
-use Keboola\ObjectEncryptor\Wrapper\ProjectWrapper;
+use Keboola\ObjectEncryptor\Wrapper\ProjectKMSWrapper;
 use Keboola\ObjectEncryptor\Wrapper\GenericKMSWrapper;
 
 class ObjectEncryptorFactory
@@ -192,14 +192,14 @@ class ObjectEncryptorFactory
         $encryptor->pushWrapper($wrapper);
 
         if ($this->componentId && $this->stackId) {
-            $wrapper = new ComponentWrapper();
+            $wrapper = new ComponentKMSWrapper();
             $wrapper->setKMSKeyId((string)$this->kmsKeyId);
             $wrapper->setKMSRegion((string)$this->kmsKeyRegion);
             $wrapper->setComponentId($this->componentId);
             $wrapper->setStackId($this->stackId);
             $encryptor->pushWrapper($wrapper);
             if ($this->projectId) {
-                $wrapper = new ProjectWrapper();
+                $wrapper = new ProjectKMSWrapper();
                 $wrapper->setKMSKeyId((string)$this->kmsKeyId);
                 $wrapper->setKMSRegion((string)$this->kmsKeyRegion);
                 $wrapper->setComponentId($this->componentId);
@@ -207,7 +207,7 @@ class ObjectEncryptorFactory
                 $wrapper->setProjectId($this->projectId);
                 $encryptor->pushWrapper($wrapper);
                 if ($this->configurationId) {
-                    $wrapper = new ConfigurationWrapper();
+                    $wrapper = new ConfigurationKMSWrapper();
                     $wrapper->setKMSKeyId((string)$this->kmsKeyId);
                     $wrapper->setKMSRegion((string)$this->kmsKeyRegion);
                     $wrapper->setComponentId($this->componentId);
