@@ -7,8 +7,14 @@ use Keboola\ObjectEncryptor\Exception\UserException;
 use Keboola\ObjectEncryptor\Legacy\Encryptor;
 use Keboola\ObjectEncryptor\ObjectEncryptor;
 use Keboola\ObjectEncryptor\ObjectEncryptorFactory;
+use Keboola\ObjectEncryptor\Wrapper\ComponentAKVWrapper;
+use Keboola\ObjectEncryptor\Wrapper\ComponentKMSWrapper;
+use Keboola\ObjectEncryptor\Wrapper\ConfigurationAKVWrapper;
+use Keboola\ObjectEncryptor\Wrapper\ConfigurationKMSWrapper;
 use Keboola\ObjectEncryptor\Wrapper\GenericAKVWrapper;
 use Keboola\ObjectEncryptor\Wrapper\GenericKMSWrapper;
+use Keboola\ObjectEncryptor\Wrapper\ProjectAKVWrapper;
+use Keboola\ObjectEncryptor\Wrapper\ProjectKMSWrapper;
 use PHPUnit\Framework\TestCase;
 
 class ObjectEncryptorTest extends TestCase
@@ -46,7 +52,7 @@ class ObjectEncryptorTest extends TestCase
         $encryptor = $factory->getEncryptor();
         self::expectException(ApplicationException::class);
         self::expectExceptionMessage('There are no wrappers registered for the encryptor.');
-        $encrypted = $encryptor->decrypt('secret');
+        $encryptor->decrypt('secret');
     }
 
     public function testEncryptorScalar()
@@ -910,5 +916,120 @@ class ObjectEncryptorTest extends TestCase
         self::expectException(UserException::class);
         self::expectExceptionMessage('Value is not an encrypted value.');
         $encryptor->decrypt($originalText);
+    }
+
+    /**
+     * @dataProvider registeredProvider()
+     * @param string $kmsKey
+     * @param string $keyVaultUrl
+     * @param string $classifier
+     * @param string $expectedClass
+     * @throws ApplicationException
+     */
+    public function testGetRegisteredWrapperEncryptor($kmsKey, $keyVaultUrl, $classifier, $expectedClass)
+    {
+        $factory = new ObjectEncryptorFactory($kmsKey, AWS_DEFAULT_REGION, '', $this->aesKey, $keyVaultUrl);
+        $factory->setStackId('my-stack');
+        $factory->setComponentId('dummy-component');
+        $factory->setConfigurationId('123456');
+        $factory->setProjectId('123');
+        $encryptor = $factory->getEncryptor();
+        $method = 'getRegistered' . $classifier . 'WrapperClass';
+        self::assertEquals($expectedClass, $encryptor->$method());
+    }
+
+    public function registeredProvider()
+    {
+        return [
+            'kms-akv-component' => [
+                KMS_TEST_KEY,
+                getenv('TEST_KEY_VAULT_URL'),
+                'Component',
+                ComponentKMSWrapper::class,
+            ],
+            'kms-akv-project' => [
+                KMS_TEST_KEY,
+                getenv('TEST_KEY_VAULT_URL'),
+                'Project',
+                ProjectKMSWrapper::class,
+            ],
+            'kms-akv-configuration' => [
+                KMS_TEST_KEY,
+                getenv('TEST_KEY_VAULT_URL'),
+                'Configuration',
+                ConfigurationKMSWrapper::class,
+            ],
+            'kms-component' => [
+                KMS_TEST_KEY,
+                '',
+                'Component',
+                ComponentKMSWrapper::class,
+            ],
+            'kms-project' => [
+                KMS_TEST_KEY,
+                '',
+                'Project',
+                ProjectKMSWrapper::class,
+            ],
+            'kms-configuration' => [
+                KMS_TEST_KEY,
+                '',
+                'Configuration',
+                ConfigurationKMSWrapper::class,
+            ],
+            'akv-component' => [
+                '',
+                getenv('TEST_KEY_VAULT_URL'),
+                'Component',
+                ComponentAKVWrapper::class,
+            ],
+            'akv-project' => [
+                '',
+                getenv('TEST_KEY_VAULT_URL'),
+                'Project',
+                ProjectAKVWrapper::class,
+            ],
+            'akv-configuration' => [
+                '',
+                getenv('TEST_KEY_VAULT_URL'),
+                'Configuration',
+                ConfigurationAKVWrapper::class,
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider registeredFailureProvider()
+     * @param string $classifier
+     * @param $expectedMessage
+     * @throws ApplicationException
+     */
+    public function testGetRegisteredWrapperFailure($classifier, $expectedMessage)
+    {
+        $factory = new ObjectEncryptorFactory(KMS_TEST_KEY, AWS_DEFAULT_REGION, '', $this->aesKey, getenv('TEST_KEY_VAULT_URL'));
+        $factory->setStackId('my-stack');
+        $encryptor = $factory->getEncryptor();
+        $method = 'getRegistered' . $classifier . 'WrapperClass';
+        self::expectException(ApplicationException::class);
+        self::expectExceptionMessage($expectedMessage);
+        $encryptor->$method();
+    }
+
+    public function registeredFailureProvider()
+    {
+        return [
+            [
+                'Component',
+                'No Component wrappers registered.',
+            ],
+            [
+                'Project',
+                'No Project wrappers registered.',
+            ],
+            [
+                'Configuration',
+                'No Configuration wrappers registered.',
+            ],
+        ];
     }
 }
