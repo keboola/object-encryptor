@@ -4,7 +4,7 @@ namespace Keboola\ObjectEncryptor\Wrapper;
 
 use Keboola\ObjectEncryptor\Exception\ApplicationException;
 
-class ConfigurationWrapper extends ProjectWrapper
+class ConfigurationAKVWrapper extends ProjectAKVWrapper
 {
     const KEY_CONFIGURATION = 'configurationId';
 
@@ -36,6 +36,6 @@ class ConfigurationWrapper extends ProjectWrapper
      */
     public function getPrefix()
     {
-        return 'KBC::ConfigSecure::';
+        return 'KBC::ConfigSecureKV::';
     }
 }

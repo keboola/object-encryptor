@@ -4,7 +4,7 @@ namespace Keboola\ObjectEncryptor\Wrapper;
 
 use Keboola\ObjectEncryptor\Exception\ApplicationException;
 
-class ComponentWrapper extends GenericKMSWrapper
+class ComponentKMSWrapper extends GenericKMSWrapper
 {
     const KEY_COMPONENT = 'componentId';
     const KEY_STACK = 'stackId';

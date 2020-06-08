@@ -13,6 +13,8 @@ use PHPUnit\Framework\TestCase;
 
 class GenericKMSWrapperTest extends TestCase
 {
+    use DataProviderTrait;
+
     public function setUp()
     {
         parent::setUp();
@@ -56,24 +58,6 @@ class GenericKMSWrapperTest extends TestCase
         // This is ok, because KMS key is found automatically during decryption
         $wrapper->setKMSKeyId('non-existent');
         self::assertEquals($secret, $wrapper->decrypt($encrypted));
-    }
-
-    public function emptyValuesProvider()
-    {
-        return [
-            [
-                '',
-            ],
-            [
-                '0',
-            ],
-            [
-                0,
-            ],
-            [
-                null,
-            ],
-        ];
     }
 
     /**
@@ -223,7 +207,6 @@ class GenericKMSWrapperTest extends TestCase
         $mockWrapper->decrypt($encrypted);
     }
 
-
     public function testEncryptNonScalar()
     {
         $secret = ['a' => 'b'];
@@ -304,7 +287,7 @@ class GenericKMSWrapperTest extends TestCase
 
         $wrapper = $this->getWrapper();
         self::expectException(UserException::class);
-        self::expectExceptionMessage('Invalid metadata.');
+        self::expectExceptionMessage('Deciphering failed.');
         $wrapper->decrypt($encrypted);
     }
 
@@ -320,10 +303,9 @@ class GenericKMSWrapperTest extends TestCase
         $wrapper = $this->getWrapper();
         $wrapper->setMetadataValue('key', 'value-bad');
         self::expectException(UserException::class);
-        self::expectExceptionMessage('Invalid metadata.');
+        self::expectExceptionMessage('Deciphering failed.');
         $wrapper->decrypt($encrypted);
     }
-
 
     public function testInvalidSetupEncryptMissingAll()
     {
@@ -418,35 +400,6 @@ class GenericKMSWrapperTest extends TestCase
         self::expectException(ApplicationException::class);
         self::expectExceptionMessage('Ciphering failed: Failed to obtain encryption key.');
         $wrapper->encrypt('mySecretValue');
-    }
-
-    /**
-     * @return \string[][]
-     */
-    public function invalidCipherProvider()
-    {
-        return [
-            [
-                'some garbage',
-                'Cipher is malformed',
-            ],
-            [
-                base64_encode('some garbage'),
-                'Cipher is malformed',
-            ],
-            [
-                base64_encode(gzcompress('some garbage')),
-                'Cipher is malformed',
-            ],
-            [
-                base64_encode(gzcompress(serialize('some garbage'))),
-                'Cipher is malformed',
-            ],
-            [
-                base64_encode(gzcompress(serialize(['some', 'garbage']))),
-                'Invalid metadata',
-            ]
-        ];
     }
 
     /**

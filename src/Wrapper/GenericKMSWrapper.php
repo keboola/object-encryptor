@@ -179,10 +179,10 @@ class GenericKMSWrapper implements CryptoWrapperInterface
         try {
             $encrypted = @unserialize(gzuncompress(base64_decode($encryptedData)));
         } catch (\Exception $e) {
-            throw new UserException("Cipher is malformed.", $e);
+            throw new UserException("Deciphering failed.", $e);
         }
         if (!is_array($encrypted) || count($encrypted) != 2) {
-            throw new UserException("Cipher is malformed.");
+            throw new UserException("Deciphering failed.");
         }
         try {
             $retryPolicy = new SimpleRetryPolicy(3);
@@ -197,7 +197,7 @@ class GenericKMSWrapper implements CryptoWrapperInterface
                 ]);
             });
         } catch (KmsException $e) {
-            throw new UserException("Invalid metadata.", $e);
+            throw new UserException("Deciphering failed.", $e);
         } catch (\Exception $e) {
             throw new ApplicationException("Deciphering failed.", $e);
         }

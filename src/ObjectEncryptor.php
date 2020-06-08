@@ -6,7 +6,13 @@ use Keboola\ObjectEncryptor\Exception\ApplicationException;
 use Keboola\ObjectEncryptor\Exception\UserException;
 use Keboola\ObjectEncryptor\Legacy\Encryptor;
 use Keboola\ObjectEncryptor\Legacy\Wrapper\BaseWrapper;
+use Keboola\ObjectEncryptor\Wrapper\ComponentAKVWrapper;
+use Keboola\ObjectEncryptor\Wrapper\ComponentKMSWrapper;
+use Keboola\ObjectEncryptor\Wrapper\ConfigurationAKVWrapper;
+use Keboola\ObjectEncryptor\Wrapper\ConfigurationKMSWrapper;
 use Keboola\ObjectEncryptor\Wrapper\CryptoWrapperInterface;
+use Keboola\ObjectEncryptor\Wrapper\ProjectAKVWrapper;
+use Keboola\ObjectEncryptor\Wrapper\ProjectKMSWrapper;
 
 class ObjectEncryptor
 {
@@ -98,6 +104,36 @@ class ObjectEncryptor
             throw new ApplicationException('CryptoWrapper prefix ' . $wrapper->getPrefix() . ' is not unique.');
         }
         $this->wrappers[$wrapper->getPrefix()] = $wrapper;
+    }
+
+    public function getRegisteredComponentWrapperClass()
+    {
+        foreach ($this->wrappers as $wrapper) {
+            if (get_class($wrapper) === ComponentKMSWrapper::class || get_class($wrapper) === ComponentAKVWrapper::class) {
+                return get_class($wrapper);
+            }
+        }
+        throw new ApplicationException('No Component wrappers registered.');
+    }
+
+    public function getRegisteredProjectWrapperClass()
+    {
+        foreach ($this->wrappers as $wrapper) {
+            if (get_class($wrapper) === ProjectKMSWrapper::class || get_class($wrapper) === ProjectAKVWrapper::class) {
+                return get_class($wrapper);
+            }
+        }
+        throw new ApplicationException('No Project wrappers registered.');
+    }
+
+    public function getRegisteredConfigurationWrapperClass()
+    {
+        foreach ($this->wrappers as $wrapper) {
+            if (get_class($wrapper) === ConfigurationKMSWrapper::class || get_class($wrapper) === ConfigurationAKVWrapper::class) {
+                return get_class($wrapper);
+            }
+        }
+        throw new ApplicationException('No Configuration wrappers registered.');
     }
 
     /**

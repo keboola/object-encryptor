@@ -7,9 +7,13 @@ use Keboola\ObjectEncryptor\Legacy\Encryptor;
 use Keboola\ObjectEncryptor\Legacy\Wrapper\BaseWrapper;
 use Keboola\ObjectEncryptor\Legacy\Wrapper\ComponentProjectWrapper;
 use Keboola\ObjectEncryptor\Legacy\Wrapper\ComponentWrapper as LegacyComponentWrapper;
-use Keboola\ObjectEncryptor\Wrapper\ComponentWrapper;
-use Keboola\ObjectEncryptor\Wrapper\ConfigurationWrapper;
-use Keboola\ObjectEncryptor\Wrapper\ProjectWrapper;
+use Keboola\ObjectEncryptor\Wrapper\ComponentAKVWrapper;
+use Keboola\ObjectEncryptor\Wrapper\ComponentKMSWrapper;
+use Keboola\ObjectEncryptor\Wrapper\ConfigurationAKVWrapper;
+use Keboola\ObjectEncryptor\Wrapper\ConfigurationKMSWrapper;
+use Keboola\ObjectEncryptor\Wrapper\GenericAKVWrapper;
+use Keboola\ObjectEncryptor\Wrapper\ProjectAKVWrapper;
+use Keboola\ObjectEncryptor\Wrapper\ProjectKMSWrapper;
 use Keboola\ObjectEncryptor\Wrapper\GenericKMSWrapper;
 
 class ObjectEncryptorFactory
@@ -55,19 +59,26 @@ class ObjectEncryptorFactory
     private $kmsKeyRegion = null;
 
     /**
+     * @var string|null AKV Vault URL.
+     */
+    private $akvUrl = null;
+
+    /**
      * ObjectEncryptorFactory constructor.
-     * @param string $keyId KMS Key ID Encryption key for KBC::Secure ciphers.
-     * @param string $region KMS Key Region.
+     * @param string $kmsKeyId KMS Key ID Encryption key for KBC::Secure ciphers.
+     * @param string $kmsRegion KMS Key Region.
      * @param string $keyVersion1 Encryption key for KBC::Encrypted ciphers.
      * @param string $keyVersion0 Encryption key for legacy ciphers.
+     * @param string $akvUrl Azure Key Vault URL.
      */
-    public function __construct($keyId, $region, $keyVersion1, $keyVersion0)
+    public function __construct($kmsKeyId, $kmsRegion, $keyVersion1, $keyVersion0, $akvUrl)
     {
         // No logic here, this constructor is exception-less so as not to leak keys in stack trace
-        $this->kmsKeyId = $keyId;
-        $this->kmsKeyRegion = $region;
+        $this->kmsKeyId = $kmsKeyId;
+        $this->kmsKeyRegion = $kmsRegion;
         $this->keyVersion1 = $keyVersion1;
         $this->keyVersion0 = $keyVersion0;
+        $this->akvUrl = $akvUrl;
     }
 
     /**
@@ -140,6 +151,9 @@ class ObjectEncryptorFactory
         if (!is_null($this->kmsKeyRegion) && !is_string($this->kmsKeyRegion)) {
             throw new ApplicationException('Invalid KMS region.');
         }
+        if (!is_null($this->akvUrl) && !is_string($this->akvUrl)) {
+            throw new ApplicationException('Invalid AKV URL.');
+        }
     }
 
     /**
@@ -170,7 +184,7 @@ class ObjectEncryptorFactory
      * @param ObjectEncryptor $encryptor
      * @throws ApplicationException
      */
-    private function addVersion2Wrappers($encryptor)
+    private function addKMSWrappers($encryptor)
     {
         $wrapper = new GenericKMSWrapper();
         $wrapper->setKMSKeyId((string)$this->kmsKeyId);
@@ -178,14 +192,14 @@ class ObjectEncryptorFactory
         $encryptor->pushWrapper($wrapper);
 
         if ($this->componentId && $this->stackId) {
-            $wrapper = new ComponentWrapper();
+            $wrapper = new ComponentKMSWrapper();
             $wrapper->setKMSKeyId((string)$this->kmsKeyId);
             $wrapper->setKMSRegion((string)$this->kmsKeyRegion);
             $wrapper->setComponentId($this->componentId);
             $wrapper->setStackId($this->stackId);
             $encryptor->pushWrapper($wrapper);
             if ($this->projectId) {
-                $wrapper = new ProjectWrapper();
+                $wrapper = new ProjectKMSWrapper();
                 $wrapper->setKMSKeyId((string)$this->kmsKeyId);
                 $wrapper->setKMSRegion((string)$this->kmsKeyRegion);
                 $wrapper->setComponentId($this->componentId);
@@ -193,9 +207,45 @@ class ObjectEncryptorFactory
                 $wrapper->setProjectId($this->projectId);
                 $encryptor->pushWrapper($wrapper);
                 if ($this->configurationId) {
-                    $wrapper = new ConfigurationWrapper();
+                    $wrapper = new ConfigurationKMSWrapper();
                     $wrapper->setKMSKeyId((string)$this->kmsKeyId);
                     $wrapper->setKMSRegion((string)$this->kmsKeyRegion);
+                    $wrapper->setComponentId($this->componentId);
+                    $wrapper->setStackId($this->stackId);
+                    $wrapper->setProjectId($this->projectId);
+                    $wrapper->setConfigurationId($this->configurationId);
+                    $encryptor->pushWrapper($wrapper);
+                }
+            }
+        }
+    }
+
+    /**
+     * @param ObjectEncryptor $encryptor
+     * @throws ApplicationException
+     */
+    private function addAKVWrappers($encryptor)
+    {
+        $wrapper = new GenericAKVWrapper();
+        $wrapper->setKeyVaultUrl((string) $this->akvUrl);
+        $encryptor->pushWrapper($wrapper);
+
+        if ($this->componentId && $this->stackId) {
+            $wrapper = new ComponentAKVWrapper();
+            $wrapper->setKeyVaultUrl((string) $this->akvUrl);
+            $wrapper->setComponentId($this->componentId);
+            $wrapper->setStackId($this->stackId);
+            $encryptor->pushWrapper($wrapper);
+            if ($this->projectId) {
+                $wrapper = new ProjectAKVWrapper();
+                $wrapper->setKeyVaultUrl((string) $this->akvUrl);
+                $wrapper->setComponentId($this->componentId);
+                $wrapper->setStackId($this->stackId);
+                $wrapper->setProjectId($this->projectId);
+                $encryptor->pushWrapper($wrapper);
+                if ($this->configurationId) {
+                    $wrapper = new ConfigurationAKVWrapper();
+                    $wrapper->setKeyVaultUrl((string) $this->akvUrl);
                     $wrapper->setComponentId($this->componentId);
                     $wrapper->setStackId($this->stackId);
                     $wrapper->setProjectId($this->projectId);
@@ -226,7 +276,11 @@ class ObjectEncryptorFactory
         }
 
         if ($this->kmsKeyRegion && $this->kmsKeyId) {
-            $this->addVersion2Wrappers($encryptor);
+            $this->addKMSWrappers($encryptor);
+        }
+
+        if ($this->akvUrl) {
+            $this->addAKVWrappers($encryptor);
         }
         return $encryptor;
     }
