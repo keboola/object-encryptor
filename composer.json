@@ -23,7 +23,7 @@
         "aws/aws-sdk-php": "^3.45",
         "vkartaviy/retry": "^0.2.2",
         "phpseclib/mcrypt_compat": "^1.0",
-        "keboola/azure-key-vault-client": "^0.2",
+        "keboola/azure-key-vault-client": "^1.0",
         "ext-zlib": "*"
     },
     "require-dev": {
