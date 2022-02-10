@@ -1,6 +1,4 @@
-[![Build Status](https://travis-ci.org/keboola/object-encryptor.svg?branch=master)](https://travis-ci.org/keboola/object-encryptor)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/a08caf5f9ff2116fd497/test_coverage)](https://codeclimate.com/github/keboola/object-encryptor/test_coverage)
-[![Maintainability](https://api.codeclimate.com/v1/badges/a08caf5f9ff2116fd497/maintainability)](https://codeclimate.com/github/keboola/object-encryptor/maintainability)
+[![GitHub Actions](https://github.com/keboola/object-encryptor/actions/workflows/push.yml/badge.svg)](https://github.com/keboola/object-encryptor/actions/workflows/push.yml)
 
 # Object Encryptor
 Library provides interface for encrypting PHP arrays, stdclass objects and scalars. A cipher may contain additional metadata
