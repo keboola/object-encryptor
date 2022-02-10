@@ -393,11 +393,11 @@ class GenericAKVWrapperTest extends TestCase
 
     public function testInvalidSetupInvalidCredentials()
     {
-        putenv('AZURE_CLIENT_ID=');
+        putenv('AZURE_CLIENT_ID=invalid');
         $wrapper = new GenericAKVWrapper();
         $wrapper->setKeyVaultUrl(getenv('TEST_KEY_VAULT_URL'));
         self::expectException(ApplicationException::class);
-        self::expectExceptionMessage('Ciphering failed: No suitable authentication method found.');
+        self::expectExceptionMessage('Ciphering failed: Failed to get authentication token');
         $wrapper->encrypt('test');
     }
 }

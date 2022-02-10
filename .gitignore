@@ -3,3 +3,4 @@
 /composer.lock
 /config.php
 /set-env.sh
+/.env.local

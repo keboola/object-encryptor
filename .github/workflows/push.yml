@@ -1,0 +1,25 @@
+name: GitHub Actions
+on: [ push ]
+env:
+  TEST_TENANT_ID: 9b85ee6f-4fb0-4a46-8cb7-4dcc6b262a89
+  TEST_CLIENT_ID: 04d6e451-e964-4cdf-ab2f-a6c77c3261fe
+  TEST_CLIENT_SECRET: ${{ secrets.TEST_CLIENT_SECRET }}
+  TEST_KEY_VAULT_URL: https://testing-object-encryptor.vault.azure.net/
+  TEST_AWS_REGION: us-east-1
+  TEST_AWS_ACCESS_KEY_ID: AKIAQLZBTO5VKBAGWLNC
+  TEST_AWS_SECRET_ACCESS_KEY: ${{ secrets.TEST_AWS_SECRET_ACCESS_KEY }}
+  TEST_AWS_KMS_KEY_ID: b3556450-c32c-4843-95ae-13b6dd0b03a1
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+      - name: Build image
+        run: |
+          docker login --username "$DOCKERHUB_USER" --password "$DOCKERHUB_TOKEN"
+          docker-compose build
+      - name: Run tests
+        run: |
+          docker-compose run tests56
+          docker-compose run tests74

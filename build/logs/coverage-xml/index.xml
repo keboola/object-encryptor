@@ -1,0 +1,425 @@
+<?xml version="1.0"?>
+<phpunit xmlns="https://schema.phpunit.de/coverage/1.0">
+  <build time="Thu Feb 10 17:55:54 GMT+0000 2022" phpunit="7.5.20" coverage="6.1.4">
+    <runtime name="PHP" version="7.4.27" url="https://secure.php.net/"/>
+    <driver name="xdebug" version="2.9.8"/>
+  </build>
+  <project source="/code/src">
+    <tests>
+      <test name="Keboola\ObjectEncryptor\Tests\BaseWrapperTest::testPrefix" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\BaseWrapperTest::testEncryptor" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ComponentWrapperTest::testEncrypt with data set &quot;KMS&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ComponentWrapperTest::testEncrypt with data set &quot;AKV&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ComponentWrapperTest::testEncryptDifferentStack with data set &quot;KMS&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ComponentWrapperTest::testEncryptDifferentStack with data set &quot;AKV&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ComponentWrapperTest::testEncryptDifferentComponent with data set &quot;KMS&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ComponentWrapperTest::testEncryptDifferentComponent with data set &quot;AKV&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ComponentWrapperTest::testInvalidSetupEncryptKMS" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ComponentWrapperTest::testInvalidSetupEncryptAKV" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ComponentWrapperTest::testInvalidSetupEncryptStackAndComponent with data set &quot;KMS&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ComponentWrapperTest::testInvalidSetupEncryptStackAndComponent with data set &quot;AKV&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ComponentWrapperTest::testInvalidSetupEncryptStack with data set &quot;KMS&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ComponentWrapperTest::testInvalidSetupEncryptStack with data set &quot;AKV&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ComponentWrapperTest::testInvalidSetupEncryptComponent with data set &quot;KMS&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ComponentWrapperTest::testInvalidSetupEncryptComponent with data set &quot;AKV&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ComponentWrapperTest::testInvalidSetupDecryptKMS" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ComponentWrapperTest::testInvalidSetupDecryptAKV" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ComponentWrapperTest::testInvalidSetupDecryptStackAndComponent with data set &quot;KMS&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ComponentWrapperTest::testInvalidSetupDecryptStackAndComponent with data set &quot;AKV&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ComponentWrapperTest::testInvalidSetupDecryptStack with data set &quot;KMS&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ComponentWrapperTest::testInvalidSetupDecryptStack with data set &quot;AKV&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ComponentWrapperTest::testInvalidSetupDecryptComponent with data set &quot;KMS&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ComponentWrapperTest::testInvalidSetupDecryptComponent with data set &quot;AKV&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ComponentWrapperTest::testInvalidComponent with data set &quot;KMS&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ComponentWrapperTest::testInvalidComponent with data set &quot;AKV&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ComponentWrapperTest::testInvalidStack with data set &quot;KMS&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ComponentWrapperTest::testInvalidStack with data set &quot;AKV&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ConfigurationWrapperTest::testEncrypt with data set &quot;KMS&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ConfigurationWrapperTest::testEncrypt with data set &quot;AKV&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ConfigurationWrapperTest::testEncryptDifferentConfiguration with data set &quot;KMS&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ConfigurationWrapperTest::testEncryptDifferentConfiguration with data set &quot;AKV&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ConfigurationWrapperTest::testEncryptDifferentProject with data set &quot;KMS&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ConfigurationWrapperTest::testEncryptDifferentProject with data set &quot;AKV&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ConfigurationWrapperTest::testInvalidSetupEncryptKMS" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ConfigurationWrapperTest::testInvalidSetupEncryptAKV" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ConfigurationWrapperTest::testInvalidSetupEncryptStackAndComponent with data set &quot;KMS&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ConfigurationWrapperTest::testInvalidSetupEncryptStackAndComponent with data set &quot;AKV&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ConfigurationWrapperTest::testInvalidSetupEncryptProjectId with data set &quot;KMS&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ConfigurationWrapperTest::testInvalidSetupEncryptProjectId with data set &quot;AKV&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ConfigurationWrapperTest::testInvalidSetupEncryptConfigurationId with data set &quot;KMS&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ConfigurationWrapperTest::testInvalidSetupEncryptConfigurationId with data set &quot;AKV&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ConfigurationWrapperTest::testInvalidSetupDecryptKMS" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ConfigurationWrapperTest::testInvalidSetupDecryptAKV" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ConfigurationWrapperTest::testInvalidSetupDecryptStackAndComponent with data set &quot;KMS&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ConfigurationWrapperTest::testInvalidSetupDecryptStackAndComponent with data set &quot;AKV&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ConfigurationWrapperTest::testInvalidSetupDecryptProjectId with data set &quot;KMS&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ConfigurationWrapperTest::testInvalidSetupDecryptProjectId with data set &quot;AKV&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ConfigurationWrapperTest::testInvalidSetupDecryptConfigurationId with data set &quot;KMS&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ConfigurationWrapperTest::testInvalidSetupDecryptConfigurationId with data set &quot;AKV&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ConfigurationWrapperTest::testInvalidConfiguration with data set &quot;KMS&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ConfigurationWrapperTest::testInvalidConfiguration with data set &quot;AKV&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\EncryptorTest::testEncryptor" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\GenericAKVWrapperTest::testEncryptNonScalar" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\GenericAKVWrapperTest::testEncryptNoMetadata" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\GenericAKVWrapperTest::testEncryptMetadata" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\GenericAKVWrapperTest::testEncryptMetadataMismatch" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\GenericAKVWrapperTest::testEncryptEmptyValue with data set #0" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\GenericAKVWrapperTest::testEncryptEmptyValue with data set #1" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\GenericAKVWrapperTest::testEncryptEmptyValue with data set #2" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\GenericAKVWrapperTest::testEncryptEmptyValue with data set #3" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\GenericAKVWrapperTest::testRetryEncryptDecrypt" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\GenericAKVWrapperTest::testRetryEncryptFail" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\GenericAKVWrapperTest::testRetryDecryptFail" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\GenericAKVWrapperTest::testInvalidSecretContents" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\GenericAKVWrapperTest::testInvalidSecretCipher" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\GenericAKVWrapperTest::testDecryptInvalidCiphers with data set #0" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\GenericAKVWrapperTest::testDecryptInvalidCiphers with data set #1" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\GenericAKVWrapperTest::testDecryptInvalidCiphers with data set #2" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\GenericAKVWrapperTest::testDecryptInvalidCiphers with data set #3" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\GenericAKVWrapperTest::testDecryptInvalidCiphers with data set #4" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\GenericAKVWrapperTest::testInvalidSetupMissingUrl" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\GenericAKVWrapperTest::testInvalidSetupInvalidUrl" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\GenericAKVWrapperTest::testInvalidSetupInvalidUrlDecrypt" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\GenericAKVWrapperTest::testInvalidSetupInvalidCredentials" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\GenericKMSWrapperTest::testEncrypt" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\GenericKMSWrapperTest::testEncryptWrongKey" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\GenericKMSWrapperTest::testEncryptEmptyValue with data set #0" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\GenericKMSWrapperTest::testEncryptEmptyValue with data set #1" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\GenericKMSWrapperTest::testEncryptEmptyValue with data set #2" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\GenericKMSWrapperTest::testEncryptEmptyValue with data set #3" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\GenericKMSWrapperTest::testRetryEncrypt" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\GenericKMSWrapperTest::testRetryEncryptFail" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\GenericKMSWrapperTest::testRetryDecrypt" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\GenericKMSWrapperTest::testRetryDecryptFail" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\GenericKMSWrapperTest::testEncryptNonScalar" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\GenericKMSWrapperTest::testEncryptMetadata" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\GenericKMSWrapperTest::testEncryptMetadataCacheHit" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\GenericKMSWrapperTest::testEncryptMetadataCacheMiss" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\GenericKMSWrapperTest::testEncryptMetadataMismatchNoMetadata" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\GenericKMSWrapperTest::testEncryptMetadataMismatchBadMetadata" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\GenericKMSWrapperTest::testInvalidSetupEncryptMissingAll" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\GenericKMSWrapperTest::testInvalidSetupEncryptMissingKeyId" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\GenericKMSWrapperTest::testInvalidSetupEncryptMissingRegion" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\GenericKMSWrapperTest::testInvalidSetupDecryptMissingAll" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\GenericKMSWrapperTest::testInvalidSetupDecryptMissingKeyId" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\GenericKMSWrapperTest::testInvalidSetupDecryptMissingRegion" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\GenericKMSWrapperTest::testInvalidKeyId" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\GenericKMSWrapperTest::testInvalidRegion" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\GenericKMSWrapperTest::testInvalidCredentials" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\GenericKMSWrapperTest::testInvalidNonExistentRegion" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\GenericKMSWrapperTest::testDecryptInvalidCiphers with data set #0" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\GenericKMSWrapperTest::testDecryptInvalidCiphers with data set #1" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\GenericKMSWrapperTest::testDecryptInvalidCiphers with data set #2" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\GenericKMSWrapperTest::testDecryptInvalidCiphers with data set #3" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\GenericKMSWrapperTest::testDecryptInvalidCiphers with data set #4" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testFactoryLegacyComponentProject" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testFactoryLegacyComponent" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testFactoryLegacyBase" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testConfigurationWrapper with data set &quot;KMS&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testConfigurationWrapper with data set &quot;AKV&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testProjectWrapper with data set &quot;KMS&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testProjectWrapper with data set &quot;AKV&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testComponentWrapper with data set &quot;KMS&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testComponentWrapper with data set &quot;AKV&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testGenericWrapper with data set &quot;KMS&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testGenericWrapper with data set &quot;AKV&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testGenericWrapperInvalidCredentials with data set #0" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testGenericWrapperInvalidCredentials with data set #1" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testConfigurationWrapperInvalidEncrypt with data set #0" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testConfigurationWrapperInvalidEncrypt with data set #1" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testConfigurationWrapperInvalidDecrypt with data set &quot;KMS&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testConfigurationWrapperInvalidDecrypt with data set &quot;AKV&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testProjectWrapperInvalidEncrypt with data set #0" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testProjectWrapperInvalidEncrypt with data set #1" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testProjectWrapperInvalidDecrypt with data set &quot;KMS&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testProjectWrapperInvalidDecrypt with data set &quot;AKV&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testComponentWrapperInvalidEncrypt with data set #0" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testComponentWrapperInvalidEncrypt with data set #1" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testComponentWrapperInvalidDecrypt with data set &quot;KMS&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testComponentWrapperInvalidDecrypt with data set &quot;AKV&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testCipherError" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testInvalidKeysLegacyEncryption" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testInvalidKeysKmsId" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testInvalidKeysVaultUrl" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testInvalidKeysVersion1" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testInvalidKeysVersion0" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testInvalidParamsStackId" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testInvalidParamsComponentId" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testInvalidParamsProjectId" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testInvalidParamsConfigurationId" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorEmpty" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorScalar" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorStack with data set #0" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorStack with data set #1" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorStackNoCredentials" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorInvalidService" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorUnsupportedInput with data set &quot;invalid class&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorUnsupportedInput with data set &quot;invalid class in value&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorUnsupportedInput with data set &quot;invalid class in encrypted value&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorUnsupportedInput with data set &quot;invalid class&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorUnsupportedInput with data set &quot;invalid class in value&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorUnsupportedInput with data set &quot;invalid class in encrypted value&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorInvalidCipherText with data set &quot;somewhat similar&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorInvalidCipherText with data set &quot;completely off&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorInvalidCipherText with data set &quot;somewhat similar in key&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorInvalidCipherText with data set &quot;completely off in key&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorAlreadyEncrypted" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorAlreadyEncryptedWrapper" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testInvalidWrapper" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleArray" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleObject" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleArrayScalars" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleObjectScalars" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleArrayEncrypted" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleObjectEncrypted" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedArray" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedObject" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedArrayWithArrayKeyHashmark" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedObjectWithArrayKeyHashmark" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedArrayEncrypted" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedObjectEncrypted" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedArrayWithArray" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedObjectWithArray" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testMixedCryptoWrappersDecryptArray" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testMixedCryptoWrappersDecryptObject" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptEmptyArray" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptEmptyObject" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNoWrappers" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorDecodedJSONObject" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorLegacyNoMCrypt" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorLegacyNoMCryptNoRequire" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorLegacy" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorLegacyFail" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testGetRegisteredWrapperEncryptor with data set &quot;kms-akv-component&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testGetRegisteredWrapperEncryptor with data set &quot;kms-akv-project&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testGetRegisteredWrapperEncryptor with data set &quot;kms-akv-configuration&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testGetRegisteredWrapperEncryptor with data set &quot;kms-component&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testGetRegisteredWrapperEncryptor with data set &quot;kms-project&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testGetRegisteredWrapperEncryptor with data set &quot;kms-configuration&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testGetRegisteredWrapperEncryptor with data set &quot;akv-component&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testGetRegisteredWrapperEncryptor with data set &quot;akv-project&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testGetRegisteredWrapperEncryptor with data set &quot;akv-configuration&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testGetRegisteredWrapperFailure with data set #0" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testGetRegisteredWrapperFailure with data set #1" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testGetRegisteredWrapperFailure with data set #2" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ProjectWrapperTest::testEncrypt with data set &quot;KMS&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ProjectWrapperTest::testEncrypt with data set &quot;AKV&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ProjectWrapperTest::testEncryptDifferentProject with data set &quot;KMS&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ProjectWrapperTest::testEncryptDifferentProject with data set &quot;AKV&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ProjectWrapperTest::testEncryptDifferentComponent with data set &quot;KMS&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ProjectWrapperTest::testEncryptDifferentComponent with data set &quot;AKV&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ProjectWrapperTest::testInvalidSetupEncryptKMS" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ProjectWrapperTest::testInvalidSetupEncryptAKV" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ProjectWrapperTest::testInvalidSetupEncryptStackAndComponent with data set &quot;KMS&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ProjectWrapperTest::testInvalidSetupEncryptStackAndComponent with data set &quot;AKV&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ProjectWrapperTest::testInvalidSetupEncryptProjectId with data set &quot;KMS&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ProjectWrapperTest::testInvalidSetupEncryptProjectId with data set &quot;AKV&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ProjectWrapperTest::testInvalidSetupDecryptKMS" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ProjectWrapperTest::testInvalidSetupDecryptAKV" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ProjectWrapperTest::testInvalidSetupDecryptStackAndComponent with data set &quot;KMS&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ProjectWrapperTest::testInvalidSetupDecryptStackAndComponent with data set &quot;AKV&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ProjectWrapperTest::testInvalidSetupDecryptProjectId with data set &quot;KMS&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ProjectWrapperTest::testInvalidSetupDecryptProjectId with data set &quot;AKV&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ProjectWrapperTest::testInvalidProject with data set &quot;KMS&quot;" size="unknown" result="0" status="PASSED"/>
+      <test name="Keboola\ObjectEncryptor\Tests\ProjectWrapperTest::testInvalidProject with data set &quot;AKV&quot;" size="unknown" result="0" status="PASSED"/>
+    </tests>
+    <directory name="/">
+      <totals>
+        <lines total="1611" comments="439" code="1172" executable="467" executed="451" percent="96.57"/>
+        <methods count="88" tested="79" percent="89.77"/>
+        <functions count="0" tested="0" percent="0"/>
+        <classes count="16" tested="10" percent="62.50"/>
+        <traits count="0" tested="0" percent="0"/>
+      </totals>
+      <directory name="Exception">
+        <totals>
+          <lines total="22" comments="0" code="22" executable="4" executed="4" percent="100.00"/>
+          <methods count="2" tested="2" percent="100.00"/>
+          <functions count="0" tested="0" percent="0"/>
+          <classes count="2" tested="2" percent="100.00"/>
+          <traits count="0" tested="0" percent="0"/>
+        </totals>
+        <file name="ApplicationException.php" href="Exception/ApplicationException.php.xml">
+          <totals>
+            <lines total="11" comments="0" code="11" executable="2" executed="2" percent="100.00"/>
+            <methods count="1" tested="1" percent="100.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="1" percent="100.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="UserException.php" href="Exception/UserException.php.xml">
+          <totals>
+            <lines total="11" comments="0" code="11" executable="2" executed="2" percent="100.00"/>
+            <methods count="1" tested="1" percent="100.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="1" percent="100.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+      </directory>
+      <directory name="Legacy">
+        <totals>
+          <lines total="220" comments="72" code="148" executable="34" executed="31" percent="91.18"/>
+          <methods count="17" tested="15" percent="88.24"/>
+          <functions count="0" tested="0" percent="0"/>
+          <classes count="4" tested="2" percent="50.00"/>
+          <traits count="0" tested="0" percent="0"/>
+        </totals>
+        <directory name="Wrapper">
+          <totals>
+            <lines total="181" comments="59" code="122" executable="30" executed="27" percent="90.00"/>
+            <methods count="14" tested="12" percent="85.71"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="3" tested="1" percent="33.33"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+          <file name="BaseWrapper.php" href="Legacy/Wrapper/BaseWrapper.php.xml">
+            <totals>
+              <lines total="73" comments="26" code="47" executable="10" executed="10" percent="100.00"/>
+              <methods count="6" tested="6" percent="100.00"/>
+              <functions count="0" tested="0" percent="0"/>
+              <classes count="1" tested="1" percent="100.00"/>
+              <traits count="0" tested="0" percent="0"/>
+            </totals>
+          </file>
+          <file name="ComponentProjectWrapper.php" href="Legacy/Wrapper/ComponentProjectWrapper.php.xml">
+            <totals>
+              <lines total="54" comments="16" code="38" executable="11" executed="9" percent="81.82"/>
+              <methods count="4" tested="3" percent="75.00"/>
+              <functions count="0" tested="0" percent="0"/>
+              <classes count="1" tested="0" percent="0.00"/>
+              <traits count="0" tested="0" percent="0"/>
+            </totals>
+          </file>
+          <file name="ComponentWrapper.php" href="Legacy/Wrapper/ComponentWrapper.php.xml">
+            <totals>
+              <lines total="54" comments="17" code="37" executable="9" executed="8" percent="88.89"/>
+              <methods count="4" tested="3" percent="75.00"/>
+              <functions count="0" tested="0" percent="0"/>
+              <classes count="1" tested="0" percent="0.00"/>
+              <traits count="0" tested="0" percent="0"/>
+            </totals>
+          </file>
+        </directory>
+        <file name="Encryptor.php" href="Legacy/Encryptor.php.xml">
+          <totals>
+            <lines total="39" comments="13" code="26" executable="4" executed="4" percent="100.00"/>
+            <methods count="3" tested="3" percent="100.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="1" percent="100.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+      </directory>
+      <directory name="Wrapper">
+        <totals>
+          <lines total="746" comments="197" code="549" executable="206" executed="198" percent="96.12"/>
+          <methods count="42" tested="39" percent="92.86"/>
+          <functions count="0" tested="0" percent="0"/>
+          <classes count="8" tested="6" percent="75.00"/>
+          <traits count="0" tested="0" percent="0"/>
+        </totals>
+        <file name="ComponentAKVWrapper.php" href="Wrapper/ComponentAKVWrapper.php.xml">
+          <totals>
+            <lines total="53" comments="13" code="40" executable="13" executed="13" percent="100.00"/>
+            <methods count="4" tested="4" percent="100.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="1" percent="100.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="ComponentKMSWrapper.php" href="Wrapper/ComponentKMSWrapper.php.xml">
+          <totals>
+            <lines total="53" comments="13" code="40" executable="13" executed="13" percent="100.00"/>
+            <methods count="4" tested="4" percent="100.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="1" percent="100.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="ConfigurationAKVWrapper.php" href="Wrapper/ConfigurationAKVWrapper.php.xml">
+          <totals>
+            <lines total="41" comments="10" code="31" executable="9" executed="9" percent="100.00"/>
+            <methods count="3" tested="3" percent="100.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="1" percent="100.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="ConfigurationKMSWrapper.php" href="Wrapper/ConfigurationKMSWrapper.php.xml">
+          <totals>
+            <lines total="41" comments="10" code="31" executable="9" executed="9" percent="100.00"/>
+            <methods count="3" tested="3" percent="100.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="1" percent="100.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="CryptoWrapperInterface.php" href="Wrapper/CryptoWrapperInterface.php.xml">
+          <totals>
+            <lines total="25" comments="13" code="12" executable="0" executed="0" percent="0"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="GenericAKVWrapper.php" href="Wrapper/GenericAKVWrapper.php.xml">
+          <totals>
+            <lines total="234" comments="65" code="169" executable="67" executed="65" percent="97.01"/>
+            <methods count="12" tested="11" percent="91.67"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="GenericKMSWrapper.php" href="Wrapper/GenericKMSWrapper.php.xml">
+          <totals>
+            <lines total="217" comments="53" code="164" executable="77" executed="71" percent="92.21"/>
+            <methods count="10" tested="8" percent="80.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="ProjectAKVWrapper.php" href="Wrapper/ProjectAKVWrapper.php.xml">
+          <totals>
+            <lines total="41" comments="10" code="31" executable="9" executed="9" percent="100.00"/>
+            <methods count="3" tested="3" percent="100.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="1" percent="100.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="ProjectKMSWrapper.php" href="Wrapper/ProjectKMSWrapper.php.xml">
+          <totals>
+            <lines total="41" comments="10" code="31" executable="9" executed="9" percent="100.00"/>
+            <methods count="3" tested="3" percent="100.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="1" percent="100.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+      </directory>
+      <file name="ObjectEncryptor.php" href="ObjectEncryptor.php.xml">
+        <totals>
+          <lines total="336" comments="95" code="241" executable="106" executed="102" percent="96.23"/>
+          <methods count="17" tested="14" percent="82.35"/>
+          <functions count="0" tested="0" percent="0"/>
+          <classes count="1" tested="0" percent="0.00"/>
+          <traits count="0" tested="0" percent="0"/>
+        </totals>
+      </file>
+      <file name="ObjectEncryptorFactory.php" href="ObjectEncryptorFactory.php.xml">
+        <totals>
+          <lines total="287" comments="75" code="212" executable="117" executed="116" percent="99.15"/>
+          <methods count="10" tested="9" percent="90.00"/>
+          <functions count="0" tested="0" percent="0"/>
+          <classes count="1" tested="0" percent="0.00"/>
+          <traits count="0" tested="0" percent="0"/>
+        </totals>
+      </file>
+    </directory>
+  </project>
+</phpunit>

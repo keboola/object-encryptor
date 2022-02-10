@@ -1,12 +1,6 @@
 {
     "AWSTemplateFormatVersion": "2010-09-09",
-    "Description": "Stack for testing Object Encryptor",
-    "Parameters": {
-        "KeboolaStack": {
-            "Type": "String",
-            "Description": "All resources will be tagged by this value."
-        }
-    },
+    "Description": "Stack for testing Object Encryptor Library",
     "Resources": {
         "ObjectEncryptorUser": {
             "Type": "AWS::IAM::User",
@@ -33,7 +27,7 @@
                                         }
                                     ],
                                     "Effect": "Allow"
-                                }                
+                                }
                             ]
                         }
                     }
@@ -41,18 +35,6 @@
             },
             "DependsOn": [
                 "ObjectEncryptorKMSKey"
-            ]
-        },
-        "AccessKey": {
-            "Type": "AWS::IAM::AccessKey",
-            "DeletionPolicy": "Delete",
-            "Properties": {
-                "UserName": {
-                    "Ref": "ObjectEncryptorUser"
-                }
-            },
-            "DependsOn": [
-                "ObjectEncryptorUser"
             ]
         },
         "ObjectEncryptorKMSKey": {
@@ -68,12 +50,12 @@
                             "Principal": {
                                 "AWS": {
                                     "Fn::Join": [
-                                        "", 
+                                        "",
                                         [
-                                            "arn:aws:iam::", 
+                                            "arn:aws:iam::",
                                             {
                                                 "Ref": "AWS::AccountId"
-                                            }, 
+                                            },
                                             ":root"
                                         ]
                                     ]
@@ -83,31 +65,16 @@
                             "Resource": "*"
                         }
                     ]
-                }
-            }
-        },
-        "ObjectEncryptorKMSKeyAlias": {
-            "Type": "AWS::KMS::Alias",
-            "Properties": {
-                "AliasName": {
-                    "Fn::Join": [
-                        "", 
-                        [
-                            "alias/", 
-                            {
-                                "Ref": "KeboolaStack"
-                            },
-                            "-object-encryptor"
-                        ]
-                    ]
                 },
-                "TargetKeyId" : {
-                    "Ref": "ObjectEncryptorKMSKey"
-                }
-            },
-            "DependsOn": [
-                "ObjectEncryptorKMSKey"
-            ]
+                "Tags": [
+                    {
+                        "Key": "KeboolaStack",
+                        "Value": {
+                            "Ref": "AWS::StackName"
+                        }
+                    }
+                ]
+            }
         }
     },
     "Outputs": {
@@ -116,19 +83,9 @@
                 "Ref": "AWS::Region"
             }
         },
-        "AccessKeyId": {
+        "KeyId": {
             "Value": {
-                "Ref": "AccessKey"
-            }
-        },        
-        "AccessKeySecret": {
-            "Value": {
-                "Fn::GetAtt": ["AccessKey", "SecretAccessKey"]
-            }
-        },
-        "KMSKeyAlias": {
-            "Value": {
-                "Ref": "ObjectEncryptorKMSKeyAlias"
+                "Ref": "ObjectEncryptorKMSKey"
             }
         }
     }

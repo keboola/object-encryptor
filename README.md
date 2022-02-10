@@ -11,7 +11,7 @@ which limits the conditions under which it may be decrypted. The library support
 - [defuse/php-encryption](https://github.com/defuse/php-encryption) -- current encryption method with AWS KMS or Azure Key Vault managed keys.
 
 ## Requirements
-The library supports PHP 5.6, 7.0, 7.1, 7.2, 7.3, 7.4. Versions 7.1+ are supported through mcrypt polyfill.
+The library supports PHP 5.6, 7.4. Versions 7.1+ are supported through mcrypt polyfill.
 
 ## Usage
 Entry point to the library is the `ObjectEncryptorFactory` class which creates instances of `ObjectEncryptor` class which
@@ -69,12 +69,7 @@ $secret = $factory->getEncryptor()->decrypt($encrypted);
 
 ## Development
 
-Run tests with:
-
-    phpunit
-
-### Resources Setup
-
+### Azure
 Create a resource group:
 
 	az group create --name testing-object-encryptor --location "East US"
@@ -103,8 +98,22 @@ Get ID of a group to which the current user belongs (e.g. "Developers"):
 
 	az ad group list --filter "displayname eq 'Developers'" --query [].objectId
 
-Deploy the key vault, provide tentant ID, service principal ID and group ID from the previous commands:
+Deploy the key vault, provide tenant ID, service principal ID and group ID from the previous commands:
 
 	az deployment group create --resource-group testing-object-encryptor --template-file arm-template.json --parameters vault_name=testing-object-encryptor tenant_id=9b85ee6f-xxxxxxxxxxxxxxxxxxxxxxxxxxx service_principal_object_id=7f7a8a4c-xxxxxxxxxxxxxxxxxxxxxxxxxxx group_object_id=a1e8da73-xxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 Set the key vault URL - e.g. `https://testing-object-encryptor.vault.azure.net/` as `TEST_KEY_VAULT_URL` environment variable.
+
+### AWS
+Use the `test-cf-stack.json` CloudFormation template to create a new resource stack. Use the Stack outputs `KeyId` and `Region` to
+set the environment values `TEST_AWS_KMS_KEY_ID` and `TEST_AWS_REGION` respectively. Go the user created by the stack (`ObjectEncryptorUser`) 
+and generate new Access key (Security Credentials) for the user. Use it to set the `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` environment variables.
+
+### Run Tests
+Run tests with:
+
+    docker-compose --env-file=.env.local run tests56
+
+or
+
+    docker-compose --env-file=.env.local run tests74

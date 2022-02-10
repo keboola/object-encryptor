@@ -1,9 +1,32 @@
-version: "2"
+version: "3"
 services:
-  php:
-    build: .
-    image: keboola/object-ecryptor
-    tty: true
-    stdin_open: true
+  # for development purposes
+  tests: &tests
+    build: 
+      context: .
+      dockerfile: Dockerfile74
+    environment:
+      - TEST_TENANT_ID
+      - TEST_CLIENT_ID
+      - TEST_CLIENT_SECRET
+      - TEST_KEY_VAULT_URL
+      - TEST_AWS_REGION
+      - TEST_AWS_ACCESS_KEY_ID
+      - TEST_AWS_SECRET_ACCESS_KEY
+      - TEST_AWS_KMS_KEY_ID
+    command: ["composer", "ci"]
+
+  tests56:
+    <<: *tests
+    build: 
+      context: .
+      dockerfile: Dockerfile56
+
+  tests74:
+    <<: *tests
+    build: 
+      context: .
+      dockerfile: Dockerfile74
+    command: ["composer", "ci"]
     volumes:
-      - ./:/code
+      - ./build/logs/:/code/build/logs/

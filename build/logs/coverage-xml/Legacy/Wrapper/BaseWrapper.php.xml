@@ -1,0 +1,950 @@
+<?xml version="1.0"?>
+<phpunit xmlns="https://schema.phpunit.de/coverage/1.0">
+  <file name="BaseWrapper.php" path="/Legacy/Wrapper">
+    <totals>
+      <lines total="73" comments="26" code="47" executable="10" executed="10" percent="100.00"/>
+      <methods count="6" tested="6" percent="100.00"/>
+      <functions count="0" tested="0" percent="0"/>
+      <classes count="1" tested="1" percent="100.00"/>
+      <traits count="0" tested="0" percent="0"/>
+    </totals>
+    <class name="Keboola\ObjectEncryptor\Legacy\Wrapper\BaseWrapper" start="8" executable="10" executed="10" crap="7">
+      <package full="" name="" sub="" category=""/>
+      <namespace name="Keboola\ObjectEncryptor\Legacy\Wrapper"/>
+      <method name="__construct" signature="__construct()" start="21" end="24" crap="1" executable="2" executed="2" coverage="100"/>
+      <method name="setKey" signature="setKey($key)" start="30" end="37" crap="2" executable="4" executed="4" coverage="100"/>
+      <method name="getKey" signature="getKey()" start="42" end="45" crap="1" executable="1" executed="1" coverage="100"/>
+      <method name="encrypt" signature="encrypt($data)" start="51" end="54" crap="1" executable="1" executed="1" coverage="100"/>
+      <method name="decrypt" signature="decrypt($encryptedData)" start="61" end="64" crap="1" executable="1" executed="1" coverage="100"/>
+      <method name="getPrefix" signature="getPrefix()" start="69" end="72" crap="1" executable="1" executed="1" coverage="100"/>
+    </class>
+    <coverage>
+      <line nr="23">
+        <covered by="Keboola\ObjectEncryptor\Tests\BaseWrapperTest::testPrefix"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\BaseWrapperTest::testEncryptor"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testFactoryLegacyComponentProject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testFactoryLegacyComponent"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testFactoryLegacyBase"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testConfigurationWrapper with data set &quot;KMS&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testConfigurationWrapper with data set &quot;AKV&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testProjectWrapper with data set &quot;KMS&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testProjectWrapper with data set &quot;AKV&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testComponentWrapper with data set &quot;KMS&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testComponentWrapper with data set &quot;AKV&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testGenericWrapper with data set &quot;KMS&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testGenericWrapper with data set &quot;AKV&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testGenericWrapperInvalidCredentials with data set #0"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testGenericWrapperInvalidCredentials with data set #1"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testConfigurationWrapperInvalidEncrypt with data set #0"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testConfigurationWrapperInvalidEncrypt with data set #1"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testConfigurationWrapperInvalidDecrypt with data set &quot;KMS&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testConfigurationWrapperInvalidDecrypt with data set &quot;AKV&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testProjectWrapperInvalidEncrypt with data set #0"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testProjectWrapperInvalidEncrypt with data set #1"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testProjectWrapperInvalidDecrypt with data set &quot;KMS&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testProjectWrapperInvalidDecrypt with data set &quot;AKV&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testComponentWrapperInvalidEncrypt with data set #0"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testComponentWrapperInvalidEncrypt with data set #1"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testComponentWrapperInvalidDecrypt with data set &quot;KMS&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testComponentWrapperInvalidDecrypt with data set &quot;AKV&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testCipherError"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testInvalidKeysLegacyEncryption"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorScalar"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorStack with data set #0"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorStack with data set #1"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorStackNoCredentials"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorInvalidService"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorUnsupportedInput with data set &quot;invalid class&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorUnsupportedInput with data set &quot;invalid class in value&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorUnsupportedInput with data set &quot;invalid class in encrypted value&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorUnsupportedInput with data set &quot;invalid class&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorUnsupportedInput with data set &quot;invalid class in value&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorUnsupportedInput with data set &quot;invalid class in encrypted value&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorInvalidCipherText with data set &quot;somewhat similar&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorInvalidCipherText with data set &quot;completely off&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorInvalidCipherText with data set &quot;somewhat similar in key&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorInvalidCipherText with data set &quot;completely off in key&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorAlreadyEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorAlreadyEncryptedWrapper"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testInvalidWrapper"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleObject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleArrayScalars"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleObjectScalars"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleArrayEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleObjectEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedObject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedArrayWithArrayKeyHashmark"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedObjectWithArrayKeyHashmark"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedArrayEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedObjectEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedArrayWithArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedObjectWithArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testMixedCryptoWrappersDecryptArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testMixedCryptoWrappersDecryptObject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptEmptyArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptEmptyObject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorDecodedJSONObject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorLegacyNoMCrypt"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorLegacyNoMCryptNoRequire"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorLegacy"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorLegacyFail"/>
+      </line>
+      <line nr="24">
+        <covered by="Keboola\ObjectEncryptor\Tests\BaseWrapperTest::testPrefix"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\BaseWrapperTest::testEncryptor"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testFactoryLegacyComponentProject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testFactoryLegacyComponent"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testFactoryLegacyBase"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testConfigurationWrapper with data set &quot;KMS&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testConfigurationWrapper with data set &quot;AKV&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testProjectWrapper with data set &quot;KMS&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testProjectWrapper with data set &quot;AKV&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testComponentWrapper with data set &quot;KMS&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testComponentWrapper with data set &quot;AKV&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testGenericWrapper with data set &quot;KMS&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testGenericWrapper with data set &quot;AKV&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testGenericWrapperInvalidCredentials with data set #0"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testGenericWrapperInvalidCredentials with data set #1"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testConfigurationWrapperInvalidEncrypt with data set #0"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testConfigurationWrapperInvalidEncrypt with data set #1"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testConfigurationWrapperInvalidDecrypt with data set &quot;KMS&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testConfigurationWrapperInvalidDecrypt with data set &quot;AKV&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testProjectWrapperInvalidEncrypt with data set #0"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testProjectWrapperInvalidEncrypt with data set #1"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testProjectWrapperInvalidDecrypt with data set &quot;KMS&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testProjectWrapperInvalidDecrypt with data set &quot;AKV&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testComponentWrapperInvalidEncrypt with data set #0"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testComponentWrapperInvalidEncrypt with data set #1"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testComponentWrapperInvalidDecrypt with data set &quot;KMS&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testComponentWrapperInvalidDecrypt with data set &quot;AKV&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testCipherError"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testInvalidKeysLegacyEncryption"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorScalar"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorStack with data set #0"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorStack with data set #1"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorStackNoCredentials"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorInvalidService"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorUnsupportedInput with data set &quot;invalid class&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorUnsupportedInput with data set &quot;invalid class in value&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorUnsupportedInput with data set &quot;invalid class in encrypted value&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorUnsupportedInput with data set &quot;invalid class&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorUnsupportedInput with data set &quot;invalid class in value&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorUnsupportedInput with data set &quot;invalid class in encrypted value&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorInvalidCipherText with data set &quot;somewhat similar&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorInvalidCipherText with data set &quot;completely off&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorInvalidCipherText with data set &quot;somewhat similar in key&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorInvalidCipherText with data set &quot;completely off in key&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorAlreadyEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorAlreadyEncryptedWrapper"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testInvalidWrapper"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleObject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleArrayScalars"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleObjectScalars"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleArrayEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleObjectEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedObject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedArrayWithArrayKeyHashmark"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedObjectWithArrayKeyHashmark"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedArrayEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedObjectEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedArrayWithArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedObjectWithArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testMixedCryptoWrappersDecryptArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testMixedCryptoWrappersDecryptObject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptEmptyArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptEmptyObject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorDecodedJSONObject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorLegacyNoMCrypt"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorLegacyNoMCryptNoRequire"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorLegacy"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorLegacyFail"/>
+      </line>
+      <line nr="32">
+        <covered by="Keboola\ObjectEncryptor\Tests\BaseWrapperTest::testEncryptor"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testFactoryLegacyComponentProject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testFactoryLegacyComponent"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testFactoryLegacyBase"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testConfigurationWrapper with data set &quot;KMS&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testConfigurationWrapper with data set &quot;AKV&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testProjectWrapper with data set &quot;KMS&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testProjectWrapper with data set &quot;AKV&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testComponentWrapper with data set &quot;KMS&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testComponentWrapper with data set &quot;AKV&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testGenericWrapper with data set &quot;KMS&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testGenericWrapper with data set &quot;AKV&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testGenericWrapperInvalidCredentials with data set #0"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testGenericWrapperInvalidCredentials with data set #1"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testConfigurationWrapperInvalidEncrypt with data set #0"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testConfigurationWrapperInvalidEncrypt with data set #1"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testConfigurationWrapperInvalidDecrypt with data set &quot;KMS&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testConfigurationWrapperInvalidDecrypt with data set &quot;AKV&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testProjectWrapperInvalidEncrypt with data set #0"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testProjectWrapperInvalidEncrypt with data set #1"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testProjectWrapperInvalidDecrypt with data set &quot;KMS&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testProjectWrapperInvalidDecrypt with data set &quot;AKV&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testComponentWrapperInvalidEncrypt with data set #0"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testComponentWrapperInvalidEncrypt with data set #1"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testComponentWrapperInvalidDecrypt with data set &quot;KMS&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testComponentWrapperInvalidDecrypt with data set &quot;AKV&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testCipherError"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testInvalidKeysLegacyEncryption"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorScalar"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorStack with data set #0"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorStack with data set #1"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorStackNoCredentials"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorInvalidService"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorUnsupportedInput with data set &quot;invalid class&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorUnsupportedInput with data set &quot;invalid class in value&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorUnsupportedInput with data set &quot;invalid class in encrypted value&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorUnsupportedInput with data set &quot;invalid class&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorUnsupportedInput with data set &quot;invalid class in value&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorUnsupportedInput with data set &quot;invalid class in encrypted value&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorInvalidCipherText with data set &quot;somewhat similar&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorInvalidCipherText with data set &quot;completely off&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorInvalidCipherText with data set &quot;somewhat similar in key&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorInvalidCipherText with data set &quot;completely off in key&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorAlreadyEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorAlreadyEncryptedWrapper"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testInvalidWrapper"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleObject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleArrayScalars"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleObjectScalars"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleArrayEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleObjectEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedObject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedArrayWithArrayKeyHashmark"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedObjectWithArrayKeyHashmark"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedArrayEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedObjectEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedArrayWithArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedObjectWithArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testMixedCryptoWrappersDecryptArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testMixedCryptoWrappersDecryptObject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptEmptyArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptEmptyObject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorDecodedJSONObject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorLegacyNoMCrypt"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorLegacyNoMCryptNoRequire"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorLegacy"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorLegacyFail"/>
+      </line>
+      <line nr="33">
+        <covered by="Keboola\ObjectEncryptor\Tests\BaseWrapperTest::testEncryptor"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testFactoryLegacyComponentProject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testFactoryLegacyComponent"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testFactoryLegacyBase"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testConfigurationWrapper with data set &quot;KMS&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testConfigurationWrapper with data set &quot;AKV&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testProjectWrapper with data set &quot;KMS&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testProjectWrapper with data set &quot;AKV&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testComponentWrapper with data set &quot;KMS&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testComponentWrapper with data set &quot;AKV&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testGenericWrapper with data set &quot;KMS&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testGenericWrapper with data set &quot;AKV&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testGenericWrapperInvalidCredentials with data set #0"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testGenericWrapperInvalidCredentials with data set #1"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testConfigurationWrapperInvalidEncrypt with data set #0"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testConfigurationWrapperInvalidEncrypt with data set #1"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testConfigurationWrapperInvalidDecrypt with data set &quot;KMS&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testConfigurationWrapperInvalidDecrypt with data set &quot;AKV&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testProjectWrapperInvalidEncrypt with data set #0"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testProjectWrapperInvalidEncrypt with data set #1"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testProjectWrapperInvalidDecrypt with data set &quot;KMS&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testProjectWrapperInvalidDecrypt with data set &quot;AKV&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testComponentWrapperInvalidEncrypt with data set #0"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testComponentWrapperInvalidEncrypt with data set #1"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testComponentWrapperInvalidDecrypt with data set &quot;KMS&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testComponentWrapperInvalidDecrypt with data set &quot;AKV&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testCipherError"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorScalar"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorStack with data set #0"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorStack with data set #1"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorStackNoCredentials"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorInvalidService"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorUnsupportedInput with data set &quot;invalid class&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorUnsupportedInput with data set &quot;invalid class in value&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorUnsupportedInput with data set &quot;invalid class in encrypted value&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorUnsupportedInput with data set &quot;invalid class&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorUnsupportedInput with data set &quot;invalid class in value&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorUnsupportedInput with data set &quot;invalid class in encrypted value&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorInvalidCipherText with data set &quot;somewhat similar&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorInvalidCipherText with data set &quot;completely off&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorInvalidCipherText with data set &quot;somewhat similar in key&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorInvalidCipherText with data set &quot;completely off in key&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorAlreadyEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorAlreadyEncryptedWrapper"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testInvalidWrapper"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleObject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleArrayScalars"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleObjectScalars"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleArrayEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleObjectEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedObject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedArrayWithArrayKeyHashmark"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedObjectWithArrayKeyHashmark"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedArrayEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedObjectEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedArrayWithArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedObjectWithArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testMixedCryptoWrappersDecryptArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testMixedCryptoWrappersDecryptObject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptEmptyArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptEmptyObject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorDecodedJSONObject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorLegacyNoMCrypt"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorLegacyNoMCryptNoRequire"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorLegacy"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorLegacyFail"/>
+      </line>
+      <line nr="35">
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testInvalidKeysLegacyEncryption"/>
+      </line>
+      <line nr="37">
+        <covered by="Keboola\ObjectEncryptor\Tests\BaseWrapperTest::testEncryptor"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testFactoryLegacyComponentProject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testFactoryLegacyComponent"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testFactoryLegacyBase"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testConfigurationWrapper with data set &quot;KMS&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testConfigurationWrapper with data set &quot;AKV&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testProjectWrapper with data set &quot;KMS&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testProjectWrapper with data set &quot;AKV&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testComponentWrapper with data set &quot;KMS&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testComponentWrapper with data set &quot;AKV&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testGenericWrapper with data set &quot;KMS&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testGenericWrapper with data set &quot;AKV&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testGenericWrapperInvalidCredentials with data set #0"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testGenericWrapperInvalidCredentials with data set #1"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testConfigurationWrapperInvalidEncrypt with data set #0"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testConfigurationWrapperInvalidEncrypt with data set #1"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testConfigurationWrapperInvalidDecrypt with data set &quot;KMS&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testConfigurationWrapperInvalidDecrypt with data set &quot;AKV&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testProjectWrapperInvalidEncrypt with data set #0"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testProjectWrapperInvalidEncrypt with data set #1"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testProjectWrapperInvalidDecrypt with data set &quot;KMS&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testProjectWrapperInvalidDecrypt with data set &quot;AKV&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testComponentWrapperInvalidEncrypt with data set #0"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testComponentWrapperInvalidEncrypt with data set #1"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testComponentWrapperInvalidDecrypt with data set &quot;KMS&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testComponentWrapperInvalidDecrypt with data set &quot;AKV&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testCipherError"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorScalar"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorStack with data set #0"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorStack with data set #1"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorStackNoCredentials"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorInvalidService"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorUnsupportedInput with data set &quot;invalid class&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorUnsupportedInput with data set &quot;invalid class in value&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorUnsupportedInput with data set &quot;invalid class in encrypted value&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorUnsupportedInput with data set &quot;invalid class&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorUnsupportedInput with data set &quot;invalid class in value&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorUnsupportedInput with data set &quot;invalid class in encrypted value&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorInvalidCipherText with data set &quot;somewhat similar&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorInvalidCipherText with data set &quot;completely off&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorInvalidCipherText with data set &quot;somewhat similar in key&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorInvalidCipherText with data set &quot;completely off in key&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorAlreadyEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorAlreadyEncryptedWrapper"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testInvalidWrapper"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleObject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleArrayScalars"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleObjectScalars"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleArrayEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleObjectEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedObject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedArrayWithArrayKeyHashmark"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedObjectWithArrayKeyHashmark"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedArrayEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedObjectEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedArrayWithArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedObjectWithArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testMixedCryptoWrappersDecryptArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testMixedCryptoWrappersDecryptObject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptEmptyArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptEmptyObject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorDecodedJSONObject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorLegacyNoMCrypt"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorLegacyNoMCryptNoRequire"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorLegacy"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorLegacyFail"/>
+      </line>
+      <line nr="44">
+        <covered by="Keboola\ObjectEncryptor\Tests\BaseWrapperTest::testEncryptor"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testFactoryLegacyComponentProject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testFactoryLegacyComponent"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testFactoryLegacyBase"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorScalar"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorInvalidCipherText with data set &quot;somewhat similar&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorInvalidCipherText with data set &quot;somewhat similar in key&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorAlreadyEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleObject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleArrayScalars"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleObjectScalars"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleArrayEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleObjectEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedObject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedArrayWithArrayKeyHashmark"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedObjectWithArrayKeyHashmark"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedArrayEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedObjectEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedArrayWithArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedObjectWithArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testMixedCryptoWrappersDecryptArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testMixedCryptoWrappersDecryptObject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorDecodedJSONObject"/>
+      </line>
+      <line nr="53">
+        <covered by="Keboola\ObjectEncryptor\Tests\BaseWrapperTest::testEncryptor"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testFactoryLegacyComponentProject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testFactoryLegacyComponent"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testFactoryLegacyBase"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorScalar"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorAlreadyEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleObject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleArrayScalars"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleObjectScalars"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleArrayEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleObjectEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedObject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedArrayWithArrayKeyHashmark"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedObjectWithArrayKeyHashmark"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedArrayEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedObjectEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedArrayWithArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedObjectWithArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testMixedCryptoWrappersDecryptArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testMixedCryptoWrappersDecryptObject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorDecodedJSONObject"/>
+      </line>
+      <line nr="63">
+        <covered by="Keboola\ObjectEncryptor\Tests\BaseWrapperTest::testEncryptor"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testFactoryLegacyComponentProject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testFactoryLegacyComponent"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testFactoryLegacyBase"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorScalar"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorInvalidCipherText with data set &quot;somewhat similar&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorInvalidCipherText with data set &quot;somewhat similar in key&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorAlreadyEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleObject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleArrayScalars"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleObjectScalars"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleArrayEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleObjectEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedObject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedArrayWithArrayKeyHashmark"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedObjectWithArrayKeyHashmark"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedArrayEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedObjectEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedArrayWithArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedObjectWithArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testMixedCryptoWrappersDecryptArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testMixedCryptoWrappersDecryptObject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorDecodedJSONObject"/>
+      </line>
+      <line nr="71">
+        <covered by="Keboola\ObjectEncryptor\Tests\BaseWrapperTest::testPrefix"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testFactoryLegacyComponentProject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testFactoryLegacyComponent"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testFactoryLegacyBase"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testConfigurationWrapper with data set &quot;KMS&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testConfigurationWrapper with data set &quot;AKV&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testProjectWrapper with data set &quot;KMS&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testProjectWrapper with data set &quot;AKV&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testComponentWrapper with data set &quot;KMS&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testComponentWrapper with data set &quot;AKV&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testGenericWrapper with data set &quot;KMS&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testGenericWrapper with data set &quot;AKV&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testGenericWrapperInvalidCredentials with data set #0"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testGenericWrapperInvalidCredentials with data set #1"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testConfigurationWrapperInvalidEncrypt with data set #0"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testConfigurationWrapperInvalidEncrypt with data set #1"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testConfigurationWrapperInvalidDecrypt with data set &quot;KMS&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testConfigurationWrapperInvalidDecrypt with data set &quot;AKV&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testProjectWrapperInvalidEncrypt with data set #0"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testProjectWrapperInvalidEncrypt with data set #1"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testProjectWrapperInvalidDecrypt with data set &quot;KMS&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testProjectWrapperInvalidDecrypt with data set &quot;AKV&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testComponentWrapperInvalidEncrypt with data set #0"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testComponentWrapperInvalidEncrypt with data set #1"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testComponentWrapperInvalidDecrypt with data set &quot;KMS&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testComponentWrapperInvalidDecrypt with data set &quot;AKV&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testCipherError"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorScalar"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorStack with data set #0"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorStack with data set #1"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorStackNoCredentials"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorInvalidService"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorUnsupportedInput with data set &quot;invalid class&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorUnsupportedInput with data set &quot;invalid class in value&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorUnsupportedInput with data set &quot;invalid class in encrypted value&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorUnsupportedInput with data set &quot;invalid class&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorUnsupportedInput with data set &quot;invalid class in value&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorUnsupportedInput with data set &quot;invalid class in encrypted value&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorInvalidCipherText with data set &quot;somewhat similar&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorInvalidCipherText with data set &quot;completely off&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorInvalidCipherText with data set &quot;somewhat similar in key&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorInvalidCipherText with data set &quot;completely off in key&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorAlreadyEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorAlreadyEncryptedWrapper"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testInvalidWrapper"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleObject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleArrayScalars"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleObjectScalars"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleArrayEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleObjectEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedObject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedArrayWithArrayKeyHashmark"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedObjectWithArrayKeyHashmark"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedArrayEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedObjectEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedArrayWithArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedObjectWithArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testMixedCryptoWrappersDecryptArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testMixedCryptoWrappersDecryptObject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptEmptyArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptEmptyObject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorDecodedJSONObject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorLegacyNoMCrypt"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorLegacyNoMCryptNoRequire"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorLegacy"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorLegacyFail"/>
+      </line>
+    </coverage>
+    <source>
+      <line no="1">
+        <token name="T_OPEN_TAG">&lt;?php</token>
+      </line>
+      <line no="2"/>
+      <line no="3">
+        <token name="T_NAMESPACE">namespace</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">Keboola</token>
+        <token name="T_NS_SEPARATOR">\</token>
+        <token name="T_STRING">ObjectEncryptor</token>
+        <token name="T_NS_SEPARATOR">\</token>
+        <token name="T_STRING">Legacy</token>
+        <token name="T_NS_SEPARATOR">\</token>
+        <token name="T_STRING">Wrapper</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="4"/>
+      <line no="5">
+        <token name="T_USE">use</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">Keboola</token>
+        <token name="T_NS_SEPARATOR">\</token>
+        <token name="T_STRING">ObjectEncryptor</token>
+        <token name="T_NS_SEPARATOR">\</token>
+        <token name="T_STRING">Exception</token>
+        <token name="T_NS_SEPARATOR">\</token>
+        <token name="T_STRING">ApplicationException</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="6">
+        <token name="T_USE">use</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">Keboola</token>
+        <token name="T_NS_SEPARATOR">\</token>
+        <token name="T_STRING">ObjectEncryptor</token>
+        <token name="T_NS_SEPARATOR">\</token>
+        <token name="T_STRING">Wrapper</token>
+        <token name="T_NS_SEPARATOR">\</token>
+        <token name="T_STRING">CryptoWrapperInterface</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="7"/>
+      <line no="8">
+        <token name="T_CLASS">class</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">BaseWrapper</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_IMPLEMENTS">implements</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">CryptoWrapperInterface</token>
+      </line>
+      <line no="9">
+        <token name="T_OPEN_CURLY">{</token>
+      </line>
+      <line no="10">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_DOC_COMMENT">/** @var \Crypto */</token>
+      </line>
+      <line no="11">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_PRIVATE">private</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$encryptor</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="12"/>
+      <line no="13">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_DOC_COMMENT">/**</token>
+      </line>
+      <line no="14">
+        <token name="T_DOC_COMMENT">     * @var string</token>
+      </line>
+      <line no="15">
+        <token name="T_DOC_COMMENT">     */</token>
+      </line>
+      <line no="16">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_PRIVATE">private</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$key</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="17"/>
+      <line no="18">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_DOC_COMMENT">/**</token>
+      </line>
+      <line no="19">
+        <token name="T_DOC_COMMENT">     * BaseWrapper constructor.</token>
+      </line>
+      <line no="20">
+        <token name="T_DOC_COMMENT">     */</token>
+      </line>
+      <line no="21">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_PUBLIC">public</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_FUNCTION">function</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">__construct</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+      </line>
+      <line no="22">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_OPEN_CURLY">{</token>
+      </line>
+      <line no="23">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">encryptor</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EQUAL">=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_NEW">new</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_NS_SEPARATOR">\</token>
+        <token name="T_STRING">Crypto</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="24">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_CLOSE_CURLY">}</token>
+      </line>
+      <line no="25"/>
+      <line no="26">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_DOC_COMMENT">/**</token>
+      </line>
+      <line no="27">
+        <token name="T_DOC_COMMENT">     * @param string $key</token>
+      </line>
+      <line no="28">
+        <token name="T_DOC_COMMENT">     * @throws ApplicationException</token>
+      </line>
+      <line no="29">
+        <token name="T_DOC_COMMENT">     */</token>
+      </line>
+      <line no="30">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_PUBLIC">public</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_FUNCTION">function</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">setKey</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$key</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+      </line>
+      <line no="31">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_OPEN_CURLY">{</token>
+      </line>
+      <line no="32">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_IF">if</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_STRING">strlen</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$key</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_IS_GREATER_OR_EQUAL">&gt;=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_LNUMBER">16</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_OPEN_CURLY">{</token>
+      </line>
+      <line no="33">
+        <token name="T_WHITESPACE">            </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">key</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EQUAL">=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">substr</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$key</token>
+        <token name="T_COMMA">,</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_LNUMBER">0</token>
+        <token name="T_COMMA">,</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_LNUMBER">16</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="34">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_CLOSE_CURLY">}</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_ELSE">else</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_OPEN_CURLY">{</token>
+      </line>
+      <line no="35">
+        <token name="T_WHITESPACE">            </token>
+        <token name="T_THROW">throw</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_NEW">new</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">ApplicationException</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">"Encryption key too short. Minimum is 16 bytes."</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="36">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_CLOSE_CURLY">}</token>
+      </line>
+      <line no="37">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_CLOSE_CURLY">}</token>
+      </line>
+      <line no="38"/>
+      <line no="39">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_DOC_COMMENT">/**</token>
+      </line>
+      <line no="40">
+        <token name="T_DOC_COMMENT">     * @return string</token>
+      </line>
+      <line no="41">
+        <token name="T_DOC_COMMENT">     */</token>
+      </line>
+      <line no="42">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_PROTECTED">protected</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_FUNCTION">function</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">getKey</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+      </line>
+      <line no="43">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_OPEN_CURLY">{</token>
+      </line>
+      <line no="44">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_RETURN">return</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">key</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="45">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_CLOSE_CURLY">}</token>
+      </line>
+      <line no="46"/>
+      <line no="47">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_DOC_COMMENT">/**</token>
+      </line>
+      <line no="48">
+        <token name="T_DOC_COMMENT">     * @inheritdoc</token>
+      </line>
+      <line no="49">
+        <token name="T_DOC_COMMENT">     * @throws \CannotPerformOperationException</token>
+      </line>
+      <line no="50">
+        <token name="T_DOC_COMMENT">     */</token>
+      </line>
+      <line no="51">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_PUBLIC">public</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_FUNCTION">function</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">encrypt</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$data</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+      </line>
+      <line no="52">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_OPEN_CURLY">{</token>
+      </line>
+      <line no="53">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_RETURN">return</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">base64_encode</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">encryptor</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">Encrypt</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$data</token>
+        <token name="T_COMMA">,</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">getKey</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="54">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_CLOSE_CURLY">}</token>
+      </line>
+      <line no="55"/>
+      <line no="56">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_DOC_COMMENT">/**</token>
+      </line>
+      <line no="57">
+        <token name="T_DOC_COMMENT">     * @inheritdoc</token>
+      </line>
+      <line no="58">
+        <token name="T_DOC_COMMENT">     * @throws \CannotPerformOperationException</token>
+      </line>
+      <line no="59">
+        <token name="T_DOC_COMMENT">     * @throws \InvalidCiphertextException</token>
+      </line>
+      <line no="60">
+        <token name="T_DOC_COMMENT">     */</token>
+      </line>
+      <line no="61">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_PUBLIC">public</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_FUNCTION">function</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">decrypt</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$encryptedData</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+      </line>
+      <line no="62">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_OPEN_CURLY">{</token>
+      </line>
+      <line no="63">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_RETURN">return</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">encryptor</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">Decrypt</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_STRING">base64_decode</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$encryptedData</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_COMMA">,</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">getKey</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="64">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_CLOSE_CURLY">}</token>
+      </line>
+      <line no="65"/>
+      <line no="66">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_DOC_COMMENT">/**</token>
+      </line>
+      <line no="67">
+        <token name="T_DOC_COMMENT">     * @inheritdoc</token>
+      </line>
+      <line no="68">
+        <token name="T_DOC_COMMENT">     */</token>
+      </line>
+      <line no="69">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_PUBLIC">public</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_FUNCTION">function</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">getPrefix</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+      </line>
+      <line no="70">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_OPEN_CURLY">{</token>
+      </line>
+      <line no="71">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_RETURN">return</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">'KBC::Encrypted=='</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="72">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_CLOSE_CURLY">}</token>
+      </line>
+      <line no="73">
+        <token name="T_CLOSE_CURLY">}</token>
+      </line>
+      <line no="74"/>
+    </source>
+  </file>
+</phpunit>

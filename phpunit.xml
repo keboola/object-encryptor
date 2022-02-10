@@ -8,7 +8,7 @@
          convertDeprecationsToExceptions="false"
          processIsolation="false"
          stopOnFailure="false"
-         bootstrap="bootstrap.php">
+         bootstrap="tests/bootstrap.php">
 
     <testsuite name="Test Suite">
         <directory>tests</directory>

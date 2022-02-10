@@ -1,0 +1,532 @@
+<?xml version="1.0"?>
+<phpunit xmlns="https://schema.phpunit.de/coverage/1.0">
+  <file name="ComponentProjectWrapper.php" path="/Legacy/Wrapper">
+    <totals>
+      <lines total="54" comments="16" code="38" executable="11" executed="9" percent="81.82"/>
+      <methods count="4" tested="3" percent="75.00"/>
+      <functions count="0" tested="0" percent="0"/>
+      <classes count="1" tested="0" percent="0.00"/>
+      <traits count="0" tested="0" percent="0"/>
+    </totals>
+    <class name="Keboola\ObjectEncryptor\Legacy\Wrapper\ComponentProjectWrapper" start="7" executable="11" executed="9" crap="6.22">
+      <package full="" name="" sub="" category=""/>
+      <namespace name="Keboola\ObjectEncryptor\Legacy\Wrapper"/>
+      <method name="getProjectId" signature="getProjectId()" start="17" end="20" crap="1" executable="1" executed="1" coverage="100"/>
+      <method name="setProjectId" signature="setProjectId($projectId)" start="25" end="28" crap="1" executable="2" executed="2" coverage="100"/>
+      <method name="getKey" signature="getKey()" start="34" end="45" crap="3.21" executable="7" executed="5" coverage="71.428571428571"/>
+      <method name="getPrefix" signature="getPrefix()" start="50" end="53" crap="1" executable="1" executed="1" coverage="100"/>
+    </class>
+    <coverage>
+      <line nr="19">
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testFactoryLegacyComponentProject"/>
+      </line>
+      <line nr="27">
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testFactoryLegacyComponentProject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testFactoryLegacyComponent"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testFactoryLegacyBase"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testConfigurationWrapper with data set &quot;KMS&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testConfigurationWrapper with data set &quot;AKV&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testProjectWrapper with data set &quot;KMS&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testProjectWrapper with data set &quot;AKV&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorScalar"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorStack with data set #0"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorStack with data set #1"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorStackNoCredentials"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorInvalidService"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorUnsupportedInput with data set &quot;invalid class&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorUnsupportedInput with data set &quot;invalid class in value&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorUnsupportedInput with data set &quot;invalid class in encrypted value&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorUnsupportedInput with data set &quot;invalid class&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorUnsupportedInput with data set &quot;invalid class in value&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorUnsupportedInput with data set &quot;invalid class in encrypted value&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorInvalidCipherText with data set &quot;somewhat similar&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorInvalidCipherText with data set &quot;completely off&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorInvalidCipherText with data set &quot;somewhat similar in key&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorInvalidCipherText with data set &quot;completely off in key&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorAlreadyEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorAlreadyEncryptedWrapper"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testInvalidWrapper"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleObject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleArrayScalars"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleObjectScalars"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleArrayEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleObjectEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedObject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedArrayWithArrayKeyHashmark"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedObjectWithArrayKeyHashmark"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedArrayEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedObjectEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedArrayWithArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedObjectWithArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testMixedCryptoWrappersDecryptArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testMixedCryptoWrappersDecryptObject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptEmptyArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptEmptyObject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorDecodedJSONObject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorLegacyNoMCrypt"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorLegacyNoMCryptNoRequire"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorLegacy"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorLegacyFail"/>
+      </line>
+      <line nr="28">
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testFactoryLegacyComponentProject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testFactoryLegacyComponent"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testFactoryLegacyBase"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testConfigurationWrapper with data set &quot;KMS&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testConfigurationWrapper with data set &quot;AKV&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testProjectWrapper with data set &quot;KMS&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testProjectWrapper with data set &quot;AKV&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorScalar"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorStack with data set #0"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorStack with data set #1"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorStackNoCredentials"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorInvalidService"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorUnsupportedInput with data set &quot;invalid class&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorUnsupportedInput with data set &quot;invalid class in value&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorUnsupportedInput with data set &quot;invalid class in encrypted value&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorUnsupportedInput with data set &quot;invalid class&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorUnsupportedInput with data set &quot;invalid class in value&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorUnsupportedInput with data set &quot;invalid class in encrypted value&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorInvalidCipherText with data set &quot;somewhat similar&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorInvalidCipherText with data set &quot;completely off&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorInvalidCipherText with data set &quot;somewhat similar in key&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorInvalidCipherText with data set &quot;completely off in key&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorAlreadyEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorAlreadyEncryptedWrapper"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testInvalidWrapper"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleObject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleArrayScalars"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleObjectScalars"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleArrayEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleObjectEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedObject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedArrayWithArrayKeyHashmark"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedObjectWithArrayKeyHashmark"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedArrayEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedObjectEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedArrayWithArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedObjectWithArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testMixedCryptoWrappersDecryptArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testMixedCryptoWrappersDecryptObject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptEmptyArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptEmptyObject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorDecodedJSONObject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorLegacyNoMCrypt"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorLegacyNoMCryptNoRequire"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorLegacy"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorLegacyFail"/>
+      </line>
+      <line nr="36">
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testFactoryLegacyComponentProject"/>
+      </line>
+      <line nr="39">
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testFactoryLegacyComponentProject"/>
+      </line>
+      <line nr="42">
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testFactoryLegacyComponentProject"/>
+      </line>
+      <line nr="43">
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testFactoryLegacyComponentProject"/>
+      </line>
+      <line nr="44">
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testFactoryLegacyComponentProject"/>
+      </line>
+      <line nr="52">
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testFactoryLegacyComponentProject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testFactoryLegacyComponent"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testFactoryLegacyBase"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testConfigurationWrapper with data set &quot;KMS&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testConfigurationWrapper with data set &quot;AKV&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testProjectWrapper with data set &quot;KMS&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorFactoryTest::testProjectWrapper with data set &quot;AKV&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorScalar"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorStack with data set #0"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorStack with data set #1"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorStackNoCredentials"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorInvalidService"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorUnsupportedInput with data set &quot;invalid class&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorUnsupportedInput with data set &quot;invalid class in value&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorUnsupportedInput with data set &quot;invalid class in encrypted value&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorUnsupportedInput with data set &quot;invalid class&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorUnsupportedInput with data set &quot;invalid class in value&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorUnsupportedInput with data set &quot;invalid class in encrypted value&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorInvalidCipherText with data set &quot;somewhat similar&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorInvalidCipherText with data set &quot;completely off&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorInvalidCipherText with data set &quot;somewhat similar in key&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testDecryptorInvalidCipherText with data set &quot;completely off in key&quot;"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorAlreadyEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorAlreadyEncryptedWrapper"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testInvalidWrapper"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleObject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleArrayScalars"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleObjectScalars"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleArrayEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorSimpleObjectEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedObject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedArrayWithArrayKeyHashmark"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedObjectWithArrayKeyHashmark"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedArrayEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedObjectEncrypted"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedArrayWithArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorNestedObjectWithArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testMixedCryptoWrappersDecryptArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testMixedCryptoWrappersDecryptObject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptEmptyArray"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptEmptyObject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorDecodedJSONObject"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorLegacyNoMCrypt"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorLegacyNoMCryptNoRequire"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorLegacy"/>
+        <covered by="Keboola\ObjectEncryptor\Tests\ObjectEncryptorTest::testEncryptorLegacyFail"/>
+      </line>
+    </coverage>
+    <source>
+      <line no="1">
+        <token name="T_OPEN_TAG">&lt;?php</token>
+      </line>
+      <line no="2"/>
+      <line no="3">
+        <token name="T_NAMESPACE">namespace</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">Keboola</token>
+        <token name="T_NS_SEPARATOR">\</token>
+        <token name="T_STRING">ObjectEncryptor</token>
+        <token name="T_NS_SEPARATOR">\</token>
+        <token name="T_STRING">Legacy</token>
+        <token name="T_NS_SEPARATOR">\</token>
+        <token name="T_STRING">Wrapper</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="4"/>
+      <line no="5">
+        <token name="T_USE">use</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">Keboola</token>
+        <token name="T_NS_SEPARATOR">\</token>
+        <token name="T_STRING">ObjectEncryptor</token>
+        <token name="T_NS_SEPARATOR">\</token>
+        <token name="T_STRING">Exception</token>
+        <token name="T_NS_SEPARATOR">\</token>
+        <token name="T_STRING">ApplicationException</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="6"/>
+      <line no="7">
+        <token name="T_CLASS">class</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">ComponentProjectWrapper</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EXTENDS">extends</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">ComponentWrapper</token>
+      </line>
+      <line no="8">
+        <token name="T_OPEN_CURLY">{</token>
+      </line>
+      <line no="9">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_DOC_COMMENT">/**</token>
+      </line>
+      <line no="10">
+        <token name="T_DOC_COMMENT">     * @var string</token>
+      </line>
+      <line no="11">
+        <token name="T_DOC_COMMENT">     */</token>
+      </line>
+      <line no="12">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_PRIVATE">private</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$projectId</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="13"/>
+      <line no="14">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_DOC_COMMENT">/**</token>
+      </line>
+      <line no="15">
+        <token name="T_DOC_COMMENT">     * @return string</token>
+      </line>
+      <line no="16">
+        <token name="T_DOC_COMMENT">     */</token>
+      </line>
+      <line no="17">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_PUBLIC">public</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_FUNCTION">function</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">getProjectId</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+      </line>
+      <line no="18">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_OPEN_CURLY">{</token>
+      </line>
+      <line no="19">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_RETURN">return</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">projectId</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="20">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_CLOSE_CURLY">}</token>
+      </line>
+      <line no="21"/>
+      <line no="22">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_DOC_COMMENT">/**</token>
+      </line>
+      <line no="23">
+        <token name="T_DOC_COMMENT">     * @param string $projectId</token>
+      </line>
+      <line no="24">
+        <token name="T_DOC_COMMENT">     */</token>
+      </line>
+      <line no="25">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_PUBLIC">public</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_FUNCTION">function</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">setProjectId</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$projectId</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+      </line>
+      <line no="26">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_OPEN_CURLY">{</token>
+      </line>
+      <line no="27">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">projectId</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EQUAL">=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$projectId</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="28">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_CLOSE_CURLY">}</token>
+      </line>
+      <line no="29"/>
+      <line no="30">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_DOC_COMMENT">/**</token>
+      </line>
+      <line no="31">
+        <token name="T_DOC_COMMENT">     * @return string</token>
+      </line>
+      <line no="32">
+        <token name="T_DOC_COMMENT">     * @throws ApplicationException</token>
+      </line>
+      <line no="33">
+        <token name="T_DOC_COMMENT">     */</token>
+      </line>
+      <line no="34">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_PROTECTED">protected</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_FUNCTION">function</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">getKey</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+      </line>
+      <line no="35">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_OPEN_CURLY">{</token>
+      </line>
+      <line no="36">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_IF">if</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_EXCLAMATION_MARK">!</token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">getComponentId</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_OPEN_CURLY">{</token>
+      </line>
+      <line no="37">
+        <token name="T_WHITESPACE">            </token>
+        <token name="T_THROW">throw</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_NEW">new</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">ApplicationException</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">"ComponentId not set"</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="38">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_CLOSE_CURLY">}</token>
+      </line>
+      <line no="39">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_IF">if</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_EXCLAMATION_MARK">!</token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">getProjectId</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_OPEN_CURLY">{</token>
+      </line>
+      <line no="40">
+        <token name="T_WHITESPACE">            </token>
+        <token name="T_THROW">throw</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_NEW">new</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">ApplicationException</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">"ProjectId not set"</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="41">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_CLOSE_CURLY">}</token>
+      </line>
+      <line no="42">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_VARIABLE">$fullKey</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EQUAL">=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">getComponentId</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOT">.</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">"-"</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOT">.</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">getProjectId</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOT">.</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">"-"</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_DOT">.</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">parent</token>
+        <token name="T_DOUBLE_COLON">::</token>
+        <token name="T_STRING">getKey</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="43">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_VARIABLE">$key</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EQUAL">=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">substr</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_STRING">hash</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">'sha256'</token>
+        <token name="T_COMMA">,</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$fullKey</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_COMMA">,</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_LNUMBER">0</token>
+        <token name="T_COMMA">,</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_LNUMBER">16</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="44">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_RETURN">return</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$key</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="45">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_CLOSE_CURLY">}</token>
+      </line>
+      <line no="46"/>
+      <line no="47">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_DOC_COMMENT">/**</token>
+      </line>
+      <line no="48">
+        <token name="T_DOC_COMMENT">     * @inheritdoc</token>
+      </line>
+      <line no="49">
+        <token name="T_DOC_COMMENT">     */</token>
+      </line>
+      <line no="50">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_PUBLIC">public</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_FUNCTION">function</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_STRING">getPrefix</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+      </line>
+      <line no="51">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_OPEN_CURLY">{</token>
+      </line>
+      <line no="52">
+        <token name="T_WHITESPACE">        </token>
+        <token name="T_RETURN">return</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">"KBC::ComponentProjectEncrypted=="</token>
+        <token name="T_SEMICOLON">;</token>
+      </line>
+      <line no="53">
+        <token name="T_WHITESPACE">    </token>
+        <token name="T_CLOSE_CURLY">}</token>
+      </line>
+      <line no="54">
+        <token name="T_CLOSE_CURLY">}</token>
+      </line>
+      <line no="55"/>
+    </source>
+  </file>
+</phpunit>
