@@ -945,19 +945,19 @@ class ObjectEncryptorTest extends TestCase
                 getenv('TEST_AWS_KMS_KEY_ID'),
                 getenv('TEST_KEY_VAULT_URL'),
                 'Component',
-                ComponentKMSWrapper::class,
+                ComponentAKVWrapper::class,
             ],
             'kms-akv-project' => [
                 getenv('TEST_AWS_KMS_KEY_ID'),
                 getenv('TEST_KEY_VAULT_URL'),
                 'Project',
-                ProjectKMSWrapper::class,
+                ProjectAKVWrapper::class,
             ],
             'kms-akv-configuration' => [
                 getenv('TEST_AWS_KMS_KEY_ID'),
                 getenv('TEST_KEY_VAULT_URL'),
                 'Configuration',
-                ConfigurationKMSWrapper::class,
+                ConfigurationAKVWrapper::class,
             ],
             'kms-component' => [
                 getenv('TEST_AWS_KMS_KEY_ID'),

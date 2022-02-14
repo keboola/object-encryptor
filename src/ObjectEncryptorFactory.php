@@ -275,12 +275,12 @@ class ObjectEncryptorFactory
             $this->addLegacyWrappers($encryptor);
         }
 
-        if ($this->kmsKeyRegion && $this->kmsKeyId) {
-            $this->addKMSWrappers($encryptor);
-        }
-
         if ($this->akvUrl) {
             $this->addAKVWrappers($encryptor);
+        }
+
+        if ($this->kmsKeyRegion && $this->kmsKeyId) {
+            $this->addKMSWrappers($encryptor);
         }
         return $encryptor;
     }
