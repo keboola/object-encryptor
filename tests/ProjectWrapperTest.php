@@ -14,8 +14,8 @@ class ProjectWrapperTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-        putenv('AWS_ACCESS_KEY_ID=' . AWS_ACCESS_KEY_ID);
-        putenv('AWS_SECRET_ACCESS_KEY='. AWS_SECRET_ACCESS_KEY);
+        putenv('AWS_ACCESS_KEY_ID=' . getenv('TEST_AWS_ACCESS_KEY_ID'));
+        putenv('AWS_SECRET_ACCESS_KEY='. getenv('TEST_AWS_SECRET_ACCESS_KEY'));
         putenv('AZURE_TENANT_ID=' . getenv('TEST_TENANT_ID'));
         putenv('AZURE_CLIENT_ID=' . getenv('TEST_CLIENT_ID'));
         putenv('AZURE_CLIENT_SECRET=' . getenv('TEST_CLIENT_SECRET'));
@@ -27,8 +27,8 @@ class ProjectWrapperTest extends TestCase
     public function wrapperProvider()
     {
         $projectWrapperKMS = new ProjectKMSWrapper();
-        $projectWrapperKMS->setKMSRegion(AWS_DEFAULT_REGION);
-        $projectWrapperKMS->setKMSKeyId(KMS_TEST_KEY);
+        $projectWrapperKMS->setKMSRegion(getenv('TEST_AWS_REGION'));
+        $projectWrapperKMS->setKMSKeyId(getenv('TEST_AWS_KMS_KEY_ID'));
 
         $projectWrapperAKV = new ProjectAKVWrapper();
         $projectWrapperAKV->setKeyVaultUrl(getenv('TEST_KEY_VAULT_URL'));

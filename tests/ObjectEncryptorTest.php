@@ -34,13 +34,13 @@ class ObjectEncryptorTest extends TestCase
         parent::setUp();
         $legacyKey = '1234567890123456';
         $this->aesKey = '123456789012345678901234567890ab';
-        $this->factory = new ObjectEncryptorFactory(KMS_TEST_KEY, AWS_DEFAULT_REGION, $legacyKey, $this->aesKey, getenv('TEST_KEY_VAULT_URL'));
+        $this->factory = new ObjectEncryptorFactory(getenv('TEST_AWS_KMS_KEY_ID'), getenv('TEST_AWS_REGION'), $legacyKey, $this->aesKey, getenv('TEST_KEY_VAULT_URL'));
         $this->factory->setStackId('my-stack');
         $this->factory->setComponentId('dummy-component');
         $this->factory->setConfigurationId('123456');
         $this->factory->setProjectId('123');
-        putenv('AWS_ACCESS_KEY_ID=' . AWS_ACCESS_KEY_ID);
-        putenv('AWS_SECRET_ACCESS_KEY='. AWS_SECRET_ACCESS_KEY);
+        putenv('AWS_ACCESS_KEY_ID=' . getenv('TEST_AWS_ACCESS_KEY_ID'));
+        putenv('AWS_SECRET_ACCESS_KEY='. getenv('TEST_AWS_SECRET_ACCESS_KEY'));
         putenv('AZURE_TENANT_ID=' . getenv('TEST_TENANT_ID'));
         putenv('AZURE_CLIENT_ID=' . getenv('TEST_CLIENT_ID'));
         putenv('AZURE_CLIENT_SECRET=' . getenv('TEST_CLIENT_SECRET'));
@@ -928,7 +928,7 @@ class ObjectEncryptorTest extends TestCase
      */
     public function testGetRegisteredWrapperEncryptor($kmsKey, $keyVaultUrl, $classifier, $expectedClass)
     {
-        $factory = new ObjectEncryptorFactory($kmsKey, AWS_DEFAULT_REGION, '', $this->aesKey, $keyVaultUrl);
+        $factory = new ObjectEncryptorFactory($kmsKey, getenv('TEST_AWS_REGION'), '', $this->aesKey, $keyVaultUrl);
         $factory->setStackId('my-stack');
         $factory->setComponentId('dummy-component');
         $factory->setConfigurationId('123456');
@@ -942,37 +942,37 @@ class ObjectEncryptorTest extends TestCase
     {
         return [
             'kms-akv-component' => [
-                KMS_TEST_KEY,
+                getenv('TEST_AWS_KMS_KEY_ID'),
                 getenv('TEST_KEY_VAULT_URL'),
                 'Component',
                 ComponentKMSWrapper::class,
             ],
             'kms-akv-project' => [
-                KMS_TEST_KEY,
+                getenv('TEST_AWS_KMS_KEY_ID'),
                 getenv('TEST_KEY_VAULT_URL'),
                 'Project',
                 ProjectKMSWrapper::class,
             ],
             'kms-akv-configuration' => [
-                KMS_TEST_KEY,
+                getenv('TEST_AWS_KMS_KEY_ID'),
                 getenv('TEST_KEY_VAULT_URL'),
                 'Configuration',
                 ConfigurationKMSWrapper::class,
             ],
             'kms-component' => [
-                KMS_TEST_KEY,
+                getenv('TEST_AWS_KMS_KEY_ID'),
                 '',
                 'Component',
                 ComponentKMSWrapper::class,
             ],
             'kms-project' => [
-                KMS_TEST_KEY,
+                getenv('TEST_AWS_KMS_KEY_ID'),
                 '',
                 'Project',
                 ProjectKMSWrapper::class,
             ],
             'kms-configuration' => [
-                KMS_TEST_KEY,
+                getenv('TEST_AWS_KMS_KEY_ID'),
                 '',
                 'Configuration',
                 ConfigurationKMSWrapper::class,
@@ -1006,7 +1006,7 @@ class ObjectEncryptorTest extends TestCase
      */
     public function testGetRegisteredWrapperFailure($classifier, $expectedMessage)
     {
-        $factory = new ObjectEncryptorFactory(KMS_TEST_KEY, AWS_DEFAULT_REGION, '', $this->aesKey, getenv('TEST_KEY_VAULT_URL'));
+        $factory = new ObjectEncryptorFactory(getenv('TEST_AWS_KMS_KEY_ID'), getenv('TEST_AWS_REGION'), '', $this->aesKey, getenv('TEST_KEY_VAULT_URL'));
         $factory->setStackId('my-stack');
         $encryptor = $factory->getEncryptor();
         $method = 'getRegistered' . $classifier . 'WrapperClass';
