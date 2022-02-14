@@ -4,3 +4,4 @@
 /config.php
 /set-env.sh
 /.env.local
+/build/logs/
