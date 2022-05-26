@@ -73,7 +73,9 @@ class GenericKMSWrapper implements CryptoWrapperInterface
         return new KmsClient([
             'region' => $this->region,
             'version' => '2014-11-01',
-            'retries' => 5
+            'retries' => 5,
+            'connect_timeout' => 10,
+            'timeout' => 120,
         ]);
     }
 
