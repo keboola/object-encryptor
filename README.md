@@ -82,3 +82,7 @@ terraform -chdir=./provisioning/local apply
 
 docker-compose run --rm tests
 ```
+
+## License
+
+MIT licensed, see [LICENSE](./LICENSE) file.
