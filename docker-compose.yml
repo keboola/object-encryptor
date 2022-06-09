@@ -4,7 +4,7 @@ services:
   tests: &tests
     build: 
       context: .
-      dockerfile: Dockerfile74
+      dockerfile: Dockerfile
     environment:
       - TEST_TENANT_ID
       - TEST_CLIENT_ID
@@ -16,17 +16,11 @@ services:
       - TEST_AWS_KMS_KEY_ID
     command: ["composer", "ci"]
 
-  tests56:
+  ci:
     <<: *tests
     build: 
       context: .
-      dockerfile: Dockerfile56
-
-  tests74:
-    <<: *tests
-    build: 
-      context: .
-      dockerfile: Dockerfile74
+      dockerfile: Dockerfile
     command: ["composer", "ci"]
     volumes:
       - ./build/logs/:/code/build/logs/

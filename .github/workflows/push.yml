@@ -21,5 +21,4 @@ jobs:
           docker-compose build
       - name: Run tests
         run: |
-          docker-compose run tests56
-          docker-compose run tests74
+          docker-compose run ci
