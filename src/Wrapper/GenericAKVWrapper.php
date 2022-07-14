@@ -23,11 +23,11 @@ use Throwable;
 class GenericAKVWrapper implements CryptoWrapperInterface
 {
     // internal indexes in cipher structures
-    const METADATA_INDEX = 0;
-    const KEY_INDEX = 1;
-    const PAYLOAD_INDEX = 2;
-    const SECRET_NAME = 3;
-    const SECRET_VERSION = 4;
+    private const METADATA_INDEX = 0;
+    private const KEY_INDEX = 1;
+    private const PAYLOAD_INDEX = 2;
+    private const SECRET_NAME = 3;
+    private const SECRET_VERSION = 4;
 
     private array $metadata = [];
     private string $keyVaultURL;
@@ -117,7 +117,7 @@ class GenericAKVWrapper implements CryptoWrapperInterface
         try {
             return @unserialize(gzuncompress(base64_decode($data)));
         } catch (Throwable $e) {
-            throw new UserException("Deciphering failed.", 0, $e);
+            throw new UserException('Deciphering failed.', 0, $e);
         }
     }
 
@@ -134,7 +134,7 @@ class GenericAKVWrapper implements CryptoWrapperInterface
             $key = Key::createNewRandomKey();
             $context = $this->encode([
                 self::METADATA_INDEX => $this->metadata,
-                self::KEY_INDEX => $key->saveToAsciiSafeString()
+                self::KEY_INDEX => $key->saveToAsciiSafeString(),
             ]);
             $secret = $this->getRetryProxy()->call(function () use ($context) {
                 return $this->getClient()->setSecret(

@@ -106,14 +106,14 @@ class GenericKMSWrapper implements CryptoWrapperInterface
                 $this->metadataCache = $this->metadata;
             }
             if (empty($this->keyCache['Plaintext']) || empty($this->keyCache['CiphertextBlob'])) {
-                throw new ApplicationException("Invalid KMS response.");
+                throw new ApplicationException('Invalid KMS response.');
             }
             $plainKey = $this->keyCache['Plaintext'];
             $encryptedKey = $this->keyCache['CiphertextBlob'];
             $safeKey = Encoding::saveBytesToChecksummedAsciiSafeString(Key::KEY_CURRENT_VERSION, $plainKey);
             return ['kms' => $encryptedKey, 'local' => Key::loadFromAsciiSafeString($safeKey)];
         } catch (Throwable $e) {
-            throw new ApplicationException("Failed to obtain encryption key.",  $e->getCode(), $e);
+            throw new ApplicationException('Failed to obtain encryption key.', $e->getCode(), $e);
         }
     }
 
@@ -166,12 +166,12 @@ class GenericKMSWrapper implements CryptoWrapperInterface
         }
         try {
             $key = $this->getEncryptKey();
-            $payload = Crypto::encrypt((string)$data, $key['local'], true);
+            $payload = Crypto::encrypt((string) $data, $key['local'], true);
             $resultBinary = [$payload, $key['kms']];
             $result = base64_encode(gzcompress(serialize($resultBinary)));
             return $result;
         } catch (Throwable $e) {
-            throw new ApplicationException("Ciphering failed: " . $e->getMessage(), $e->getCode(), $e);
+            throw new ApplicationException('Ciphering failed: ' . $e->getMessage(), $e->getCode(), $e);
         }
     }
 
@@ -184,10 +184,10 @@ class GenericKMSWrapper implements CryptoWrapperInterface
         try {
             $encrypted = @unserialize(gzuncompress(base64_decode($encryptedData)));
         } catch (Throwable $e) {
-            throw new UserException("Deciphering failed.", 0, $e);
+            throw new UserException('Deciphering failed.', 0, $e);
         }
-        if (!is_array($encrypted) || count($encrypted) != 2) {
-            throw new UserException("Deciphering failed.");
+        if (!is_array($encrypted) || count($encrypted) !== 2) {
+            throw new UserException('Deciphering failed.');
         }
         try {
             $retryPolicy = new SimpleRetryPolicy(3);
@@ -202,12 +202,12 @@ class GenericKMSWrapper implements CryptoWrapperInterface
                 ]);
             });
         } catch (KmsException $e) {
-            throw new UserException("Deciphering failed.", 0, $e);
+            throw new UserException('Deciphering failed.', 0, $e);
         } catch (Throwable $e) {
-            throw new ApplicationException("Deciphering failed.", $e->getCode(), $e);
+            throw new ApplicationException('Deciphering failed.', $e->getCode(), $e);
         }
         if (empty($result['Plaintext'])) {
-            throw new ApplicationException("Invalid KMS response.");
+            throw new ApplicationException('Invalid KMS response.');
         }
         try {
             $decryptedKey = $result['Plaintext'];
@@ -216,7 +216,7 @@ class GenericKMSWrapper implements CryptoWrapperInterface
             $payload = Crypto::decrypt($encrypted[0], $key, true);
             return $payload;
         } catch (Throwable $e) {
-            throw new UserException("Deciphering failed.", 0, $e);
+            throw new UserException('Deciphering failed.', 0, $e);
         }
     }
 }

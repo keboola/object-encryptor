@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Keboola\ObjectEncryptor;
 
 use Exception;
@@ -32,7 +34,7 @@ class ObjectEncryptor
     public function encrypt($data, string $wrapperName)
     {
         foreach ($this->wrappers as $cryptoWrapper) {
-            if (get_class($cryptoWrapper) == $wrapperName) {
+            if (get_class($cryptoWrapper) === $wrapperName) {
                 $wrapper = $cryptoWrapper;
                 break;
             }
@@ -41,12 +43,12 @@ class ObjectEncryptor
             throw new ApplicationException('Invalid crypto wrapper ' . $wrapperName);
         }
         if (is_scalar($data)) {
-            return $this->encryptValue((string)$data, $wrapper);
+            return $this->encryptValue((string) $data, $wrapper);
         }
         if (is_array($data)) {
             return $this->encryptArray($data, $wrapper);
         }
-        if (is_object($data) && get_class($data) == stdClass::class) {
+        if (is_object($data) && get_class($data) === stdClass::class) {
             return $this->encryptObject($data, $wrapper);
         }
         throw new ApplicationException('Only stdClass, array and string are supported types for encryption.');
@@ -66,7 +68,7 @@ class ObjectEncryptor
         if (is_array($data)) {
             return $this->decryptArray($data);
         }
-        if (is_a($data, stdClass::class) && (get_class($data) == stdClass::class)) {
+        if (is_a($data, stdClass::class) && (get_class($data) === stdClass::class)) {
             return $this->decryptObject($data);
         }
         throw new ApplicationException('Only stdClass, array and string are supported types for decryption.');
@@ -89,7 +91,8 @@ class ObjectEncryptor
     public function getRegisteredComponentWrapperClass(): string
     {
         foreach ($this->wrappers as $wrapper) {
-            if (get_class($wrapper) === ComponentKMSWrapper::class || get_class($wrapper) === ComponentAKVWrapper::class) {
+            if (get_class($wrapper) === ComponentKMSWrapper::class ||
+                get_class($wrapper) === ComponentAKVWrapper::class) {
                 return get_class($wrapper);
             }
         }
@@ -109,7 +112,8 @@ class ObjectEncryptor
     public function getRegisteredConfigurationWrapperClass(): string
     {
         foreach ($this->wrappers as $wrapper) {
-            if (get_class($wrapper) === ConfigurationKMSWrapper::class || get_class($wrapper) === ConfigurationAKVWrapper::class) {
+            if (get_class($wrapper) === ConfigurationKMSWrapper::class ||
+                get_class($wrapper) === ConfigurationAKVWrapper::class) {
                 return get_class($wrapper);
             }
         }
@@ -123,7 +127,7 @@ class ObjectEncryptor
     {
         $selectedWrapper = null;
         foreach ($this->wrappers as $wrapper) {
-            if (substr($value, 0, mb_strlen($wrapper->getPrefix())) == $wrapper->getPrefix()) {
+            if (substr($value, 0, mb_strlen($wrapper->getPrefix())) === $wrapper->getPrefix()) {
                 $selectedWrapper = $wrapper;
             }
         }
@@ -154,14 +158,14 @@ class ObjectEncryptor
     private function encryptItem(string $key, $value, CryptoWrapperInterface $wrapper)
     {
         if (is_scalar($value) || is_null($value)) {
-            if (substr($key, 0, 1) == '#') {
-                return $this->encryptValue((string)$value, $wrapper);
+            if (substr($key, 0, 1) === '#') {
+                return $this->encryptValue((string) $value, $wrapper);
             } else {
                 return $value;
             }
         } elseif (is_array($value)) {
             return $this->encryptArray($value, $wrapper);
-        } elseif (is_object($value) && get_class($value) == stdClass::class) {
+        } elseif (is_object($value) && get_class($value) === stdClass::class) {
             return $this->encryptObject($value, $wrapper);
         } else {
             throw new ApplicationException(
@@ -209,7 +213,7 @@ class ObjectEncryptor
     private function decryptItem(string $key, $value)
     {
         if (is_scalar($value) || is_null($value)) {
-            if (substr($key, 0, 1) == '#') {
+            if (substr($key, 0, 1) === '#') {
                 try {
                     return $this->decryptValue((string)$value);
                 } catch (UserException $e) {
@@ -220,7 +224,7 @@ class ObjectEncryptor
             }
         } elseif (is_array($value)) {
             return $this->decryptArray($value);
-        } elseif (is_object($value) && get_class($value) == stdClass::class) {
+        } elseif (is_object($value) && get_class($value) === stdClass::class) {
             return $this->decryptObject($value);
         } else {
             throw new ApplicationException(

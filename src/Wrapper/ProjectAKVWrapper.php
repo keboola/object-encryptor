@@ -8,7 +8,7 @@ use Keboola\ObjectEncryptor\Exception\ApplicationException;
 
 class ProjectAKVWrapper extends ComponentAKVWrapper
 {
-    const KEY_PROJECT = 'projectId';
+    private const KEY_PROJECT = 'projectId';
 
     /**
      * @param string $projectId

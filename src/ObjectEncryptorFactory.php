@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Keboola\ObjectEncryptor;
 
 use Keboola\ObjectEncryptor\Exception\ApplicationException;
@@ -8,9 +10,9 @@ use Keboola\ObjectEncryptor\Wrapper\ComponentKMSWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ConfigurationAKVWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ConfigurationKMSWrapper;
 use Keboola\ObjectEncryptor\Wrapper\GenericAKVWrapper;
+use Keboola\ObjectEncryptor\Wrapper\GenericKMSWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ProjectAKVWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ProjectKMSWrapper;
-use Keboola\ObjectEncryptor\Wrapper\GenericKMSWrapper;
 
 class ObjectEncryptorFactory
 {
@@ -43,7 +45,7 @@ class ObjectEncryptorFactory
         if (!is_null($componentId) && !is_scalar($componentId)) {
             throw new ApplicationException('Invalid component id.');
         }
-        $this->componentId = (string)$componentId;
+        $this->componentId = (string) $componentId;
     }
 
     /**
@@ -55,7 +57,7 @@ class ObjectEncryptorFactory
         if (!is_null($configurationId) && !is_scalar($configurationId)) {
             throw new ApplicationException('Invalid configuration id.');
         }
-        $this->configurationId = (string)$configurationId;
+        $this->configurationId = (string) $configurationId;
     }
 
     /**
@@ -67,7 +69,7 @@ class ObjectEncryptorFactory
         if (!is_null($projectId) && !is_scalar($projectId)) {
             throw new ApplicationException('Invalid project id.');
         }
-        $this->projectId = (string)$projectId;
+        $this->projectId = (string) $projectId;
     }
 
     /**
@@ -79,7 +81,7 @@ class ObjectEncryptorFactory
         if (!is_null($stackId) && !is_scalar($stackId)) {
             throw new ApplicationException('Invalid stack id.');
         }
-        $this->stackId = (string)$stackId;
+        $this->stackId = (string) $stackId;
     }
 
     /**
@@ -105,29 +107,29 @@ class ObjectEncryptorFactory
     private function addKMSWrappers(ObjectEncryptor $encryptor): void
     {
         $wrapper = new GenericKMSWrapper();
-        $wrapper->setKMSKeyId((string)$this->kmsKeyId);
-        $wrapper->setKMSRegion((string)$this->kmsKeyRegion);
+        $wrapper->setKMSKeyId((string) $this->kmsKeyId);
+        $wrapper->setKMSRegion((string) $this->kmsKeyRegion);
         $encryptor->pushWrapper($wrapper);
 
         if ($this->componentId && $this->stackId) {
             $wrapper = new ComponentKMSWrapper();
-            $wrapper->setKMSKeyId((string)$this->kmsKeyId);
-            $wrapper->setKMSRegion((string)$this->kmsKeyRegion);
+            $wrapper->setKMSKeyId((string) $this->kmsKeyId);
+            $wrapper->setKMSRegion((string) $this->kmsKeyRegion);
             $wrapper->setComponentId($this->componentId);
             $wrapper->setStackId($this->stackId);
             $encryptor->pushWrapper($wrapper);
             if ($this->projectId) {
                 $wrapper = new ProjectKMSWrapper();
-                $wrapper->setKMSKeyId((string)$this->kmsKeyId);
-                $wrapper->setKMSRegion((string)$this->kmsKeyRegion);
+                $wrapper->setKMSKeyId((string) $this->kmsKeyId);
+                $wrapper->setKMSRegion((string) $this->kmsKeyRegion);
                 $wrapper->setComponentId($this->componentId);
                 $wrapper->setStackId($this->stackId);
                 $wrapper->setProjectId($this->projectId);
                 $encryptor->pushWrapper($wrapper);
                 if ($this->configurationId) {
                     $wrapper = new ConfigurationKMSWrapper();
-                    $wrapper->setKMSKeyId((string)$this->kmsKeyId);
-                    $wrapper->setKMSRegion((string)$this->kmsKeyRegion);
+                    $wrapper->setKMSKeyId((string) $this->kmsKeyId);
+                    $wrapper->setKMSRegion((string) $this->kmsKeyRegion);
                     $wrapper->setComponentId($this->componentId);
                     $wrapper->setStackId($this->stackId);
                     $wrapper->setProjectId($this->projectId);

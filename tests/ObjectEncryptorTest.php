@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Keboola\ObjectEncryptor\Tests;
 
 use Keboola\ObjectEncryptor\Exception\ApplicationException;
@@ -24,7 +26,11 @@ class ObjectEncryptorTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->factory = new ObjectEncryptorFactory(getenv('TEST_AWS_KMS_KEY_ID'), getenv('TEST_AWS_REGION'), getenv('TEST_KEY_VAULT_URL'));
+        $this->factory = new ObjectEncryptorFactory(
+            (string) getenv('TEST_AWS_KMS_KEY_ID'),
+            (string) getenv('TEST_AWS_REGION'),
+            (string) getenv('TEST_KEY_VAULT_URL')
+        );
         $this->factory->setStackId('my-stack');
         $this->factory->setComponentId('dummy-component');
         $this->factory->setConfigurationId('123456');
@@ -99,21 +105,21 @@ class ObjectEncryptorTest extends TestCase
         return [
             'invalid class' => [
                 $invalidClass,
-                'Only stdClass, array and string are supported types for encryption.'
+                'Only stdClass, array and string are supported types for encryption.',
             ],
             'invalid class in value' => [
                 [
                     'key' => 'value',
                     'key2' => $invalidClass,
                 ],
-                'Invalid item $key - only stdClass, array and scalar can be encrypted.'
+                'Invalid item $key - only stdClass, array and scalar can be encrypted.',
             ],
             'invalid class in encrypted value' => [
                 [
                     'key' => 'value',
                     '#key2' => $invalidClass,
                 ],
-                'Invalid item $key - only stdClass, array and scalar can be encrypted.'
+                'Invalid item $key - only stdClass, array and scalar can be encrypted.',
             ],
         ];
     }
@@ -137,21 +143,21 @@ class ObjectEncryptorTest extends TestCase
         return [
             'invalid class' => [
                 $invalidClass,
-                'Only stdClass, array and string are supported types for decryption.'
+                'Only stdClass, array and string are supported types for decryption.',
             ],
             'invalid class in value' => [
                 [
                     'key' => 'value',
                     'key2' => $invalidClass,
                 ],
-                'Invalid item key2 - only stdClass, array and scalar can be decrypted.'
+                'Invalid item key2 - only stdClass, array and scalar can be decrypted.',
             ],
             'invalid class in encrypted value' => [
                 [
                     'key' => 'value',
                     '#key2' => $invalidClass,
                 ],
-                'Invalid item #key2 - only stdClass, array and scalar can be decrypted.'
+                'Invalid item #key2 - only stdClass, array and scalar can be decrypted.',
             ],
         ];
     }
@@ -184,8 +190,8 @@ class ObjectEncryptorTest extends TestCase
                     'key1' => 'somevalue',
                     'key2' => [
                         '#anotherKey' => 'KBC::ComponentSecureKV::eJxLtDK2qs60Mrthis is not a valid cipher but it ' .
-                            'looks like one lo1Sww='
-                    ]
+                            'looks like one lo1Sww=',
+                    ],
                 ],
                 'Invalid cipher text for key #anotherKey Value "KBC::ComponentSecureKV::eJxLtDK2qs60Mrthis is not ' .
                 'a valid cipher but it looks like one lo1Sww=" is not an encrypted value.',
@@ -194,8 +200,8 @@ class ObjectEncryptorTest extends TestCase
                 [
                     'key1' => 'somevalue',
                     'key2' => [
-                        '#anotherKey' => 'this does not even look like a cipher text'
-                    ]
+                        '#anotherKey' => 'this does not even look like a cipher text',
+                    ],
                 ],
                 'Invalid cipher text for key #anotherKey Value "this does not even look like a cipher text" ' .
                     'is not an encrypted value.',
@@ -254,7 +260,7 @@ class ObjectEncryptorTest extends TestCase
         $encryptor = $this->factory->getEncryptor();
         $array = [
             'key1' => 'value1',
-            '#key2' => 'value2'
+            '#key2' => 'value2',
         ];
         $result = $encryptor->encrypt($array, $encryptor->getRegisteredComponentWrapperClass());
         self::assertArrayHasKey('key1', $result);
@@ -299,7 +305,7 @@ class ObjectEncryptorTest extends TestCase
             '#key4' => 1,
             '#key5' => 1.5,
             '#key6' => null,
-            'key7' => null
+            'key7' => null,
         ];
         $result = $encryptor->encrypt($array, $encryptor->getRegisteredComponentWrapperClass());
         self::assertArrayHasKey('key1', $result);
@@ -363,7 +369,7 @@ class ObjectEncryptorTest extends TestCase
         $encryptedValue = $encryptor->encrypt('test', $encryptor->getRegisteredComponentWrapperClass());
         $array = [
             'key1' => 'value1',
-            '#key2' => $encryptedValue
+            '#key2' => $encryptedValue,
         ];
         $result = $encryptor->encrypt($array, $encryptor->getRegisteredComponentWrapperClass());
         self::assertArrayHasKey('key1', $result);
@@ -407,9 +413,9 @@ class ObjectEncryptorTest extends TestCase
             'key2' => [
                 'nestedKey1' => 'value2',
                 'nestedKey2' => [
-                    '#finalKey' => 'value3'
-                ]
-            ]
+                    '#finalKey' => 'value3',
+                ],
+            ],
         ];
         $result = $encryptor->encrypt($array, $encryptor->getRegisteredComponentWrapperClass());
         self::assertArrayHasKey('key1', $result);
@@ -473,13 +479,13 @@ class ObjectEncryptorTest extends TestCase
             'key2' => [
                 'nestedKey1' => 'value2',
                 'nestedKey2' => [
-                    '#finalKey' => 'value3'
-                ]
+                    '#finalKey' => 'value3',
+                ],
             ],
             '#key3' => [
                 'anotherNestedKey' => 'someValue',
-                '#encryptedNestedKey' => 'someValue2'
-            ]
+                '#encryptedNestedKey' => 'someValue2',
+            ],
         ];
         $result = $encryptor->encrypt($array, $encryptor->getRegisteredComponentWrapperClass());
         self::assertArrayHasKey('key1', $result);
@@ -563,9 +569,9 @@ class ObjectEncryptorTest extends TestCase
                 'nestedKey1' => 'value2',
                 'nestedKey2' => [
                     '#finalKey' => 'value3',
-                    '#finalKeyEncrypted' => $encryptedValue
-                ]
-            ]
+                    '#finalKeyEncrypted' => $encryptedValue,
+                ],
+            ],
         ];
 
         $result = $encryptor->encrypt($array, $encryptor->getRegisteredComponentWrapperClass());
@@ -640,8 +646,8 @@ class ObjectEncryptorTest extends TestCase
             'key1' => 'value1',
             'key2' => [
                 ['nestedKey1' => 'value2'],
-                ['nestedKey2' => ['#finalKey' => 'value3']]
-            ]
+                ['nestedKey2' => ['#finalKey' => 'value3']],
+            ],
         ];
         $result = $encryptor->encrypt($array, $encryptor->getRegisteredComponentWrapperClass());
         self::assertArrayHasKey('key1', $result);
@@ -710,7 +716,7 @@ class ObjectEncryptorTest extends TestCase
         $encryptor = $this->factory->getEncryptor();
         $array = [
             '#key1' => $encryptor->encrypt('value1', $encryptor->getRegisteredComponentWrapperClass()),
-            '#key2' => $encryptor->encrypt('value2', $encryptor->getRegisteredProjectWrapperClass())
+            '#key2' => $encryptor->encrypt('value2', $encryptor->getRegisteredProjectWrapperClass()),
         ];
         self::assertStringStartsWith('KBC::ComponentSecure', $array['#key1']);
         self::assertStringStartsWith('KBC::ProjectSecureKV::', $array['#key2']);
@@ -838,8 +844,12 @@ class ObjectEncryptorTest extends TestCase
     /**
      * @dataProvider registeredProvider()
      */
-    public function testGetRegisteredWrapperEncryptor(string $kmsKey, string $keyVaultUrl, string $classifier, string $expectedClass): void
-    {
+    public function testGetRegisteredWrapperEncryptor(
+        string $kmsKey,
+        string $keyVaultUrl,
+        string $classifier,
+        string $expectedClass
+    ): void {
         $factory = new ObjectEncryptorFactory($kmsKey, getenv('TEST_AWS_REGION'), $keyVaultUrl);
         $factory->setStackId('my-stack');
         $factory->setComponentId('dummy-component');
@@ -915,7 +925,11 @@ class ObjectEncryptorTest extends TestCase
      */
     public function testGetRegisteredWrapperFailure(string $classifier, string $expectedMessage): void
     {
-        $factory = new ObjectEncryptorFactory(getenv('TEST_AWS_KMS_KEY_ID'), getenv('TEST_AWS_REGION'), getenv('TEST_KEY_VAULT_URL'));
+        $factory = new ObjectEncryptorFactory(
+            (string) getenv('TEST_AWS_KMS_KEY_ID'),
+            (string) getenv('TEST_AWS_REGION'),
+            (string) getenv('TEST_KEY_VAULT_URL')
+        );
         $factory->setStackId('my-stack');
         $encryptor = $factory->getEncryptor();
         $method = 'getRegistered' . $classifier . 'WrapperClass';
