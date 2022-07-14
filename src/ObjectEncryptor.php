@@ -152,13 +152,14 @@ class ObjectEncryptor
     }
 
     /**
+     * @param string|int $key
      * @param array|string|stdClass|null $value Value to encrypt.
      * @return array|string|stdClass|null
      */
-    private function encryptItem(string $key, $value, CryptoWrapperInterface $wrapper)
+    private function encryptItem($key, $value, CryptoWrapperInterface $wrapper)
     {
         if (is_scalar($value) || is_null($value)) {
-            if (substr($key, 0, 1) === '#') {
+            if (substr((string) $key, 0, 1) === '#') {
                 return $this->encryptValue((string) $value, $wrapper);
             } else {
                 return $value;
@@ -207,13 +208,14 @@ class ObjectEncryptor
     }
 
     /**
+     * @param string|int $key
      * @param array|string|stdClass|null $value Value to decrypt.
      * @return array|string|stdClass|null Decrypted value.
      */
-    private function decryptItem(string $key, $value)
+    private function decryptItem($key, $value)
     {
         if (is_scalar($value) || is_null($value)) {
-            if (substr($key, 0, 1) === '#') {
+            if (substr((string) $key, 0, 1) === '#') {
                 try {
                     return $this->decryptValue((string) $value);
                 } catch (UserException $e) {
