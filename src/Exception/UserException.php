@@ -1,11 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Keboola\ObjectEncryptor\Exception;
 
-class UserException extends \Exception
+use Keboola\CommonExceptions\ExceptionWithContextInterface;
+use Keboola\CommonExceptions\UserExceptionInterface;
+use RuntimeException;
+use Throwable;
+
+class UserException extends RuntimeException implements UserExceptionInterface, ExceptionWithContextInterface
 {
-    public function __construct($message, $previous = null)
+    private array $context;
+
+    public function __construct(string $message, int $code = 0, ?Throwable $previous = null, array $context = [])
     {
-        parent::__construct($message, 0, $previous);
+        parent::__construct($message, $code, $previous);
+        $this->context = $context;
+    }
+
+    public function getContext(): array
+    {
+        return $this->context;
     }
 }

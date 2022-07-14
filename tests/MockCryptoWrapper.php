@@ -6,27 +6,17 @@ use Keboola\ObjectEncryptor\Wrapper\CryptoWrapperInterface;
 
 class MockCryptoWrapper implements CryptoWrapperInterface
 {
-    /**
-     * @inheritdoc
-     */
-    public function getPrefix()
+    public function getPrefix(): string
     {
         return 'KBC::MockCryptoWrapper==';
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function encrypt($data)
+    public function encrypt(string $data): string
     {
         return $data;
     }
 
-
-    /**
-     * @inheritdoc
-     */
-    public function decrypt($encryptedData)
+    public function decrypt(string $encryptedData): string
     {
         return $encryptedData;
     }

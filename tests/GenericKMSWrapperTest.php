@@ -15,17 +15,14 @@ class GenericKMSWrapperTest extends TestCase
 {
     use DataProviderTrait;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         putenv('AWS_ACCESS_KEY_ID=' . getenv('TEST_AWS_ACCESS_KEY_ID'));
         putenv('AWS_SECRET_ACCESS_KEY='. getenv('TEST_AWS_SECRET_ACCESS_KEY'));
     }
 
-    /**
-     * @return GenericKMSWrapper
-     */
-    private function getWrapper()
+    private function getWrapper(): GenericKMSWrapper
     {
         $wrapper = new GenericKMSWrapper();
         $wrapper->setKMSKeyId(getenv('TEST_AWS_KMS_KEY_ID'));
@@ -33,7 +30,7 @@ class GenericKMSWrapperTest extends TestCase
         return $wrapper;
     }
 
-    public function testEncrypt()
+    public function testEncrypt(): void
     {
         $secret = 'mySecretValue';
         $wrapper = $this->getWrapper();
@@ -45,7 +42,7 @@ class GenericKMSWrapperTest extends TestCase
         self::assertEquals($secret, $wrapper->decrypt($encrypted));
     }
 
-    public function testEncryptWrongKey()
+    public function testEncryptWrongKey(): void
     {
         $wrapper = $this->getWrapper();
         $secret = 'mySecretValue';
@@ -62,11 +59,9 @@ class GenericKMSWrapperTest extends TestCase
 
     /**
      * @dataProvider emptyValuesProvider()
-     * @param $secret
-     * @throws ApplicationException
-     * @throws UserException
+     * @param string|null|integer $secret
      */
-    public function testEncryptEmptyValue($secret)
+    public function testEncryptEmptyValue($secret): void
     {
         $wrapper = $this->getWrapper();
         $encrypted = $wrapper->encrypt($secret);
@@ -74,7 +69,7 @@ class GenericKMSWrapperTest extends TestCase
         self::assertEquals($secret, $wrapper->decrypt($encrypted));
     }
 
-    public function testRetryEncrypt()
+    public function testRetryEncrypt(): void
     {
         $mockKmsClient = self::getMockBuilder(KmsClient::class)
             // Need to pass service explicitly, because AwsClient fails to detect it from mock
@@ -93,7 +88,6 @@ class GenericKMSWrapperTest extends TestCase
                 }
             });
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject $mockWrapper */
         $mockWrapper = self::getMockBuilder(GenericKMSWrapper::class)
             ->setMethods(['getClient'])
             ->getMock();
@@ -109,19 +103,18 @@ class GenericKMSWrapperTest extends TestCase
         self::assertEquals($secret, $mockWrapper->decrypt($encrypted));
     }
 
-    public function testRetryEncryptFail()
+    public function testRetryEncryptFail(): void
     {
         $mockKmsClient = self::getMockBuilder(KmsClient::class)
             // Need to pass service explicitly, because AwsClient fails to detect it from mock
             ->setConstructorArgs([['region' => getenv('TEST_AWS_REGION'), 'version' => '2014-11-01', 'service' => 'kms']])
-            ->setMethods(['execute'])
+            ->onlyMethods(['execute'])
             ->getMock();
         $mockKmsClient->method('execute')
             ->willThrowException(
                 new ConnectException('mock failed to connect', new Request('GET', 'some-uri'))
             );
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject $mockWrapper */
         $mockWrapper = self::getMockBuilder(GenericKMSWrapper::class)
             ->setMethods(['getClient'])
             ->getMock();
@@ -137,12 +130,12 @@ class GenericKMSWrapperTest extends TestCase
         $mockWrapper->encrypt($secret);
     }
 
-    public function testRetryDecrypt()
+    public function testRetryDecrypt(): void
     {
         $mockKmsClient = self::getMockBuilder(KmsClient::class)
             // Need to pass service explicitly, because AwsClient fails to detect it from mock
             ->setConstructorArgs([['region' => getenv('TEST_AWS_REGION'), 'version' => '2014-11-01', 'service' => 'kms']])
-            ->setMethods(['execute'])
+            ->onlyMethods(['execute'])
             ->getMock();
         $mockKmsClient->method('execute')
             ->willReturnCallback(function (CommandInterface $command) use (&$callNo, $mockKmsClient) {
@@ -155,7 +148,6 @@ class GenericKMSWrapperTest extends TestCase
                 }
             });
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject $mockWrapper */
         $mockWrapper = self::getMockBuilder(GenericKMSWrapper::class)
             ->setMethods(['getClient'])
             ->getMock();
@@ -174,7 +166,7 @@ class GenericKMSWrapperTest extends TestCase
         self::assertEquals($secret, $mockWrapper->decrypt($encrypted));
     }
 
-    public function testRetryDecryptFail()
+    public function testRetryDecryptFail(): void
     {
         $mockKmsClient = self::getMockBuilder(KmsClient::class)
             // Need to pass service explicitly, because AwsClient fails to detect it from mock
@@ -186,9 +178,8 @@ class GenericKMSWrapperTest extends TestCase
                 new ConnectException('mock failed to connect', new Request('GET', 'some-uri'))
             );
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject $mockWrapper */
         $mockWrapper = self::getMockBuilder(GenericKMSWrapper::class)
-            ->setMethods(['getClient'])
+            ->onlyMethods(['getClient'])
             ->getMock();
         $mockWrapper->method('getClient')
             ->willReturn($mockKmsClient);
@@ -207,17 +198,7 @@ class GenericKMSWrapperTest extends TestCase
         $mockWrapper->decrypt($encrypted);
     }
 
-    public function testEncryptNonScalar()
-    {
-        $secret = ['a' => 'b'];
-        $wrapper = $this->getWrapper();
-        self::expectException(UserException::class);
-        self::expectExceptionMessage('Cannot encrypt a non-scalar value');
-        /** @noinspection PhpParamsInspection */
-        $wrapper->encrypt($secret);
-    }
-
-    public function testEncryptMetadata()
+    public function testEncryptMetadata(): void
     {
         $secret = 'mySecretValue';
         $wrapper = $this->getWrapper();
@@ -232,7 +213,7 @@ class GenericKMSWrapperTest extends TestCase
         self::assertEquals($secret, $wrapper->decrypt($encrypted));
     }
 
-    public function testEncryptMetadataCacheHit()
+    public function testEncryptMetadataCacheHit(): void
     {
         $secret1 = 'mySecretValue1';
         $secret2 = 'mySecretValue2';
@@ -253,7 +234,7 @@ class GenericKMSWrapperTest extends TestCase
         self::assertEquals($secret2, $wrapper->decrypt($encrypted2));
     }
 
-    public function testEncryptMetadataCacheMiss()
+    public function testEncryptMetadataCacheMiss(): void
     {
         $secret1 = 'mySecretValue1';
         $secret2 = 'mySecretValue2';
@@ -276,7 +257,7 @@ class GenericKMSWrapperTest extends TestCase
         self::assertEquals($secret2, $wrapper->decrypt($encrypted2));
     }
 
-    public function testEncryptMetadataMismatchNoMetadata()
+    public function testEncryptMetadataMismatchNoMetadata(): void
     {
         $secret = 'mySecretValue';
         $wrapper = $this->getWrapper();
@@ -291,7 +272,7 @@ class GenericKMSWrapperTest extends TestCase
         $wrapper->decrypt($encrypted);
     }
 
-    public function testEncryptMetadataMismatchBadMetadata()
+    public function testEncryptMetadataMismatchBadMetadata(): void
     {
         $secret = 'mySecretValue';
         $wrapper = $this->getWrapper();
@@ -307,7 +288,7 @@ class GenericKMSWrapperTest extends TestCase
         $wrapper->decrypt($encrypted);
     }
 
-    public function testInvalidSetupEncryptMissingAll()
+    public function testInvalidSetupEncryptMissingAll(): void
     {
         $wrapper = new GenericKMSWrapper();
         self::expectException(ApplicationException::class);
@@ -315,7 +296,7 @@ class GenericKMSWrapperTest extends TestCase
         $wrapper->encrypt('mySecretValue');
     }
 
-    public function testInvalidSetupEncryptMissingKeyId()
+    public function testInvalidSetupEncryptMissingKeyId(): void
     {
         $wrapper = new GenericKMSWrapper();
         $wrapper->setKMSRegion('my-region');
@@ -324,7 +305,7 @@ class GenericKMSWrapperTest extends TestCase
         $wrapper->encrypt('mySecretValue');
     }
 
-    public function testInvalidSetupEncryptMissingRegion()
+    public function testInvalidSetupEncryptMissingRegion(): void
     {
         $wrapper = new GenericKMSWrapper();
         $wrapper->setKMSKeyId('my-key');
@@ -333,7 +314,7 @@ class GenericKMSWrapperTest extends TestCase
         $wrapper->encrypt('mySecretValue');
     }
 
-    public function testInvalidSetupDecryptMissingAll()
+    public function testInvalidSetupDecryptMissingAll(): void
     {
         $wrapper = new GenericKMSWrapper();
         self::expectException(ApplicationException::class);
@@ -341,7 +322,7 @@ class GenericKMSWrapperTest extends TestCase
         $wrapper->decrypt('mySecretValue');
     }
 
-    public function testInvalidSetupDecryptMissingKeyId()
+    public function testInvalidSetupDecryptMissingKeyId(): void
     {
         $wrapper = new GenericKMSWrapper();
         $wrapper->setKMSRegion('my-region');
@@ -350,7 +331,7 @@ class GenericKMSWrapperTest extends TestCase
         $wrapper->decrypt('mySecretValue');
     }
 
-    public function testInvalidSetupDecryptMissingRegion()
+    public function testInvalidSetupDecryptMissingRegion(): void
     {
         $wrapper = new GenericKMSWrapper();
         $wrapper->setKMSKeyId('my-key');
@@ -359,17 +340,7 @@ class GenericKMSWrapperTest extends TestCase
         $wrapper->decrypt('mySecretValue');
     }
 
-    public function testInvalidKeyId()
-    {
-        $wrapper = new GenericKMSWrapper();
-        $wrapper->setKMSKeyId(new \stdClass());
-        $wrapper->setKMSRegion('my-region');
-        self::expectException(ApplicationException::class);
-        self::expectExceptionMessage('Cipher key settings are invalid.');
-        $wrapper->encrypt('mySecretValue');
-    }
-
-    public function testInvalidRegion()
+    public function testInvalidRegion(): void
     {
         $wrapper = new GenericKMSWrapper();
         $wrapper->setKMSKeyId('my-key');
@@ -380,7 +351,7 @@ class GenericKMSWrapperTest extends TestCase
         $wrapper->encrypt('mySecretValue');
     }
 
-    public function testInvalidCredentials()
+    public function testInvalidCredentials(): void
     {
         putenv('AWS_ACCESS_KEY_ID=' . getenv('TEST_AWS_ACCESS_KEY_ID'));
         putenv('AWS_SECRET_ACCESS_KEY=some-garbage');
@@ -392,7 +363,7 @@ class GenericKMSWrapperTest extends TestCase
         $wrapper->encrypt('mySecretValue');
     }
 
-    public function testInvalidNonExistentRegion()
+    public function testInvalidNonExistentRegion(): void
     {
         $wrapper = new GenericKMSWrapper();
         $wrapper->setKMSKeyId(getenv('TEST_AWS_KMS_KEY_ID'));
@@ -404,12 +375,8 @@ class GenericKMSWrapperTest extends TestCase
 
     /**
      * @dataProvider invalidCipherProvider()
-     * @param string $cipher
-     * @param string $message
-     * @throws ApplicationException
-     * @throws UserException
      */
-    public function testDecryptInvalidCiphers($cipher, $message)
+    public function testDecryptInvalidCiphers(string $cipher, string $message): void
     {
         $wrapper = $this->getWrapper();
         self::expectException(UserException::class);
