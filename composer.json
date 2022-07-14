@@ -39,6 +39,7 @@
         "phpstan": "phpstan analyse --no-progress -c phpstan.neon",
         "infection": "infection --threads=4 --min-covered-msi=90 --coverage=/tmp/build-logs --only-covered",
         "build": [
+            "@phpcs",
             "@tests"
         ],
         "ci": [

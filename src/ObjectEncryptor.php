@@ -215,7 +215,7 @@ class ObjectEncryptor
         if (is_scalar($value) || is_null($value)) {
             if (substr($key, 0, 1) === '#') {
                 try {
-                    return $this->decryptValue((string)$value);
+                    return $this->decryptValue((string) $value);
                 } catch (UserException $e) {
                     throw new UserException("Invalid cipher text for key $key " . $e->getMessage(), $e->getCode(), $e);
                 }
