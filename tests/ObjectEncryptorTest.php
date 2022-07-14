@@ -36,15 +36,6 @@ class ObjectEncryptorTest extends TestCase
         putenv('AZURE_CLIENT_SECRET=' . getenv('TEST_CLIENT_SECRET'));
     }
 
-    public function testEncryptorEmpty(): void
-    {
-        $factory = new ObjectEncryptorFactory('', '', '');
-        $encryptor = $factory->getEncryptor();
-        self::expectException(UserException::class);
-        self::expectExceptionMessage('Value "secret" is not an encrypted value.');
-        $encryptor->decrypt('secret');
-    }
-
     public function testEncryptorScalar(): void
     {
         $encryptor = $this->factory->getEncryptor();
