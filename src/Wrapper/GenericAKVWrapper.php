@@ -117,7 +117,7 @@ class GenericAKVWrapper implements CryptoWrapperInterface
         try {
             return @unserialize(gzuncompress(base64_decode($data)));
         } catch (Throwable $e) {
-            throw new UserException('Cipher is malformed.', 0, $e);
+            throw new UserException("Deciphering failed.", 0, $e);
         }
     }
 
