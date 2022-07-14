@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Keboola\ObjectEncryptor\Wrapper;
 
 interface CryptoWrapperInterface
@@ -7,19 +9,10 @@ interface CryptoWrapperInterface
     /**
      * Return a prefix for the encrypted string identifying this wrapper.
      *  It is important that this prefix is different for each wrapper.
-     * @return string Cipher text prefix.
      */
-    public function getPrefix();
+    public function getPrefix(): string;
 
-    /**
-     * @param string $data Data to encrypt.
-     * @return string Encrypted data.
-     */
-    public function encrypt($data);
+    public function encrypt(string $data): string;
 
-    /**
-     * @param string $encryptedData Encrypted data.
-     * @return string Decrypted data.
-     */
-    public function decrypt($encryptedData);
+    public function decrypt(string $encryptedData): string;
 }

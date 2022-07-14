@@ -1,11 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Keboola\ObjectEncryptor\Exception;
 
-class ApplicationException extends \Exception
+use Keboola\CommonExceptions\ApplicationExceptionInterface;
+use RuntimeException;
+
+class ApplicationException extends RuntimeException implements ApplicationExceptionInterface
 {
-    public function __construct($message, $previous = null)
-    {
-        parent::__construct($message, 0, $previous);
-    }
 }

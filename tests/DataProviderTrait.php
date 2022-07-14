@@ -4,7 +4,7 @@ namespace Keboola\ObjectEncryptor\Tests;
 
 trait DataProviderTrait
 {
-    public function emptyValuesProvider()
+    public function emptyValuesProvider(): array
     {
         return [
             [
@@ -14,18 +14,15 @@ trait DataProviderTrait
                 '0',
             ],
             [
-                0,
-            ],
-            [
                 null,
             ],
         ];
     }
 
     /**
-     * @return \string[][]
+     * @return string[][]
      */
-    public function invalidCipherProvider()
+    public function invalidCipherProvider(): array
     {
         return [
             [

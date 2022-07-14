@@ -4,7 +4,6 @@ namespace Keboola\ObjectEncryptor\Tests;
 
 use Keboola\ObjectEncryptor\Exception\ApplicationException;
 use Keboola\ObjectEncryptor\Exception\UserException;
-use Keboola\ObjectEncryptor\Legacy\Encryptor;
 use Keboola\ObjectEncryptor\ObjectEncryptor;
 use Keboola\ObjectEncryptor\ObjectEncryptorFactory;
 use Keboola\ObjectEncryptor\Wrapper\ComponentAKVWrapper;
@@ -16,25 +15,16 @@ use Keboola\ObjectEncryptor\Wrapper\GenericKMSWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ProjectAKVWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ProjectKMSWrapper;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class ObjectEncryptorTest extends TestCase
 {
-    /**
-     * @var ObjectEncryptorFactory
-     */
-    private $factory;
+    private ObjectEncryptorFactory $factory;
 
-    /**
-     * @var string
-     */
-    private $aesKey;
-
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
-        $legacyKey = '1234567890123456';
-        $this->aesKey = '123456789012345678901234567890ab';
-        $this->factory = new ObjectEncryptorFactory(getenv('TEST_AWS_KMS_KEY_ID'), getenv('TEST_AWS_REGION'), $legacyKey, $this->aesKey, getenv('TEST_KEY_VAULT_URL'));
+        $this->factory = new ObjectEncryptorFactory(getenv('TEST_AWS_KMS_KEY_ID'), getenv('TEST_AWS_REGION'), getenv('TEST_KEY_VAULT_URL'));
         $this->factory->setStackId('my-stack');
         $this->factory->setComponentId('dummy-component');
         $this->factory->setConfigurationId('123456');
@@ -46,26 +36,25 @@ class ObjectEncryptorTest extends TestCase
         putenv('AZURE_CLIENT_SECRET=' . getenv('TEST_CLIENT_SECRET'));
     }
 
-    public function testEncryptorEmpty()
+    public function testEncryptorEmpty(): void
     {
-        $factory = new ObjectEncryptorFactory('', '', '', '', '');
+        $factory = new ObjectEncryptorFactory('', '', '');
         $encryptor = $factory->getEncryptor();
-        self::expectException(ApplicationException::class);
-        self::expectExceptionMessage('There are no wrappers registered for the encryptor.');
+        self::expectException(UserException::class);
+        self::expectExceptionMessage('Value "secret" is not an encrypted value.');
         $encryptor->decrypt('secret');
     }
 
-    public function testEncryptorScalar()
+    public function testEncryptorScalar(): void
     {
         $encryptor = $this->factory->getEncryptor();
         $originalText = 'secret';
-        $encrypted = $encryptor->encrypt($originalText);
-        self::assertStringStartsWith('KBC::Encrypted==', $encrypted);
+        $encrypted = $encryptor->encrypt($originalText, $encryptor->getRegisteredComponentWrapperClass());
+        self::assertStringStartsWith('KBC::ComponentSecureKV::', $encrypted);
         self::assertEquals($originalText, $encryptor->decrypt($encrypted));
     }
 
-
-    public function cryptoWrapperProvider()
+    public function cryptoWrapperProvider(): array
     {
         return [
             [
@@ -81,13 +70,9 @@ class ObjectEncryptorTest extends TestCase
 
 
     /**
-     * @param string $wrapper
-     * @param $prefix
-     * @throws ApplicationException
-     * @throws UserException
      * @dataProvider cryptoWrapperProvider
      */
-    public function testEncryptorStack($wrapper, $prefix)
+    public function testEncryptorStack(string $wrapper, string $prefix): void
     {
         $encryptor = $this->factory->getEncryptor();
         $originalText = 'secret';
@@ -96,7 +81,7 @@ class ObjectEncryptorTest extends TestCase
         self::assertEquals($originalText, $encryptor->decrypt($encrypted));
     }
 
-    public function testEncryptorStackNoCredentials()
+    public function testEncryptorStackNoCredentials(): void
     {
         putenv('AWS_ACCESS_KEY_ID=');
         putenv('AWS_SECRET_ACCESS_KEY=');
@@ -107,7 +92,7 @@ class ObjectEncryptorTest extends TestCase
         $encryptor->encrypt($originalText, GenericKMSWrapper::class);
     }
 
-    public function testEncryptorInvalidService()
+    public function testEncryptorInvalidService(): void
     {
         $encryptor = $this->factory->getEncryptor();
         self::expectExceptionMessage('Invalid crypto wrapper fooBar');
@@ -115,9 +100,9 @@ class ObjectEncryptorTest extends TestCase
         $encryptor->encrypt('secret', 'fooBar');
     }
 
-    public function unsupportedEncryptionInputProvider()
+    public function unsupportedEncryptionInputProvider(): array
     {
-        $invalidClass = $this->getMockBuilder(\stdClass::class)
+        $invalidClass = $this->getMockBuilder(stdClass::class)
             ->disableOriginalConstructor()
             ->getMock();
         return [
@@ -144,21 +129,18 @@ class ObjectEncryptorTest extends TestCase
 
     /**
      * @dataProvider unsupportedEncryptionInputProvider
-     * @param mixed $input
-     * @param string $expectedMessage
-     * @throws ApplicationException
      */
-    public function testEncryptorUnsupportedInput($input, $expectedMessage)
+    public function testEncryptorUnsupportedInput($input, string $expectedMessage): void
     {
         $encryptor = $this->factory->getEncryptor();
         self::expectException(ApplicationException::class);
         self::expectExceptionMessage($expectedMessage);
-        $encryptor->encrypt($input);
+        $encryptor->encrypt($input, $encryptor->getRegisteredComponentWrapperClass());
     }
 
-    public function unsupportedDecryptionInputProvider()
+    public function unsupportedDecryptionInputProvider(): array
     {
-        $invalidClass = $this->getMockBuilder(\stdClass::class)
+        $invalidClass = $this->getMockBuilder(stdClass::class)
             ->disableOriginalConstructor()
             ->getMock();
         return [
@@ -185,11 +167,8 @@ class ObjectEncryptorTest extends TestCase
 
     /**
      * @dataProvider unsupportedDecryptionInputProvider
-     * @param mixed $input
-     * @param string $expectedMessage
-     * @throws ApplicationException
      */
-    public function testDecryptorUnsupportedInput($input, $expectedMessage)
+    public function testDecryptorUnsupportedInput($input, string $expectedMessage): void
     {
         $encryptor = $this->factory->getEncryptor();
         self::expectException(ApplicationException::class);
@@ -197,25 +176,28 @@ class ObjectEncryptorTest extends TestCase
         $encryptor->decrypt($input);
     }
 
-    public function decryptorInvalidCipherTextProvider()
+    public function decryptorInvalidCipherTextProvider(): array
     {
         return [
             'somewhat similar' => [
-                'KBC::Encrypted==yI0sawothis is not a valid cipher but it looks like one N2Jg==',
-                'Value KBC::Encrypted==yI0sawothis is not a valid cipher but it looks like one N2Jg== is not an encrypted value.',
+                'KBC::ComponentSecureKV::eJxLtDK2qs60Mrthis is not a valid cipher but it looks like one lo1Sww=',
+                'Value "KBC::ComponentSecureKV::eJxLtDK2qs60Mrthis is not a valid cipher but it looks like one lo1Sww="'
+                . ' is not an encrypted value.',
             ],
             'completely off' => [
                 'this does not even look like a cipher text',
-                'Value is not an encrypted value.',
+                'Value "this does not even look like a cipher text" is not an encrypted value.',
             ],
             'somewhat similar in key' => [
                 [
                     'key1' => 'somevalue',
                     'key2' => [
-                        '#anotherKey' => 'KBC::Encrypted==yI0sawothis is not a valid cipher but it looks like one N2Jg=='
+                        '#anotherKey' => 'KBC::ComponentSecureKV::eJxLtDK2qs60Mrthis is not a valid cipher but it ' .
+                            'looks like one lo1Sww='
                     ]
                 ],
-                'Invalid cipher text for key #anotherKey Value KBC::Encrypted==yI0sawothis is not a valid cipher but it looks like one N2Jg== is not an encrypted value.',
+                'Invalid cipher text for key #anotherKey Value "KBC::ComponentSecureKV::eJxLtDK2qs60Mrthis is not ' .
+                'a valid cipher but it looks like one lo1Sww=" is not an encrypted value.',
             ],
             'completely off in key' => [
                 [
@@ -224,19 +206,16 @@ class ObjectEncryptorTest extends TestCase
                         '#anotherKey' => 'this does not even look like a cipher text'
                     ]
                 ],
-                'Invalid cipher text for key #anotherKey Value is not an encrypted value.',
+                'Invalid cipher text for key #anotherKey Value "this does not even look like a cipher text" ' .
+                    'is not an encrypted value.',
             ],
         ];
     }
 
     /**
      * @dataProvider decryptorInvalidCipherTextProvider
-     * @param string $encrypted
-     * @param string $expectedMessage
-     * @throws ApplicationException
-     * @throws UserException
      */
-    public function testDecryptorInvalidCipherText($encrypted, $expectedMessage)
+    public function testDecryptorInvalidCipherText($encrypted, string $expectedMessage): void
     {
         $encryptor = $this->factory->getEncryptor();
         self::expectException(UserException::class);
@@ -244,17 +223,17 @@ class ObjectEncryptorTest extends TestCase
         $encryptor->decrypt($encrypted);
     }
 
-    public function testEncryptorAlreadyEncrypted()
+    public function testEncryptorAlreadyEncrypted(): void
     {
         $encryptor = $this->factory->getEncryptor();
-        $encryptedValue = $encryptor->encrypt('test');
+        $encryptedValue = $encryptor->encrypt('test', $encryptor->getRegisteredComponentWrapperClass());
 
-        $encrypted = $encryptor->encrypt($encryptedValue);
-        self::assertEquals('KBC::Encrypted==', substr($encrypted, 0, 16));
+        $encrypted = $encryptor->encrypt($encryptedValue, $encryptor->getRegisteredComponentWrapperClass());
+        self::assertStringStartsWith('KBC::ComponentSecureKV::', $encrypted);
         self::assertEquals('test', $encryptor->decrypt($encrypted));
     }
 
-    public function testEncryptorAlreadyEncryptedWrapper()
+    public function testEncryptorAlreadyEncryptedWrapper(): void
     {
         $encryptor = $this->factory->getEncryptor();
         $wrapper = new MockCryptoWrapper();
@@ -264,12 +243,12 @@ class ObjectEncryptorTest extends TestCase
         $encryptedValue = $encryptor->encrypt($secret, MockCryptoWrapper::class);
         self::assertEquals('KBC::MockCryptoWrapper==' . $secret, $encryptedValue);
 
-        $encryptedSecond = $encryptor->encrypt($encryptedValue);
+        $encryptedSecond = $encryptor->encrypt($encryptedValue, $encryptor->getRegisteredComponentWrapperClass());
         self::assertEquals('KBC::MockCryptoWrapper==' . $secret, $encryptedSecond);
         self::assertEquals($secret, $encryptor->decrypt($encryptedSecond));
     }
 
-    public function testInvalidWrapper()
+    public function testInvalidWrapper(): void
     {
         $encryptor = $this->factory->getEncryptor();
         $wrapper = new MockCryptoWrapper();
@@ -279,18 +258,18 @@ class ObjectEncryptorTest extends TestCase
         $encryptor->pushWrapper($wrapper);
     }
 
-    public function testEncryptorSimpleArray()
+    public function testEncryptorSimpleArray(): void
     {
         $encryptor = $this->factory->getEncryptor();
         $array = [
             'key1' => 'value1',
             '#key2' => 'value2'
         ];
-        $result = $encryptor->encrypt($array);
+        $result = $encryptor->encrypt($array, $encryptor->getRegisteredComponentWrapperClass());
         self::assertArrayHasKey('key1', $result);
         self::assertArrayHasKey('#key2', $result);
         self::assertEquals('value1', $result['key1']);
-        self::assertEquals('KBC::Encrypted==', substr($result['#key2'], 0, 16));
+        self::assertStringStartsWith('KBC::ComponentSecureKV::', $result['#key2']);
 
         $decrypted = $encryptor->decrypt($result);
         self::assertArrayHasKey('key1', $decrypted);
@@ -299,18 +278,18 @@ class ObjectEncryptorTest extends TestCase
         self::assertEquals('value2', $decrypted['#key2']);
     }
 
-    public function testEncryptorSimpleObject()
+    public function testEncryptorSimpleObject(): void
     {
         $encryptor = $this->factory->getEncryptor();
-        $object = new \stdClass();
+        $object = new stdClass();
         $object->key1 = 'value1';
         $object->{'#key2'} = 'value2';
 
-        $result = $encryptor->encrypt($object);
+        $result = $encryptor->encrypt($object, $encryptor->getRegisteredComponentWrapperClass());
         self::assertObjectHasAttribute('key1', $result);
         self::assertObjectHasAttribute('#key2', $result);
         self::assertEquals('value1', $result->key1);
-        self::assertEquals('KBC::Encrypted==', substr($result->{'#key2'}, 0, 16));
+        self::assertStringStartsWith('KBC::ComponentSecure', $result->{'#key2'});
 
         $decrypted = $encryptor->decrypt($result);
         self::assertObjectHasAttribute('key1', $decrypted);
@@ -319,7 +298,7 @@ class ObjectEncryptorTest extends TestCase
         self::assertEquals('value2', $decrypted->{'#key2'});
     }
 
-    public function testEncryptorSimpleArrayScalars()
+    public function testEncryptorSimpleArrayScalars(): void
     {
         $encryptor = $this->factory->getEncryptor();
         $array = [
@@ -331,15 +310,15 @@ class ObjectEncryptorTest extends TestCase
             '#key6' => null,
             'key7' => null
         ];
-        $result = $encryptor->encrypt($array);
+        $result = $encryptor->encrypt($array, $encryptor->getRegisteredComponentWrapperClass());
         self::assertArrayHasKey('key1', $result);
         self::assertArrayHasKey('#key2', $result);
         self::assertEquals('value1', $result['key1']);
-        self::assertEquals('KBC::Encrypted==', substr($result['#key2'], 0, 16));
-        self::assertEquals('KBC::Encrypted==', substr($result['#key3'], 0, 16));
-        self::assertEquals('KBC::Encrypted==', substr($result['#key4'], 0, 16));
-        self::assertEquals('KBC::Encrypted==', substr($result['#key5'], 0, 16));
-        self::assertEquals('KBC::Encrypted==', substr($result['#key6'], 0, 16));
+        self::assertStringStartsWith('KBC::ComponentSecure', $result['#key2']);
+        self::assertStringStartsWith('KBC::ComponentSecure', $result['#key3']);
+        self::assertStringStartsWith('KBC::ComponentSecure', $result['#key4']);
+        self::assertStringStartsWith('KBC::ComponentSecure', $result['#key5']);
+        self::assertStringStartsWith('KBC::ComponentSecure', $result['#key6']);
 
         $decrypted = $encryptor->decrypt($result);
         self::assertArrayHasKey('key1', $decrypted);
@@ -353,10 +332,10 @@ class ObjectEncryptorTest extends TestCase
         self::assertEquals(null, $decrypted['key7']);
     }
 
-    public function testEncryptorSimpleObjectScalars()
+    public function testEncryptorSimpleObjectScalars(): void
     {
         $encryptor = $this->factory->getEncryptor();
-        $object = new \stdClass();
+        $object = new stdClass();
         $object->key1= 'value1';
         $object->{'#key2'} = 'value2';
         $object->{'#key3'} = true;
@@ -365,15 +344,15 @@ class ObjectEncryptorTest extends TestCase
         $object->{'#key6'} = null;
         $object->key7 = null;
 
-        $result = $encryptor->encrypt($object);
+        $result = $encryptor->encrypt($object, $encryptor->getRegisteredComponentWrapperClass());
         self::assertObjectHasAttribute('key1', $result);
         self::assertObjectHasAttribute('#key2', $result);
         self::assertEquals('value1', $result->key1);
-        self::assertEquals('KBC::Encrypted==', substr($result->{'#key2'}, 0, 16));
-        self::assertEquals('KBC::Encrypted==', substr($result->{'#key3'}, 0, 16));
-        self::assertEquals('KBC::Encrypted==', substr($result->{'#key4'}, 0, 16));
-        self::assertEquals('KBC::Encrypted==', substr($result->{'#key5'}, 0, 16));
-        self::assertEquals('KBC::Encrypted==', substr($result->{'#key6'}, 0, 16));
+        self::assertStringStartsWith('KBC::ComponentSecure', $result->{'#key2'});
+        self::assertStringStartsWith('KBC::ComponentSecure', $result->{'#key3'});
+        self::assertStringStartsWith('KBC::ComponentSecure', $result->{'#key4'});
+        self::assertStringStartsWith('KBC::ComponentSecure', $result->{'#key5'});
+        self::assertStringStartsWith('KBC::ComponentSecure', $result->{'#key6'});
 
         $decrypted = $encryptor->decrypt($result);
         self::assertObjectHasAttribute('key1', $decrypted);
@@ -387,15 +366,15 @@ class ObjectEncryptorTest extends TestCase
         self::assertEquals(null, $decrypted->{'key7'});
     }
 
-    public function testEncryptorSimpleArrayEncrypted()
+    public function testEncryptorSimpleArrayEncrypted(): void
     {
         $encryptor = $this->factory->getEncryptor();
-        $encryptedValue = $encryptor->encrypt('test');
+        $encryptedValue = $encryptor->encrypt('test', $encryptor->getRegisteredComponentWrapperClass());
         $array = [
             'key1' => 'value1',
             '#key2' => $encryptedValue
         ];
-        $result = $encryptor->encrypt($array);
+        $result = $encryptor->encrypt($array, $encryptor->getRegisteredComponentWrapperClass());
         self::assertArrayHasKey('key1', $result);
         self::assertArrayHasKey('#key2', $result);
         self::assertEquals('value1', $result['key1']);
@@ -408,15 +387,15 @@ class ObjectEncryptorTest extends TestCase
         self::assertEquals('test', $decrypted['#key2']);
     }
 
-    public function testEncryptorSimpleObjectEncrypted()
+    public function testEncryptorSimpleObjectEncrypted(): void
     {
         $encryptor = $this->factory->getEncryptor();
-        $encryptedValue = $encryptor->encrypt('test');
-        $object = new \stdClass();
+        $encryptedValue = $encryptor->encrypt('test', $encryptor->getRegisteredComponentWrapperClass());
+        $object = new stdClass();
         $object->key1 = 'value1';
         $object->{'#key2'} = $encryptedValue;
 
-        $result = $encryptor->encrypt($object);
+        $result = $encryptor->encrypt($object, $encryptor->getRegisteredComponentWrapperClass());
         self::assertObjectHasAttribute('key1', $result);
         self::assertObjectHasAttribute('#key2', $result);
         self::assertEquals('value1', $result->key1);
@@ -429,7 +408,7 @@ class ObjectEncryptorTest extends TestCase
         self::assertEquals('test', $decrypted->{'#key2'});
     }
 
-    public function testEncryptorNestedArray()
+    public function testEncryptorNestedArray(): void
     {
         $encryptor = $this->factory->getEncryptor();
         $array = [
@@ -441,7 +420,7 @@ class ObjectEncryptorTest extends TestCase
                 ]
             ]
         ];
-        $result = $encryptor->encrypt($array);
+        $result = $encryptor->encrypt($array, $encryptor->getRegisteredComponentWrapperClass());
         self::assertArrayHasKey('key1', $result);
         self::assertArrayHasKey('key2', $result);
         self::assertArrayHasKey('nestedKey1', $result['key2']);
@@ -449,7 +428,7 @@ class ObjectEncryptorTest extends TestCase
         self::assertArrayHasKey('#finalKey', $result['key2']['nestedKey2']);
         self::assertEquals('value1', $result['key1']);
         self::assertEquals('value2', $result['key2']['nestedKey1']);
-        self::assertEquals('KBC::Encrypted==', substr($result['key2']['nestedKey2']['#finalKey'], 0, 16));
+        self::assertStringStartsWith('KBC::ComponentSecure', $result['key2']['nestedKey2']['#finalKey']);
 
         $decrypted = $encryptor->decrypt($result);
         self::assertArrayHasKey('key1', $decrypted);
@@ -462,19 +441,19 @@ class ObjectEncryptorTest extends TestCase
         self::assertEquals('value3', $decrypted['key2']['nestedKey2']['#finalKey']);
     }
 
-    public function testEncryptorNestedObject()
+    public function testEncryptorNestedObject(): void
     {
         $encryptor = $this->factory->getEncryptor();
-        $object = new \stdClass();
-        $nested1 = new \stdClass();
-        $nested2 = new \stdClass();
+        $object = new stdClass();
+        $nested1 = new stdClass();
+        $nested2 = new stdClass();
         $nested2->{'#finalKey'} = 'value3';
         $nested1->nestedKey1 = 'value2';
         $nested1->nestedKey2 = $nested2;
         $object->key1 = 'value1';
         $object->key2 = $nested1;
 
-        $result = $encryptor->encrypt($object);
+        $result = $encryptor->encrypt($object, $encryptor->getRegisteredComponentWrapperClass());
         self::assertObjectHasAttribute('key1', $result);
         self::assertObjectHasAttribute('key2', $result);
         self::assertObjectHasAttribute('nestedKey1', $result->key2);
@@ -482,7 +461,7 @@ class ObjectEncryptorTest extends TestCase
         self::assertObjectHasAttribute('#finalKey', $result->key2->nestedKey2);
         self::assertEquals('value1', $result->key1);
         self::assertEquals('value2', $result->key2->nestedKey1);
-        self::assertEquals('KBC::Encrypted==', substr($result->key2->nestedKey2->{'#finalKey'}, 0, 16));
+        self::assertStringStartsWith('KBC::ComponentSecure', $result->key2->nestedKey2->{'#finalKey'});
 
         $decrypted = $encryptor->decrypt($result);
         self::assertObjectHasAttribute('key1', $decrypted);
@@ -495,7 +474,7 @@ class ObjectEncryptorTest extends TestCase
         self::assertEquals('value3', $decrypted->key2->nestedKey2->{'#finalKey'});
     }
 
-    public function testEncryptorNestedArrayWithArrayKeyHashmark()
+    public function testEncryptorNestedArrayWithArrayKeyHashmark(): void
     {
         $encryptor = $this->factory->getEncryptor();
         $array = [
@@ -511,7 +490,7 @@ class ObjectEncryptorTest extends TestCase
                 '#encryptedNestedKey' => 'someValue2'
             ]
         ];
-        $result = $encryptor->encrypt($array);
+        $result = $encryptor->encrypt($array, $encryptor->getRegisteredComponentWrapperClass());
         self::assertArrayHasKey('key1', $result);
         self::assertArrayHasKey('key2', $result);
         self::assertArrayHasKey('#key3', $result);
@@ -522,8 +501,8 @@ class ObjectEncryptorTest extends TestCase
         self::assertEquals('value1', $result['key1']);
         self::assertEquals('value2', $result['key2']['nestedKey1']);
         self::assertEquals('someValue', $result['#key3']['anotherNestedKey']);
-        self::assertEquals('KBC::Encrypted==', substr($result['#key3']['#encryptedNestedKey'], 0, 16));
-        self::assertEquals('KBC::Encrypted==', substr($result['key2']['nestedKey2']['#finalKey'], 0, 16));
+        self::assertStringStartsWith('KBC::ComponentSecure', $result['#key3']['#encryptedNestedKey']);
+        self::assertStringStartsWith('KBC::ComponentSecure', $result['key2']['nestedKey2']['#finalKey']);
 
         $decrypted = $encryptor->decrypt($result);
         self::assertArrayHasKey('key1', $decrypted);
@@ -539,23 +518,23 @@ class ObjectEncryptorTest extends TestCase
         self::assertEquals('someValue2', $decrypted['#key3']['#encryptedNestedKey']);
     }
 
-    public function testEncryptorNestedObjectWithArrayKeyHashmark()
+    public function testEncryptorNestedObjectWithArrayKeyHashmark(): void
     {
         $encryptor = $this->factory->getEncryptor();
-        $object = new \stdClass();
-        $nested1 = new \stdClass();
-        $nested2 = new \stdClass();
+        $object = new stdClass();
+        $nested1 = new stdClass();
+        $nested2 = new stdClass();
         $nested2->{'#finalKey'} = 'value3';
         $nested1->nestedKey1 = 'value2';
         $nested1->nestedKey2 = $nested2;
         $object->key1 = 'value1';
         $object->key2 = $nested1;
-        $nested3 = new \stdClass();
+        $nested3 = new stdClass();
         $nested3->anotherNestedKey = 'someValue';
         $nested3->{'#encryptedNestedKey'} = 'someValue2';
         $object->{'#key3'} = $nested3;
 
-        $result = $encryptor->encrypt($object);
+        $result = $encryptor->encrypt($object, $encryptor->getRegisteredComponentWrapperClass());
         self::assertObjectHasAttribute('key1', $result);
         self::assertObjectHasAttribute('key2', $result);
         self::assertObjectHasAttribute('#key3', $result);
@@ -566,8 +545,8 @@ class ObjectEncryptorTest extends TestCase
         self::assertEquals('value1', $result->key1);
         self::assertEquals('value2', $result->key2->nestedKey1);
         self::assertEquals('someValue', $result->{'#key3'}->anotherNestedKey);
-        self::assertEquals('KBC::Encrypted==', substr($result->{'#key3'}->{'#encryptedNestedKey'}, 0, 16));
-        self::assertEquals('KBC::Encrypted==', substr($result->key2->nestedKey2->{'#finalKey'}, 0, 16));
+        self::assertStringStartsWith('KBC::ComponentSecure', $result->{'#key3'}->{'#encryptedNestedKey'});
+        self::assertStringStartsWith('KBC::ComponentSecure', $result->key2->nestedKey2->{'#finalKey'});
 
         $decrypted = $encryptor->decrypt($result);
         self::assertObjectHasAttribute('key1', $decrypted);
@@ -583,10 +562,10 @@ class ObjectEncryptorTest extends TestCase
         self::assertEquals('someValue2', $decrypted->{'#key3'}->{'#encryptedNestedKey'});
     }
 
-    public function testEncryptorNestedArrayEncrypted()
+    public function testEncryptorNestedArrayEncrypted(): void
     {
         $encryptor = $this->factory->getEncryptor();
-        $encryptedValue = $encryptor->encrypt('test');
+        $encryptedValue = $encryptor->encrypt('test', $encryptor->getRegisteredComponentWrapperClass());
         $array = [
             'key1' => 'value1',
             'key2' => [
@@ -598,7 +577,7 @@ class ObjectEncryptorTest extends TestCase
             ]
         ];
 
-        $result = $encryptor->encrypt($array);
+        $result = $encryptor->encrypt($array, $encryptor->getRegisteredComponentWrapperClass());
         self::assertArrayHasKey('key1', $result);
         self::assertArrayHasKey('key2', $result);
         self::assertArrayHasKey('nestedKey1', $result['key2']);
@@ -607,7 +586,7 @@ class ObjectEncryptorTest extends TestCase
         self::assertArrayHasKey('#finalKeyEncrypted', $result['key2']['nestedKey2']);
         self::assertEquals('value1', $result['key1']);
         self::assertEquals('value2', $result['key2']['nestedKey1']);
-        self::assertEquals('KBC::Encrypted==', substr($result['key2']['nestedKey2']['#finalKey'], 0, 16));
+        self::assertStringStartsWith('KBC::ComponentSecure', $result['key2']['nestedKey2']['#finalKey']);
         self::assertEquals($encryptedValue, $result['key2']['nestedKey2']['#finalKeyEncrypted']);
 
         $decrypted = $encryptor->decrypt($result);
@@ -623,22 +602,22 @@ class ObjectEncryptorTest extends TestCase
         self::assertEquals('test', $decrypted['key2']['nestedKey2']['#finalKeyEncrypted']);
     }
 
-    public function testEncryptorNestedObjectEncrypted()
+    public function testEncryptorNestedObjectEncrypted(): void
     {
         $encryptor = $this->factory->getEncryptor();
-        $encryptedValue = $encryptor->encrypt('test');
+        $encryptedValue = $encryptor->encrypt('test', $encryptor->getRegisteredComponentWrapperClass());
 
-        $object = new \stdClass();
+        $object = new stdClass();
         $object->key1 = 'value1';
-        $nested1 = new \stdClass();
+        $nested1 = new stdClass();
         $nested1->nestedKey1 = 'value2';
-        $nested2 = new \stdClass();
+        $nested2 = new stdClass();
         $nested2->{'#finalKey'} = 'value3';
         $nested2->{'#finalKeyEncrypted'} = $encryptedValue;
         $nested1->nestedKey2 = $nested2;
         $object->key2 = $nested1;
 
-        $result = $encryptor->encrypt($object);
+        $result = $encryptor->encrypt($object, $encryptor->getRegisteredComponentWrapperClass());
         self::assertObjectHasAttribute('key1', $result);
         self::assertObjectHasAttribute('key2', $result);
         self::assertObjectHasAttribute('nestedKey1', $result->key2);
@@ -647,7 +626,7 @@ class ObjectEncryptorTest extends TestCase
         self::assertObjectHasAttribute('#finalKeyEncrypted', $result->key2->nestedKey2);
         self::assertEquals('value1', $result->key1);
         self::assertEquals('value2', $result->key2->nestedKey1);
-        self::assertEquals('KBC::Encrypted==', substr($result->key2->nestedKey2->{'#finalKey'}, 0, 16));
+        self::assertStringStartsWith('KBC::ComponentSecure', $result->key2->nestedKey2->{'#finalKey'});
         self::assertEquals($encryptedValue, $result->key2->nestedKey2->{'#finalKeyEncrypted'});
 
         $decrypted = $encryptor->decrypt($result);
@@ -663,7 +642,7 @@ class ObjectEncryptorTest extends TestCase
         self::assertEquals('test', $decrypted->key2->nestedKey2->{'#finalKeyEncrypted'});
     }
 
-    public function testEncryptorNestedArrayWithArray()
+    public function testEncryptorNestedArrayWithArray(): void
     {
         $encryptor = $this->factory->getEncryptor();
         $array = [
@@ -673,7 +652,7 @@ class ObjectEncryptorTest extends TestCase
                 ['nestedKey2' => ['#finalKey' => 'value3']]
             ]
         ];
-        $result = $encryptor->encrypt($array);
+        $result = $encryptor->encrypt($array, $encryptor->getRegisteredComponentWrapperClass());
         self::assertArrayHasKey('key1', $result);
         self::assertArrayHasKey('key2', $result);
         self::assertCount(2, $result['key2']);
@@ -682,7 +661,7 @@ class ObjectEncryptorTest extends TestCase
         self::assertArrayHasKey('#finalKey', $result['key2'][1]['nestedKey2']);
         self::assertEquals('value1', $result['key1']);
         self::assertEquals('value2', $result['key2'][0]['nestedKey1']);
-        self::assertEquals('KBC::Encrypted==', substr($result['key2'][1]['nestedKey2']['#finalKey'], 0, 16));
+        self::assertStringStartsWith('KBC::ComponentSecure', $result['key2'][1]['nestedKey2']['#finalKey']);
 
         $decrypted = $encryptor->decrypt($result);
         self::assertArrayHasKey('key1', $decrypted);
@@ -696,22 +675,22 @@ class ObjectEncryptorTest extends TestCase
         self::assertEquals('value3', $decrypted['key2'][1]['nestedKey2']['#finalKey']);
     }
 
-    public function testEncryptorNestedObjectWithArray()
+    public function testEncryptorNestedObjectWithArray(): void
     {
         $encryptor = $this->factory->getEncryptor();
-        $object = new \stdClass();
+        $object = new stdClass();
         $object->key1 = 'value1';
         $object->key2 = [];
-        $nested1 = new \stdClass();
+        $nested1 = new stdClass();
         $nested1->nestedKey1 = 'value2';
         $object->key2[] = $nested1;
-        $nested2 = new \stdClass();
-        $nested3 = new \stdClass();
+        $nested2 = new stdClass();
+        $nested3 = new stdClass();
         $nested3->{'#finalKey'} = 'value3';
         $nested2->nestedKey2 = $nested3;
         $object->key2[] = $nested2;
 
-        $result = $encryptor->encrypt($object);
+        $result = $encryptor->encrypt($object, $encryptor->getRegisteredComponentWrapperClass());
 
         self::assertObjectHasAttribute('key1', $result);
         self::assertObjectHasAttribute('key2', $result);
@@ -721,7 +700,7 @@ class ObjectEncryptorTest extends TestCase
         self::assertObjectHasAttribute('#finalKey', $result->key2[1]->nestedKey2);
         self::assertEquals('value1', $result->key1);
         self::assertEquals('value2', $result->key2[0]->nestedKey1);
-        self::assertEquals('KBC::Encrypted==', substr($result->key2[1]->nestedKey2->{'#finalKey'}, 0, 16));
+        self::assertStringStartsWith('KBC::ComponentSecure', $result->key2[1]->nestedKey2->{'#finalKey'});
 
         $decrypted = $encryptor->decrypt($result);
         self::assertObjectHasAttribute('key1', $decrypted);
@@ -735,19 +714,15 @@ class ObjectEncryptorTest extends TestCase
         self::assertEquals('value3', $decrypted->key2[1]->nestedKey2->{'#finalKey'});
     }
 
-    public function testMixedCryptoWrappersDecryptArray()
+    public function testMixedCryptoWrappersDecryptArray(): void
     {
         $encryptor = $this->factory->getEncryptor();
-        $wrapper = new AnotherCryptoWrapper();
-        $wrapper->setKey(md5(uniqid()));
-        $encryptor->pushWrapper($wrapper);
-
         $array = [
-            '#key1' => $encryptor->encrypt('value1'),
-            '#key2' => $encryptor->encrypt('value2', AnotherCryptoWrapper::class)
+            '#key1' => $encryptor->encrypt('value1', $encryptor->getRegisteredComponentWrapperClass()),
+            '#key2' => $encryptor->encrypt('value2', $encryptor->getRegisteredProjectWrapperClass())
         ];
-        self::assertEquals('KBC::Encrypted==', substr($array['#key1'], 0, 16));
-        self::assertEquals('KBC::AnotherCryptoWrapper==', substr($array['#key2'], 0, 27));
+        self::assertStringStartsWith('KBC::ComponentSecure', $array['#key1']);
+        self::assertStringStartsWith('KBC::ProjectSecureKV::', $array['#key2']);
 
         $decrypted = $encryptor->decrypt($array);
         self::assertArrayHasKey('#key1', $decrypted);
@@ -757,19 +732,15 @@ class ObjectEncryptorTest extends TestCase
         self::assertEquals('value2', $decrypted['#key2']);
     }
 
-    public function testMixedCryptoWrappersDecryptObject()
+    public function testMixedCryptoWrappersDecryptObject(): void
     {
         $encryptor = $this->factory->getEncryptor();
-        $wrapper = new AnotherCryptoWrapper();
-        $wrapper->setKey(md5(uniqid()));
-        $encryptor->pushWrapper($wrapper);
+        $object = new stdClass();
+        $object->{'#key1'} = $encryptor->encrypt('value1', $encryptor->getRegisteredComponentWrapperClass());
+        $object->{'#key2'} = $encryptor->encrypt('value2', $encryptor->getRegisteredProjectWrapperClass());
 
-        $object = new \stdClass();
-        $object->{'#key1'} = $encryptor->encrypt('value1');
-        $object->{'#key2'} = $encryptor->encrypt('value2', AnotherCryptoWrapper::class);
-
-        self::assertEquals('KBC::Encrypted==', substr($object->{'#key1'}, 0, 16));
-        self::assertEquals('KBC::AnotherCryptoWrapper==', substr($object->{'#key2'}, 0, 27));
+        self::assertStringStartsWith('KBC::ComponentSecureKV::', $object->{'#key1'});
+        self::assertStringStartsWith('KBC::ProjectSecureKV::', $object->{'#key2'});
 
         $decrypted = $encryptor->decrypt($object);
         self::assertObjectHasAttribute('#key1', $decrypted);
@@ -778,33 +749,33 @@ class ObjectEncryptorTest extends TestCase
         self::assertEquals('value2', $decrypted->{'#key2'});
     }
 
-    public function testEncryptEmptyArray()
+    public function testEncryptEmptyArray(): void
     {
         $encryptor = $this->factory->getEncryptor();
         $array = [];
-        $encrypted = $encryptor->encrypt($array);
+        $encrypted = $encryptor->encrypt($array, $encryptor->getRegisteredComponentWrapperClass());
         self::assertEquals([], $encrypted);
         self::assertEquals([], $encryptor->decrypt($encrypted));
     }
 
-    public function testEncryptEmptyObject()
+    public function testEncryptEmptyObject(): void
     {
         $encryptor = $this->factory->getEncryptor();
-        $object = new \stdClass();
-        $encrypted = $encryptor->encrypt($object);
-        self::assertEquals(\stdClass::class, get_class($encrypted));
-        self::assertEquals(\stdClass::class, get_class($encryptor->decrypt($encrypted)));
+        $object = new stdClass();
+        $encrypted = $encryptor->encrypt($object, $encryptor->getRegisteredComponentWrapperClass());
+        self::assertEquals(stdClass::class, get_class($encrypted));
+        self::assertEquals(stdClass::class, get_class($encryptor->decrypt($encrypted)));
     }
 
-    public function testEncryptorNoWrappers()
+    public function testEncryptorNoWrappers(): void
     {
         $encryptor = new ObjectEncryptor();
         self::expectException(ApplicationException::class);
-        self::expectExceptionMessage('Invalid crypto wrapper Keboola\ObjectEncryptor\Legacy\Wrapper\BaseWrapper');
-        $encryptor->encrypt('test');
+        self::expectExceptionMessage('No Component wrappers registered.');
+        $encryptor->encrypt('test', $encryptor->getRegisteredComponentWrapperClass());
     }
 
-    public function testEncryptorDecodedJSONObject()
+    public function testEncryptorDecodedJSONObject(): void
     {
         $encryptor = $this->factory->getEncryptor();
         $json = '{
@@ -824,7 +795,7 @@ class ObjectEncryptorTest extends TestCase
             "emptyObject": {}
         }';
 
-        $result = $encryptor->encrypt(json_decode($json));
+        $result = $encryptor->encrypt(json_decode($json), $encryptor->getRegisteredComponentWrapperClass());
         self::assertTrue(is_object($result));
         self::assertObjectHasAttribute('key1', $result);
         self::assertObjectHasAttribute('key2', $result);
@@ -844,8 +815,8 @@ class ObjectEncryptorTest extends TestCase
         self::assertEquals('value1', $result->key1);
         self::assertEquals('value2', $result->key2->nestedKey1);
         self::assertEquals('someValue', $result->{'#key3'}->anotherNestedKey);
-        self::assertEquals('KBC::Encrypted==', substr($result->{'#key3'}->{'#encryptedNestedKey'}, 0, 16));
-        self::assertEquals('KBC::Encrypted==', substr($result->key2->nestedKey2->{'#finalKey'}, 0, 16));
+        self::assertStringStartsWith('KBC::ComponentSecureKV::', $result->{'#key3'}->{'#encryptedNestedKey'});
+        self::assertStringStartsWith('KBC::ComponentSecureKV::', $result->key2->nestedKey2->{'#finalKey'});
 
         $decrypted = $encryptor->decrypt($result);
         self::assertTrue(is_object($decrypted));
@@ -873,62 +844,12 @@ class ObjectEncryptorTest extends TestCase
         self::assertEquals(json_encode($decrypted), json_encode(json_decode($json)));
     }
 
-    public function testEncryptorLegacyNoMCrypt()
-    {
-        $encryptor = $this->factory->getEncryptor(true);
-        $prop = new \ReflectionProperty($encryptor, 'legacyEncryptor');
-        $prop->setAccessible(true);
-        $legacyEncryptor = $prop->getValue($encryptor);
-        if (!function_exists('mcrypt_module_open')) {
-            self::assertNull($legacyEncryptor);
-        } else {
-            self::assertNotNull($legacyEncryptor);
-        }
-    }
-
-    public function testEncryptorLegacyNoMCryptNoRequire()
-    {
-        $encryptor = $this->factory->getEncryptor();
-        $prop = new \ReflectionProperty($encryptor, 'legacyEncryptor');
-        $prop->setAccessible(true);
-        $legacyEncryptor = $prop->getValue($encryptor);
-        self::assertNull($legacyEncryptor);
-    }
-
-    public function testEncryptorLegacy()
-    {
-        if (!function_exists('mcrypt_module_open')) {
-            self::markTestSkipped("Mcrypt not available");
-        }
-        $encryptor = $this->factory->getEncryptor(true);
-        $legacyEncryptor = new Encryptor($this->aesKey);
-
-        $originalText = 'secret';
-        $encrypted = $legacyEncryptor->encrypt($originalText);
-        self::assertNotEquals($originalText, $encrypted);
-        self::assertEquals($originalText, $encryptor->decrypt($encrypted));
-    }
-
-    public function testEncryptorLegacyFail()
-    {
-        $encryptor = $this->factory->getEncryptor();
-        $originalText = 'test';
-        self::expectException(UserException::class);
-        self::expectExceptionMessage('Value is not an encrypted value.');
-        $encryptor->decrypt($originalText);
-    }
-
     /**
      * @dataProvider registeredProvider()
-     * @param string $kmsKey
-     * @param string $keyVaultUrl
-     * @param string $classifier
-     * @param string $expectedClass
-     * @throws ApplicationException
      */
-    public function testGetRegisteredWrapperEncryptor($kmsKey, $keyVaultUrl, $classifier, $expectedClass)
+    public function testGetRegisteredWrapperEncryptor(string $kmsKey, string $keyVaultUrl, string $classifier, string $expectedClass): void
     {
-        $factory = new ObjectEncryptorFactory($kmsKey, getenv('TEST_AWS_REGION'), '', $this->aesKey, $keyVaultUrl);
+        $factory = new ObjectEncryptorFactory($kmsKey, getenv('TEST_AWS_REGION'), $keyVaultUrl);
         $factory->setStackId('my-stack');
         $factory->setComponentId('dummy-component');
         $factory->setConfigurationId('123456');
@@ -938,7 +859,7 @@ class ObjectEncryptorTest extends TestCase
         self::assertEquals($expectedClass, $encryptor->$method());
     }
 
-    public function registeredProvider()
+    public function registeredProvider(): array
     {
         return [
             'kms-akv-component' => [
@@ -1000,13 +921,10 @@ class ObjectEncryptorTest extends TestCase
 
     /**
      * @dataProvider registeredFailureProvider()
-     * @param string $classifier
-     * @param $expectedMessage
-     * @throws ApplicationException
      */
-    public function testGetRegisteredWrapperFailure($classifier, $expectedMessage)
+    public function testGetRegisteredWrapperFailure(string $classifier, string $expectedMessage): void
     {
-        $factory = new ObjectEncryptorFactory(getenv('TEST_AWS_KMS_KEY_ID'), getenv('TEST_AWS_REGION'), '', $this->aesKey, getenv('TEST_KEY_VAULT_URL'));
+        $factory = new ObjectEncryptorFactory(getenv('TEST_AWS_KMS_KEY_ID'), getenv('TEST_AWS_REGION'), getenv('TEST_KEY_VAULT_URL'));
         $factory->setStackId('my-stack');
         $encryptor = $factory->getEncryptor();
         $method = 'getRegistered' . $classifier . 'WrapperClass';
@@ -1015,7 +933,7 @@ class ObjectEncryptorTest extends TestCase
         $encryptor->$method();
     }
 
-    public function registeredFailureProvider()
+    public function registeredFailureProvider(): array
     {
         return [
             [

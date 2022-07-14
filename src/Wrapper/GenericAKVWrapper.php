@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Keboola\ObjectEncryptor\Wrapper;
 
 use Defuse\Crypto\Crypto;
 use Defuse\Crypto\Key;
-use Exception;
 use Keboola\AzureKeyVaultClient\Authentication\AuthenticatorFactory;
 use Keboola\AzureKeyVaultClient\Client;
 use Keboola\AzureKeyVaultClient\GuzzleClientFactory;
@@ -17,6 +18,7 @@ use Psr\Log\NullLogger;
 use Retry\BackOff\ExponentialBackOffPolicy;
 use Retry\Policy\SimpleRetryPolicy;
 use Retry\RetryProxy;
+use Throwable;
 
 class GenericAKVWrapper implements CryptoWrapperInterface
 {
@@ -27,20 +29,9 @@ class GenericAKVWrapper implements CryptoWrapperInterface
     const SECRET_NAME = 3;
     const SECRET_VERSION = 4;
 
-    /**
-     * @var array Key value metadata.
-     */
-    private $metadata = [];
-
-    /**
-     * @var string
-     */
-    private $keyVaultURL;
-
-    /**
-     * @var Client
-     */
-    private $client;
+    private array $metadata = [];
+    private string $keyVaultURL;
+    private ?Client $client = null;
 
     /**
      * Set cipher metadata.
@@ -85,13 +76,9 @@ class GenericAKVWrapper implements CryptoWrapperInterface
         $this->keyVaultURL = $keyVaultURL;
     }
 
-    /**
-     * Get Azure Key Vault client
-     * @return Client
-     */
-    protected function getClient()
+    public function getClient(): Client
     {
-        if (!$this->client) {
+        if ($this->client === null) {
             $this->client = new Client(
                 new GuzzleClientFactory(new NullLogger()),
                 new AuthenticatorFactory(),
@@ -129,8 +116,8 @@ class GenericAKVWrapper implements CryptoWrapperInterface
     {
         try {
             return @unserialize(gzuncompress(base64_decode($data)));
-        } catch (Exception $e) {
-            throw new UserException('Cipher is malformed.', $e);
+        } catch (Throwable $e) {
+            throw new UserException('Cipher is malformed.', 0, $e);
         }
     }
 
@@ -140,12 +127,9 @@ class GenericAKVWrapper implements CryptoWrapperInterface
      * @throws ApplicationException
      * @throws UserException
      */
-    public function encrypt($data)
+    public function encrypt(?string $data): string
     {
         $this->validateState();
-        if (!is_scalar($data) && !is_null($data)) {
-            throw new UserException('Cannot encrypt a non-scalar value.');
-        }
         try {
             $key = Key::createNewRandomKey();
             $context = $this->encode([
@@ -164,8 +148,8 @@ class GenericAKVWrapper implements CryptoWrapperInterface
                 self::SECRET_NAME => $secret->getName(),
                 self::SECRET_VERSION => $secret->getVersion(),
             ]);
-        } catch (Exception $e) {
-            throw new ApplicationException('Ciphering failed: ' . $e->getMessage(), $e);
+        } catch (Throwable $e) {
+            throw new ApplicationException('Ciphering failed: ' . $e->getMessage(), $e->getCode(), $e);
         }
     }
 
@@ -189,7 +173,7 @@ class GenericAKVWrapper implements CryptoWrapperInterface
      * @throws ApplicationException
      * @throws UserException
      */
-    public function decrypt($encryptedData)
+    public function decrypt(string $encryptedData): string
     {
         $this->validateState();
         $encrypted = $this->decode($encryptedData);
@@ -212,22 +196,22 @@ class GenericAKVWrapper implements CryptoWrapperInterface
             ) {
                 throw new ApplicationException('Deciphering failed.');
             }
-        } catch (Exception $e) {
-            throw new ApplicationException('Deciphering failed.', $e);
+        } catch (Throwable $e) {
+            throw new ApplicationException('Deciphering failed.', $e->getCode(), $e);
         }
         $this->verifyMetadata($decryptedContext[self::METADATA_INDEX], $this->metadata);
         try {
             $key = Key::loadFromAsciiSafeString($decryptedContext[self::KEY_INDEX]);
             return Crypto::decrypt($encrypted[self::PAYLOAD_INDEX], $key, true);
-        } catch (Exception $e) {
-            throw new ApplicationException('Deciphering failed.', $e);
+        } catch (Throwable $e) {
+            throw new ApplicationException('Deciphering failed.', $e->getCode(), $e);
         }
     }
 
     /**
      * @inheritdoc
      */
-    public function getPrefix()
+    public function getPrefix(): string
     {
         return 'KBC::SecureKV::';
     }

@@ -6,3 +6,4 @@
 /.env
 /build/logs/
 /.env.local
+/.phpunit.result.cache

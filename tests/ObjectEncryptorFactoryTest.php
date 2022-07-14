@@ -4,9 +4,6 @@ namespace Keboola\ObjectEncryptor\Tests;
 
 use Keboola\ObjectEncryptor\Exception\ApplicationException;
 use Keboola\ObjectEncryptor\Exception\UserException;
-use Keboola\ObjectEncryptor\Legacy\Wrapper\BaseWrapper;
-use Keboola\ObjectEncryptor\Legacy\Wrapper\ComponentProjectWrapper;
-use Keboola\ObjectEncryptor\Legacy\Wrapper\ComponentWrapper as LegacyComponentWrapper;
 use Keboola\ObjectEncryptor\ObjectEncryptorFactory;
 use Keboola\ObjectEncryptor\Wrapper\ComponentAKVWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ComponentKMSWrapper;
@@ -21,7 +18,7 @@ use PHPUnit\Framework\TestCase;
 
 class ObjectEncryptorFactoryTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         putenv('AWS_ACCESS_KEY_ID=' . getenv('TEST_AWS_ACCESS_KEY_ID'));
@@ -31,79 +28,16 @@ class ObjectEncryptorFactoryTest extends TestCase
         putenv('AZURE_CLIENT_SECRET=' . getenv('TEST_CLIENT_SECRET'));
     }
 
-    public function testFactoryLegacyComponentProject()
-    {
-        $legacyKey = '1234567890123456';
-        $aesKey = '123456789012345678901234567890ab';
-        $secret = 'secret';
-        $factory = new ObjectEncryptorFactory(getenv('TEST_AWS_KMS_KEY_ID'), getenv('TEST_AWS_REGION'), $legacyKey, $aesKey, getenv('TEST_KEY_VAULT_URL'));
-        $factory->setComponentId('dummy-component');
-        $factory->setConfigurationId('123456');
-        $factory->setProjectId('123');
-        $wrapper = new ComponentProjectWrapper();
-        $wrapper->setComponentId('dummy-component');
-        $wrapper->setProjectId('123');
-        $wrapper->setKey($legacyKey);
-        $encrypted = $wrapper->encrypt($secret);
-        self::assertEquals($secret, $wrapper->decrypt($encrypted));
-        $encrypted = $factory->getEncryptor()->encrypt($secret, ComponentProjectWrapper::class);
-        self::assertStringStartsWith('KBC::ComponentProjectEncrypted==', $encrypted);
-        $encrypted = substr($encrypted, strlen($wrapper->getPrefix()));
-        $decrypted = $wrapper->decrypt($encrypted);
-        self::assertEquals($secret, $decrypted);
-    }
-
-    public function testFactoryLegacyComponent()
-    {
-        $legacyKey = '1234567890123456';
-        $aesKey = '123456789012345678901234567890ab';
-        $secret = 'secret';
-        $factory = new ObjectEncryptorFactory(getenv('TEST_AWS_KMS_KEY_ID'), getenv('TEST_AWS_REGION'), $legacyKey, $aesKey, getenv('TEST_KEY_VAULT_URL'));
-        $factory->setComponentId('dummy-component');
-        $factory->setConfigurationId('123456');
-        $factory->setProjectId('123');
-        $wrapper = new LegacyComponentWrapper();
-        $wrapper->setComponentId('dummy-component');
-        $wrapper->setKey($legacyKey);
-        $encrypted = $wrapper->encrypt($secret);
-        self::assertEquals($secret, $wrapper->decrypt($encrypted));
-        $encrypted = $factory->getEncryptor()->encrypt($secret, LegacyComponentWrapper::class);
-        self::assertStringStartsWith('KBC::ComponentEncrypted==', $encrypted);
-        $encrypted = substr($encrypted, strlen($wrapper->getPrefix()));
-        $decrypted = $wrapper->decrypt($encrypted);
-        self::assertEquals($secret, $decrypted);
-    }
-
-    public function testFactoryLegacyBase()
-    {
-        $legacyKey = '1234567890123456';
-        $aesKey = '123456789012345678901234567890ab';
-        $secret = 'secret';
-        $factory = new ObjectEncryptorFactory(getenv('TEST_AWS_KMS_KEY_ID'), getenv('TEST_AWS_REGION'), $legacyKey, $aesKey, getenv('TEST_KEY_VAULT_URL'));
-        $factory->setComponentId('dummy-component');
-        $factory->setConfigurationId('123456');
-        $factory->setProjectId('123');
-        $wrapper = new BaseWrapper();
-        $wrapper->setKey($legacyKey);
-        $encrypted = $wrapper->encrypt($secret);
-        self::assertEquals($secret, $wrapper->decrypt($encrypted));
-        $encrypted = $factory->getEncryptor()->encrypt($secret, BaseWrapper::class);
-        self::assertStringStartsWith('KBC::Encrypted==', $encrypted);
-        $encrypted = substr($encrypted, strlen($wrapper->getPrefix()));
-        $decrypted = $wrapper->decrypt($encrypted);
-        self::assertEquals($secret, $decrypted);
-    }
-
     /**
      * @return CryptoWrapperInterface[][]
      */
-    public function configurationWrapperProvider()
+    public function configurationWrapperProvider(): array
     {
         $configurationKMSWrapper = new ConfigurationKMSWrapper();
-        $configurationKMSWrapper->setKMSRegion(getenv('TEST_AWS_REGION'));
-        $configurationKMSWrapper->setKMSKeyId(getenv('TEST_AWS_KMS_KEY_ID'));
+        $configurationKMSWrapper->setKMSRegion((string) getenv('TEST_AWS_REGION'));
+        $configurationKMSWrapper->setKMSKeyId((string) getenv('TEST_AWS_KMS_KEY_ID'));
         $configurationAKVWrapper = new ConfigurationAKVWrapper();
-        $configurationAKVWrapper->setKeyVaultUrl(getenv('TEST_KEY_VAULT_URL'));
+        $configurationAKVWrapper->setKeyVaultUrl((string) getenv('TEST_KEY_VAULT_URL'));
 
         return [
             'KMS' => [
@@ -120,12 +54,10 @@ class ObjectEncryptorFactoryTest extends TestCase
      * @throws ApplicationException
      * @dataProvider configurationWrapperProvider
      */
-    public function testConfigurationWrapper(CryptoWrapperInterface $wrapper)
+    public function testConfigurationWrapper(CryptoWrapperInterface $wrapper): void
     {
-        $legacyKey = '1234567890123456';
-        $aesKey = '123456789012345678901234567890ab';
         $secret = 'secret';
-        $factory = new ObjectEncryptorFactory(getenv('TEST_AWS_KMS_KEY_ID'), getenv('TEST_AWS_REGION'), $legacyKey, $aesKey, getenv('TEST_KEY_VAULT_URL'));
+        $factory = new ObjectEncryptorFactory(getenv('TEST_AWS_KMS_KEY_ID'), getenv('TEST_AWS_REGION'), getenv('TEST_KEY_VAULT_URL'));
         $factory->setStackId('my-stack');
         $factory->setComponentId('dummy-component');
         $factory->setConfigurationId('123456');
@@ -146,7 +78,7 @@ class ObjectEncryptorFactoryTest extends TestCase
     /**
      * @return CryptoWrapperInterface[][]
      */
-    public function projectWrapperProvider()
+    public function projectWrapperProvider(): array
     {
         $projectKMSWrapper = new ProjectKMSWrapper();
         $projectKMSWrapper->setKMSRegion(getenv('TEST_AWS_REGION'));
@@ -169,12 +101,10 @@ class ObjectEncryptorFactoryTest extends TestCase
      * @throws ApplicationException
      * @dataProvider projectWrapperProvider
      */
-    public function testProjectWrapper(CryptoWrapperInterface $wrapper)
+    public function testProjectWrapper(CryptoWrapperInterface $wrapper): void
     {
-        $legacyKey = '1234567890123456';
-        $aesKey = '123456789012345678901234567890ab';
         $secret = 'secret';
-        $factory = new ObjectEncryptorFactory(getenv('TEST_AWS_KMS_KEY_ID'), getenv('TEST_AWS_REGION'), $legacyKey, $aesKey, getenv('TEST_KEY_VAULT_URL'));
+        $factory = new ObjectEncryptorFactory(getenv('TEST_AWS_KMS_KEY_ID'), getenv('TEST_AWS_REGION'), getenv('TEST_KEY_VAULT_URL'));
         $factory->setComponentId('dummy-component');
         $factory->setStackId('my-stack');
         $factory->setProjectId('my-project');
@@ -193,7 +123,7 @@ class ObjectEncryptorFactoryTest extends TestCase
     /**
      * @return CryptoWrapperInterface[][]
      */
-    public function componentWrapperProvider()
+    public function componentWrapperProvider(): array
     {
         $componentKMSWrapper = new ComponentKMSWrapper();
         $componentKMSWrapper->setKMSRegion(getenv('TEST_AWS_REGION'));
@@ -212,16 +142,12 @@ class ObjectEncryptorFactoryTest extends TestCase
     }
 
     /**
-     * @param CryptoWrapperInterface $wrapper
-     * @throws ApplicationException
      * @dataProvider componentWrapperProvider
      */
-    public function testComponentWrapper(CryptoWrapperInterface $wrapper)
+    public function testComponentWrapper(CryptoWrapperInterface $wrapper): void
     {
-        $legacyKey = '1234567890123456';
-        $aesKey = '123456789012345678901234567890ab';
         $secret = 'secret';
-        $factory = new ObjectEncryptorFactory(getenv('TEST_AWS_KMS_KEY_ID'), getenv('TEST_AWS_REGION'), $legacyKey, $aesKey, getenv('TEST_KEY_VAULT_URL'));
+        $factory = new ObjectEncryptorFactory(getenv('TEST_AWS_KMS_KEY_ID'), getenv('TEST_AWS_REGION'), getenv('TEST_KEY_VAULT_URL'));
         $factory->setComponentId('dummy-component');
         $factory->setStackId('my-stack');
 
@@ -237,7 +163,7 @@ class ObjectEncryptorFactoryTest extends TestCase
     /**
      * @return CryptoWrapperInterface[][]
      */
-    public function genericWrapperProvider()
+    public function genericWrapperProvider(): array
     {
         $genericKMSWrapper = new GenericKMSWrapper();
         $genericKMSWrapper->setKMSRegion(getenv('TEST_AWS_REGION'));
@@ -256,16 +182,12 @@ class ObjectEncryptorFactoryTest extends TestCase
     }
 
     /**
-     * @param CryptoWrapperInterface $wrapper
-     * @throws ApplicationException
      * @dataProvider genericWrapperProvider
      */
-    public function testGenericWrapper(CryptoWrapperInterface $wrapper)
+    public function testGenericWrapper(CryptoWrapperInterface $wrapper): void
     {
-        $legacyKey = '1234567890123456';
-        $aesKey = '123456789012345678901234567890ab';
         $secret = 'secret';
-        $factory = new ObjectEncryptorFactory(getenv('TEST_AWS_KMS_KEY_ID'), getenv('TEST_AWS_REGION'), $legacyKey, $aesKey, getenv('TEST_KEY_VAULT_URL'));
+        $factory = new ObjectEncryptorFactory(getenv('TEST_AWS_KMS_KEY_ID'), getenv('TEST_AWS_REGION'), getenv('TEST_KEY_VAULT_URL'));
         $encrypted = $factory->getEncryptor()->encrypt($secret, get_class($wrapper));
         self::assertStringStartsWith($wrapper->getPrefix(), $encrypted);
         $encrypted = substr($encrypted, strlen($wrapper->getPrefix()));
@@ -276,7 +198,7 @@ class ObjectEncryptorFactoryTest extends TestCase
     /**
      * @return string[][]
      */
-    public function genericWrapperClassProvider()
+    public function genericWrapperClassProvider(): array
     {
         return [
             [
@@ -289,16 +211,12 @@ class ObjectEncryptorFactoryTest extends TestCase
     }
 
     /**
-     * @param $wrapperClass
-     * @throws ApplicationException
      * @dataProvider genericWrapperClassProvider
      */
-    public function testGenericWrapperInvalidCredentials($wrapperClass)
+    public function testGenericWrapperInvalidCredentials(string $wrapperClass): void
     {
-        $legacyKey = '1234567890123456';
-        $aesKey = '123456789012345678901234567890ab';
         $secret = 'secret';
-        $factory = new ObjectEncryptorFactory('non-existent', getenv('TEST_AWS_REGION'), $legacyKey, $aesKey, 'non-existent');
+        $factory = new ObjectEncryptorFactory('non-existent', getenv('TEST_AWS_REGION'), 'non-existent');
         self::expectException(ApplicationException::class);
         self::expectExceptionMessage('Ciphering failed:');
         $factory->getEncryptor()->encrypt($secret, $wrapperClass);
@@ -307,7 +225,7 @@ class ObjectEncryptorFactoryTest extends TestCase
     /**
      * @return string[][]
      */
-    public function configurationWrapperClassProvider()
+    public function configurationWrapperClassProvider(): array
     {
         return [
             [
@@ -320,32 +238,24 @@ class ObjectEncryptorFactoryTest extends TestCase
     }
 
     /**
-     * @param $wrapperClass
-     * @throws ApplicationException
      * @dataProvider configurationWrapperClassProvider
      */
-    public function testConfigurationWrapperInvalidEncrypt($wrapperClass)
+    public function testConfigurationWrapperInvalidEncrypt(string $wrapperClass): void
     {
-        $legacyKey = '1234567890123456';
-        $aesKey = '123456789012345678901234567890ab';
         $secret = 'secret';
-        $factory = new ObjectEncryptorFactory(getenv('TEST_AWS_KMS_KEY_ID'), getenv('TEST_AWS_REGION'), $legacyKey, $aesKey, getenv('TEST_KEY_VAULT_URL'));
+        $factory = new ObjectEncryptorFactory(getenv('TEST_AWS_KMS_KEY_ID'), getenv('TEST_AWS_REGION'), getenv('TEST_KEY_VAULT_URL'));
         self::expectException(ApplicationException::class);
         self::expectExceptionMessage('Invalid crypto wrapper');
         $factory->getEncryptor()->encrypt($secret, $wrapperClass);
     }
 
     /**
-     * @param CryptoWrapperInterface $wrapper
-     * @throws ApplicationException
-     * @throws UserException
      * @dataProvider configurationWrapperProvider
      */
-    public function testConfigurationWrapperInvalidDecrypt(CryptoWrapperInterface $wrapper)
+    public function testConfigurationWrapperInvalidDecrypt(CryptoWrapperInterface $wrapper): void
     {
-        $legacyKey = '1234567890123456';
         $secret = 'secret';
-        $factory = new ObjectEncryptorFactory(getenv('TEST_AWS_KMS_KEY_ID'), getenv('TEST_AWS_REGION'), $legacyKey, '', getenv('TEST_KEY_VAULT_URL'));
+        $factory = new ObjectEncryptorFactory(getenv('TEST_AWS_KMS_KEY_ID'), getenv('TEST_AWS_REGION'), getenv('TEST_KEY_VAULT_URL'));
         $wrapper->setStackId('my-stack');
         $wrapper->setComponentId('dummy-component');
         $wrapper->setConfigurationId('123456');
@@ -353,14 +263,14 @@ class ObjectEncryptorFactoryTest extends TestCase
         $encrypted = $wrapper->encrypt($secret);
         self::assertEquals($secret, $wrapper->decrypt($encrypted));
         self::expectException(UserException::class);
-        self::expectExceptionMessage('Value is not an encrypted value.');
+        self::expectExceptionMessage('is not an encrypted value.');
         $factory->getEncryptor()->decrypt($encrypted);
     }
 
     /**
      * @return string[][]
      */
-    public function projectWrapperClassProvider()
+    public function projectWrapperClassProvider(): array
     {
         return [
             [
@@ -373,46 +283,44 @@ class ObjectEncryptorFactoryTest extends TestCase
     }
 
     /**
-     * @param string $wrapperClassName
-     * @throws ApplicationException
      * @dataProvider projectWrapperClassProvider
      */
-    public function testProjectWrapperInvalidEncrypt($wrapperClassName)
+    public function testProjectWrapperInvalidEncrypt(string $wrapperClassName): void
     {
-        $legacyKey = '1234567890123456';
-        $aesKey = '123456789012345678901234567890ab';
         $secret = 'secret';
-        $factory = new ObjectEncryptorFactory(getenv('TEST_AWS_KMS_KEY_ID'), getenv('TEST_AWS_REGION'), $legacyKey, $aesKey, getenv('TEST_KEY_VAULT_URL'));
+        $factory = new ObjectEncryptorFactory(getenv('TEST_AWS_KMS_KEY_ID'), getenv('TEST_AWS_REGION'), getenv('TEST_KEY_VAULT_URL'));
         self::expectException(ApplicationException::class);
         self::expectExceptionMessage('Invalid crypto wrapper');
         $factory->getEncryptor()->encrypt($secret, $wrapperClassName);
     }
 
     /**
-     * @param CryptoWrapperInterface $wrapper
-     * @throws ApplicationException
-     * @throws UserException
      * @dataProvider projectWrapperProvider
      */
-    public function testProjectWrapperInvalidDecrypt(CryptoWrapperInterface $wrapper)
+    public function testProjectWrapperInvalidDecrypt(CryptoWrapperInterface $wrapper): void
     {
-        $legacyKey = '1234567890123456';
         $secret = 'secret';
-        $factory = new ObjectEncryptorFactory(getenv('TEST_AWS_KMS_KEY_ID'), getenv('TEST_AWS_REGION'), $legacyKey, '', getenv('TEST_KEY_VAULT_URL'));
+        $factory = new ObjectEncryptorFactory(
+            (string) getenv('TEST_AWS_KMS_KEY_ID'),
+            (string) getenv('TEST_AWS_REGION'),
+            (string) getenv('TEST_KEY_VAULT_URL')
+        );
         $wrapper->setStackId('my-stack');
         $wrapper->setComponentId('dummy-component');
         $wrapper->setProjectId('my-project');
         $encrypted = $wrapper->encrypt($secret);
         self::assertEquals($secret, $wrapper->decrypt($encrypted));
         self::expectException(UserException::class);
-        self::expectExceptionMessage('Value is not an encrypted value.');
+        self::expectExceptionMessage('is not an encrypted value.');
+        $factory->setStackId('my-stack');
+        $factory->setComponentId('dummy-component');
         $factory->getEncryptor()->decrypt($encrypted);
     }
 
     /**
      * @return string[][]
      */
-    public function componentWrapperClassProvider()
+    public function componentWrapperClassProvider(): array
     {
         return [
             [
@@ -425,144 +333,50 @@ class ObjectEncryptorFactoryTest extends TestCase
     }
 
     /**
-     * @param string $wrapperClassName
-     * @throws ApplicationException
      * @dataProvider projectWrapperClassProvider
      */
-    public function testComponentWrapperInvalidEncrypt($wrapperClassName)
+    public function testComponentWrapperInvalidEncrypt(string $wrapperClassName): void
     {
-        $legacyKey = '1234567890123456';
-        $aesKey = '123456789012345678901234567890ab';
         $secret = 'secret';
-        $factory = new ObjectEncryptorFactory(getenv('TEST_AWS_KMS_KEY_ID'), getenv('TEST_AWS_REGION'), $legacyKey, $aesKey, getenv('TEST_KEY_VAULT_URL'));
+        $factory = new ObjectEncryptorFactory(getenv('TEST_AWS_KMS_KEY_ID'), getenv('TEST_AWS_REGION'), getenv('TEST_KEY_VAULT_URL'));
         self::expectException(ApplicationException::class);
         self::expectExceptionMessage('Invalid crypto wrapper');
         $factory->getEncryptor()->encrypt($secret, $wrapperClassName);
     }
 
     /**
-     * @param CryptoWrapperInterface $wrapper
-     * @throws ApplicationException
-     * @throws UserException
      * @dataProvider componentWrapperProvider
      */
-    public function testComponentWrapperInvalidDecrypt(CryptoWrapperInterface $wrapper)
+    public function testComponentWrapperInvalidDecrypt(CryptoWrapperInterface $wrapper): void
     {
-        $legacyKey = '1234567890123456';
         $secret = 'secret';
-        $factory = new ObjectEncryptorFactory(getenv('TEST_AWS_KMS_KEY_ID'), getenv('TEST_AWS_REGION'), $legacyKey, '', getenv('TEST_KEY_VAULT_URL'));
+        $factory = new ObjectEncryptorFactory(getenv('TEST_AWS_KMS_KEY_ID'), getenv('TEST_AWS_REGION'), getenv('TEST_KEY_VAULT_URL'));
         $wrapper->setStackId('my-stack');
         $wrapper->setComponentId('dummy-component');
         $encrypted = $wrapper->encrypt($secret);
         self::assertEquals($secret, $wrapper->decrypt($encrypted));
         self::expectException(UserException::class);
-        self::expectExceptionMessage('Value is not an encrypted value.');
+        self::expectExceptionMessage('is not an encrypted value.');
         $factory->getEncryptor()->decrypt($encrypted);
     }
 
-    public function testCipherError()
+    public function testCipherError(): void
     {
-        $legacyKey = '1234567890123456';
         $secret = [
             'a' => 'b',
             'c' => [
                 '#d' => 'secret'
             ]
         ];
-        $factory = new ObjectEncryptorFactory(getenv('TEST_AWS_KMS_KEY_ID'), getenv('TEST_AWS_REGION'), $legacyKey, '', getenv('TEST_KEY_VAULT_URL'));
+        $factory = new ObjectEncryptorFactory(getenv('TEST_AWS_KMS_KEY_ID'), getenv('TEST_AWS_REGION'), getenv('TEST_KEY_VAULT_URL'));
         $factory->setStackId('my-stack');
         $factory->setComponentId('dummy-component');
         $secret = $factory->getEncryptor()->encrypt($secret, ComponentKMSWrapper::class);
-        $factory = new ObjectEncryptorFactory(getenv('TEST_AWS_KMS_KEY_ID'), getenv('TEST_AWS_REGION'), $legacyKey, '', getenv('TEST_KEY_VAULT_URL'));
+        $factory = new ObjectEncryptorFactory(getenv('TEST_AWS_KMS_KEY_ID'), getenv('TEST_AWS_REGION'), getenv('TEST_KEY_VAULT_URL'));
         $factory->setStackId('my-stack');
         $factory->setComponentId('different-dummy-component');
         self::expectException(UserException::class);
-        self::expectExceptionMessage('Invalid cipher text for key #d Value KBC::ComponentSecure::');
+        self::expectExceptionMessage('Invalid cipher text for key #d Value "KBC::ComponentSecure::');
         $factory->getEncryptor()->decrypt($secret);
-    }
-
-    public function testInvalidKeysLegacyEncryption()
-    {
-        $factory = new ObjectEncryptorFactory(getenv('TEST_AWS_KMS_KEY_ID'), getenv('TEST_AWS_REGION'), 'short', '', getenv('TEST_KEY_VAULT_URL'));
-        self::expectException(ApplicationException::class);
-        self::expectExceptionMessage('Encryption key too short. Minimum is 16 bytes.');
-        $factory->getEncryptor();
-    }
-
-    public function testInvalidKeysKmsId()
-    {
-        $legacyKey = '1234567890123456';
-        $factory = new ObjectEncryptorFactory(new \stdClass(), getenv('TEST_AWS_REGION'), $legacyKey, '', getenv('TEST_KEY_VAULT_URL'));
-        self::expectException(ApplicationException::class);
-        self::expectExceptionMessage('Invalid KMS key Id.');
-        $factory->getEncryptor();
-    }
-
-    public function testInvalidKeysVaultUrl()
-    {
-        $legacyKey = '1234567890123456';
-        $factory = new ObjectEncryptorFactory('', getenv('TEST_AWS_REGION'), $legacyKey, '', new \stdClass());
-        self::expectException(ApplicationException::class);
-        self::expectExceptionMessage('Invalid AKV URL.');
-        $factory->getEncryptor();
-    }
-
-    public function testInvalidKeysVersion1()
-    {
-        /** @noinspection PhpParamsInspection */
-        $factory = new ObjectEncryptorFactory(getenv('TEST_AWS_KMS_KEY_ID'), getenv('TEST_AWS_REGION'), ['a' => 'b'], '', getenv('TEST_KEY_VAULT_URL'));
-        self::expectException(ApplicationException::class);
-        self::expectExceptionMessage('Invalid key version 1.');
-        $factory->getEncryptor();
-    }
-
-    public function testInvalidKeysVersion0()
-    {
-        $legacyKey = '1234567890123456';
-        /** @noinspection PhpParamsInspection */
-        $factory = new ObjectEncryptorFactory(getenv('TEST_AWS_KMS_KEY_ID'), getenv('TEST_AWS_REGION'), $legacyKey, ['a' => 'b'], getenv('TEST_KEY_VAULT_URL'));
-        self::expectException(ApplicationException::class);
-        self::expectExceptionMessage('Invalid key version 0.');
-        $factory->getEncryptor();
-    }
-
-    public function testInvalidParamsStackId()
-    {
-        $legacyKey = '1234567890123456';
-        $factory = new ObjectEncryptorFactory(getenv('TEST_AWS_KMS_KEY_ID'), getenv('TEST_AWS_REGION'), $legacyKey, '', getenv('TEST_KEY_VAULT_URL'));
-        self::expectException(ApplicationException::class);
-        self::expectExceptionMessage('Invalid stack id.');
-        /** @noinspection PhpParamsInspection */
-        $factory->setStackId(['a' => 'b']);
-    }
-
-    public function testInvalidParamsComponentId()
-    {
-        $legacyKey = '1234567890123456';
-        $factory = new ObjectEncryptorFactory(getenv('TEST_AWS_KMS_KEY_ID'), getenv('TEST_AWS_REGION'), $legacyKey, '', getenv('TEST_KEY_VAULT_URL'));
-        self::expectException(ApplicationException::class);
-        self::expectExceptionMessage('Invalid component id.');
-        /** @noinspection PhpParamsInspection */
-        $factory->setComponentId(['a' => 'b']);
-    }
-
-    public function testInvalidParamsProjectId()
-    {
-        $legacyKey = '1234567890123456';
-        $factory = new ObjectEncryptorFactory(getenv('TEST_AWS_KMS_KEY_ID'), getenv('TEST_AWS_REGION'), $legacyKey, '', getenv('TEST_KEY_VAULT_URL'));
-        self::expectException(ApplicationException::class);
-        self::expectExceptionMessage('Invalid project id.');
-        /** @noinspection PhpParamsInspection */
-        $factory->setProjectId(['a' => 'b']);
-    }
-
-    public function testInvalidParamsConfigurationId()
-    {
-        $legacyKey = '1234567890123456';
-        $factory = new ObjectEncryptorFactory(getenv('TEST_AWS_KMS_KEY_ID'), getenv('TEST_AWS_REGION'), $legacyKey, '', getenv('TEST_KEY_VAULT_URL'));
-        self::expectException(ApplicationException::class);
-        self::expectExceptionMessage('Invalid configuration id.');
-        /** @noinspection PhpParamsInspection */
-        $factory->setConfigurationId(['a' => 'b']);
     }
 }

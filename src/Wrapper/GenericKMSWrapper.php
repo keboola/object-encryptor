@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Keboola\ObjectEncryptor\Wrapper;
 
 use Aws\Kms\Exception\KmsException;
@@ -12,6 +14,7 @@ use Keboola\ObjectEncryptor\Exception\UserException;
 use Retry\BackOff\ExponentialBackOffPolicy;
 use Retry\Policy\SimpleRetryPolicy;
 use Retry\RetryProxy;
+use Throwable;
 
 class GenericKMSWrapper implements CryptoWrapperInterface
 {
@@ -109,8 +112,8 @@ class GenericKMSWrapper implements CryptoWrapperInterface
             $encryptedKey = $this->keyCache['CiphertextBlob'];
             $safeKey = Encoding::saveBytesToChecksummedAsciiSafeString(Key::KEY_CURRENT_VERSION, $plainKey);
             return ['kms' => $encryptedKey, 'local' => Key::loadFromAsciiSafeString($safeKey)];
-        } catch (\Exception $e) {
-            throw new ApplicationException("Failed to obtain encryption key.", $e);
+        } catch (Throwable $e) {
+            throw new ApplicationException("Failed to obtain encryption key.",  $e->getCode(), $e);
         }
     }
 
@@ -147,7 +150,7 @@ class GenericKMSWrapper implements CryptoWrapperInterface
     /**
      * @inheritdoc
      */
-    public function getPrefix()
+    public function getPrefix(): string
     {
         return 'KBC::Secure::';
     }
@@ -155,7 +158,7 @@ class GenericKMSWrapper implements CryptoWrapperInterface
     /**
      * @inheritdoc
      */
-    public function encrypt($data)
+    public function encrypt(?string $data): string
     {
         $this->validateState();
         if (!is_scalar($data) && !is_null($data)) {
@@ -167,21 +170,21 @@ class GenericKMSWrapper implements CryptoWrapperInterface
             $resultBinary = [$payload, $key['kms']];
             $result = base64_encode(gzcompress(serialize($resultBinary)));
             return $result;
-        } catch (\Exception $e) {
-            throw new ApplicationException("Ciphering failed: " . $e->getMessage(), $e);
+        } catch (Throwable $e) {
+            throw new ApplicationException("Ciphering failed: " . $e->getMessage(), $e->getCode(), $e);
         }
     }
 
     /**
      * @inheritdoc
      */
-    public function decrypt($encryptedData)
+    public function decrypt(string $encryptedData): string
     {
         $this->validateState();
         try {
             $encrypted = @unserialize(gzuncompress(base64_decode($encryptedData)));
-        } catch (\Exception $e) {
-            throw new UserException("Deciphering failed.", $e);
+        } catch (Throwable $e) {
+            throw new UserException("Deciphering failed.", 0, $e);
         }
         if (!is_array($encrypted) || count($encrypted) != 2) {
             throw new UserException("Deciphering failed.");
@@ -199,9 +202,9 @@ class GenericKMSWrapper implements CryptoWrapperInterface
                 ]);
             });
         } catch (KmsException $e) {
-            throw new UserException("Deciphering failed.", $e);
-        } catch (\Exception $e) {
-            throw new ApplicationException("Deciphering failed.", $e);
+            throw new UserException("Deciphering failed.", 0, $e);
+        } catch (Throwable $e) {
+            throw new ApplicationException("Deciphering failed.", $e->getCode(), $e);
         }
         if (empty($result['Plaintext'])) {
             throw new ApplicationException("Invalid KMS response.");
@@ -212,8 +215,8 @@ class GenericKMSWrapper implements CryptoWrapperInterface
             $key = Key::loadFromAsciiSafeString($safeKey);
             $payload = Crypto::decrypt($encrypted[0], $key, true);
             return $payload;
-        } catch (\Exception $e) {
-            throw new UserException("Deciphering failed.", $e);
+        } catch (Throwable $e) {
+            throw new UserException("Deciphering failed.", 0, $e);
         }
     }
 }

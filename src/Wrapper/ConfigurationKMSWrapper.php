@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Keboola\ObjectEncryptor\Wrapper;
 
 use Keboola\ObjectEncryptor\Exception\ApplicationException;
@@ -34,7 +36,7 @@ class ConfigurationKMSWrapper extends ProjectKMSWrapper
     /**
      * @inheritdoc
      */
-    public function getPrefix()
+    public function getPrefix(): string
     {
         return 'KBC::ConfigSecure::';
     }

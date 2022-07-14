@@ -13,7 +13,6 @@ use Keboola\ObjectEncryptor\Exception\ApplicationException;
 use Keboola\ObjectEncryptor\Exception\UserException;
 use Keboola\ObjectEncryptor\Wrapper\GenericAKVWrapper;
 use PHPUnit\Framework\TestCase;
-use PHPUnit_Framework_MockObject_MockObject;
 use Psr\Log\NullLogger;
 use RuntimeException;
 
@@ -21,7 +20,7 @@ class GenericAKVWrapperTest extends TestCase
 {
     use DataProviderTrait;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $envs = ['TEST_TENANT_ID', 'TEST_CLIENT_ID', 'TEST_CLIENT_SECRET', 'TEST_KEY_VAULT_URL'];
@@ -38,7 +37,7 @@ class GenericAKVWrapperTest extends TestCase
         $this->clearSecrets();
     }
 
-    private function clearSecrets()
+    private function clearSecrets(): void
     {
         $client = new Client(
             new GuzzleClientFactory(new NullLogger()),
@@ -50,26 +49,14 @@ class GenericAKVWrapperTest extends TestCase
         }
     }
 
-    /**
-     * @return GenericAKVWrapper
-     */
-    private function getWrapper()
+    private function getWrapper(): GenericAKVWrapper
     {
         $wrapper = new GenericAKVWrapper();
         $wrapper->setKeyVaultUrl(getenv('TEST_KEY_VAULT_URL'));
         return $wrapper;
     }
 
-    public function testEncryptNonScalar()
-    {
-        $wrapper = $this->getWrapper();
-        self::expectException(UserException::class);
-        self::expectExceptionMessage('Cannot encrypt a non-scalar value.');
-        /** @noinspection PhpParamsInspection */
-        $wrapper->encrypt(['invalid']);
-    }
-
-    public function testEncryptNoMetadata()
+    public function testEncryptNoMetadata(): void
     {
         $secret = 'mySecretValue';
         $wrapper = $this->getWrapper();
@@ -82,7 +69,7 @@ class GenericAKVWrapperTest extends TestCase
         self::assertEquals('KBC::SecureKV::', $wrapper->getPrefix());
     }
 
-    public function testEncryptMetadata()
+    public function testEncryptMetadata(): void
     {
         $secret = 'mySecretValue';
         $wrapper = $this->getWrapper();
@@ -102,7 +89,7 @@ class GenericAKVWrapperTest extends TestCase
         self::assertEquals($secret, $wrapper->decrypt($encrypted));
     }
 
-    public function testEncryptMetadataMismatch()
+    public function testEncryptMetadataMismatch(): void
     {
         $secret = 'mySecretValue';
         $wrapper = $this->getWrapper();
@@ -123,11 +110,8 @@ class GenericAKVWrapperTest extends TestCase
 
     /**
      * @dataProvider emptyValuesProvider()
-     * @param $secret
-     * @throws ApplicationException
-     * @throws UserException
      */
-    public function testEncryptEmptyValue($secret)
+    public function testEncryptEmptyValue(?string $secret): void
     {
         $wrapper = $this->getWrapper();
         $encrypted = $wrapper->encrypt($secret);
@@ -135,24 +119,17 @@ class GenericAKVWrapperTest extends TestCase
         self::assertEquals($secret, $wrapper->decrypt($encrypted));
     }
 
-    /**
-     * @param Client|PHPUnit_Framework_MockObject_MockObject $mockClient
-     * @return GenericAKVWrapper
-     */
-    private function getMockWrapper($mockClient)
+    private function getMockWrapper(Client $mockClient): GenericAKVWrapper
     {
-        $mockWrapper = self::getMockBuilder(GenericAKVWrapper::class)
+        $mockWrapper = $this->getMockBuilder(GenericAKVWrapper::class)
             ->setMethods(['getClient'])
             ->getMock();
-        $mockWrapper->method('getClient')
-            ->willReturn($mockClient);
-        /** @var GenericAKVWrapper $mockWrapper */
+        $mockWrapper->method('getClient')->willReturn($mockClient);
         $mockWrapper->setKeyVaultUrl(getenv('TEST_KEY_VAULT_URL'));
         return $mockWrapper;
     }
 
-    /** @noinspection PhpUnusedParameterInspection */
-    public function testRetryEncryptDecrypt()
+    public function testRetryEncryptDecrypt(): void
     {
         $mockClient = self::getMockBuilder(Client::class)
             ->setConstructorArgs([
@@ -160,7 +137,7 @@ class GenericAKVWrapperTest extends TestCase
                 new AuthenticatorFactory(),
                 getenv('TEST_KEY_VAULT_URL')
             ])
-            ->setMethods(['setSecret', 'getSecret'])
+            ->onlyMethods(['setSecret', 'getSecret'])
             ->getMock();
         $callNoSet = 0;
         $callNoGet = 0;
@@ -201,7 +178,6 @@ class GenericAKVWrapperTest extends TestCase
                 if ($callNoGet < 3) {
                     throw new ConnectException('mock failed to connect', new Request('GET', 'some-uri'));
                 } else {
-                    /** @var Client $mockClient */
                     return new SecretBundle([
                         'id' => 'https://test.vault.azure.net/secrets/foo/53af0dad94f248',
                         'attributes' => [],
@@ -216,15 +192,15 @@ class GenericAKVWrapperTest extends TestCase
         self::assertEquals($secret, $mockWrapper->decrypt($encrypted));
     }
 
-    public function testRetryEncryptFail()
+    public function testRetryEncryptFail(): void
     {
-        $mockClient = self::getMockBuilder(Client::class)
+        $mockClient = $this->getMockBuilder(Client::class)
             ->setConstructorArgs([
                 new GuzzleClientFactory(new NullLogger()),
                 new AuthenticatorFactory(),
                 getenv('TEST_KEY_VAULT_URL')
             ])
-            ->setMethods(['setSecret'])
+            ->onlyMethods(['setSecret'])
             ->getMock();
         $mockClient->method('setSecret')
             ->willThrowException(
@@ -265,7 +241,7 @@ class GenericAKVWrapperTest extends TestCase
     }
 
     /** @noinspection PhpUnusedParameterInspection */
-    public function testInvalidSecretContents()
+    public function testInvalidSecretContents(): void
     {
         $mockClient = self::getMockBuilder(Client::class)
             ->setConstructorArgs([
@@ -303,7 +279,7 @@ class GenericAKVWrapperTest extends TestCase
     }
 
     /** @noinspection PhpUnusedParameterInspection */
-    public function testInvalidSecretCipher()
+    public function testInvalidSecretCipher(): void
     {
         $mockClient = self::getMockBuilder(Client::class)
             ->setConstructorArgs([
@@ -352,12 +328,8 @@ class GenericAKVWrapperTest extends TestCase
 
     /**
      * @dataProvider invalidCipherProvider()
-     * @param string $cipher
-     * @param string $message
-     * @throws ApplicationException
-     * @throws UserException
      */
-    public function testDecryptInvalidCiphers($cipher, $message)
+    public function testDecryptInvalidCiphers(string $cipher, string $message): void
     {
         $wrapper = $this->getWrapper();
         self::expectException(UserException::class);
@@ -365,7 +337,7 @@ class GenericAKVWrapperTest extends TestCase
         $wrapper->decrypt($cipher);
     }
 
-    public function testInvalidSetupMissingUrl()
+    public function testInvalidSetupMissingUrl(): void
     {
         $wrapper = new GenericAKVWrapper();
         self::expectException(ApplicationException::class);
@@ -373,7 +345,7 @@ class GenericAKVWrapperTest extends TestCase
         $wrapper->encrypt('test');
     }
 
-    public function testInvalidSetupInvalidUrl()
+    public function testInvalidSetupInvalidUrl(): void
     {
         $wrapper = new GenericAKVWrapper();
         $wrapper->setKeyVaultUrl('test-key');
@@ -382,7 +354,7 @@ class GenericAKVWrapperTest extends TestCase
         $wrapper->encrypt('test');
     }
 
-    public function testInvalidSetupInvalidUrlDecrypt()
+    public function testInvalidSetupInvalidUrlDecrypt(): void
     {
         $wrapper = new GenericAKVWrapper();
         $wrapper->setKeyVaultUrl('test-key');
@@ -391,7 +363,7 @@ class GenericAKVWrapperTest extends TestCase
         $wrapper->decrypt(base64_encode(gzcompress(serialize([2 => 'test', 3 => 'test', 4 => 'test']))));
     }
 
-    public function testInvalidSetupInvalidCredentials()
+    public function testInvalidSetupInvalidCredentials(): void
     {
         putenv('AZURE_CLIENT_ID=invalid');
         $wrapper = new GenericAKVWrapper();

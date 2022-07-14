@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 
 class ConfigurationWrapperTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         putenv('AWS_ACCESS_KEY_ID=' . getenv('TEST_AWS_ACCESS_KEY_ID'));
@@ -24,7 +24,7 @@ class ConfigurationWrapperTest extends TestCase
     /**
      * @return CryptoWrapperInterface[][]
      */
-    public function wrapperProvider()
+    public function wrapperProvider(): array
     {
         $configurationWrapperKMS = new ConfigurationKMSWrapper();
         $configurationWrapperKMS->setKMSRegion(getenv('TEST_AWS_REGION'));
@@ -47,7 +47,7 @@ class ConfigurationWrapperTest extends TestCase
      * @param CryptoWrapperInterface $wrapper
      * @dataProvider wrapperProvider
      */
-    public function testEncrypt(CryptoWrapperInterface $wrapper)
+    public function testEncrypt(CryptoWrapperInterface $wrapper): void
     {
         $secret = 'mySecretValue';
         $wrapper->setStackId('my-stack');
@@ -70,7 +70,7 @@ class ConfigurationWrapperTest extends TestCase
      * @param CryptoWrapperInterface $wrapper
      * @dataProvider wrapperProvider
      */
-    public function testEncryptDifferentConfiguration(CryptoWrapperInterface $wrapper)
+    public function testEncryptDifferentConfiguration(CryptoWrapperInterface $wrapper): void
     {
         $wrapper->setStackId('my-stack');
         $wrapper->setComponentId('dummy-component');
@@ -94,7 +94,7 @@ class ConfigurationWrapperTest extends TestCase
      * @param CryptoWrapperInterface $wrapper
      * @dataProvider wrapperProvider
      */
-    public function testEncryptDifferentProject(CryptoWrapperInterface $wrapper)
+    public function testEncryptDifferentProject(CryptoWrapperInterface $wrapper): void
     {
         $wrapper->setStackId('my-stack');
         $wrapper->setComponentId('dummy-component');
@@ -114,7 +114,7 @@ class ConfigurationWrapperTest extends TestCase
         $wrapper->decrypt($encrypted);
     }
 
-    public function testInvalidSetupEncryptKMS()
+    public function testInvalidSetupEncryptKMS(): void
     {
         $wrapper = new ConfigurationKMSWrapper();
         self::expectException(ApplicationException::class);
@@ -122,7 +122,7 @@ class ConfigurationWrapperTest extends TestCase
         $wrapper->encrypt('mySecretValue');
     }
 
-    public function testInvalidSetupEncryptAKV()
+    public function testInvalidSetupEncryptAKV(): void
     {
         $wrapper = new ConfigurationAKVWrapper();
         self::expectException(ApplicationException::class);
@@ -131,10 +131,9 @@ class ConfigurationWrapperTest extends TestCase
     }
 
     /**
-     * @param CryptoWrapperInterface $wrapper
      * @dataProvider wrapperProvider
      */
-    public function testInvalidSetupEncryptStackAndComponent(CryptoWrapperInterface $wrapper)
+    public function testInvalidSetupEncryptStackAndComponent(CryptoWrapperInterface $wrapper): void
     {
         self::expectException(ApplicationException::class);
         self::expectExceptionMessage('No stack or component id provided.');
@@ -142,10 +141,9 @@ class ConfigurationWrapperTest extends TestCase
     }
 
     /**
-     * @param CryptoWrapperInterface $wrapper
      * @dataProvider wrapperProvider
      */
-    public function testInvalidSetupEncryptProjectId(CryptoWrapperInterface $wrapper)
+    public function testInvalidSetupEncryptProjectId(CryptoWrapperInterface $wrapper): void
     {
         $wrapper->setComponentId('component-id');
         $wrapper->setStackId('my-stack');
@@ -155,10 +153,9 @@ class ConfigurationWrapperTest extends TestCase
     }
 
     /**
-     * @param CryptoWrapperInterface $wrapper
      * @dataProvider wrapperProvider
      */
-    public function testInvalidSetupEncryptConfigurationId(CryptoWrapperInterface $wrapper)
+    public function testInvalidSetupEncryptConfigurationId(CryptoWrapperInterface $wrapper): void
     {
         $wrapper->setComponentId('component-id');
         $wrapper->setStackId('my-stack');
@@ -168,7 +165,7 @@ class ConfigurationWrapperTest extends TestCase
         $wrapper->encrypt('mySecretValue');
     }
 
-    public function testInvalidSetupDecryptKMS()
+    public function testInvalidSetupDecryptKMS(): void
     {
         $wrapper = new ConfigurationKMSWrapper();
         self::expectException(ApplicationException::class);
@@ -176,7 +173,7 @@ class ConfigurationWrapperTest extends TestCase
         $wrapper->decrypt('mySecretValue');
     }
 
-    public function testInvalidSetupDecryptAKV()
+    public function testInvalidSetupDecryptAKV(): void
     {
         $wrapper = new ConfigurationAKVWrapper();
         self::expectException(ApplicationException::class);
@@ -185,10 +182,9 @@ class ConfigurationWrapperTest extends TestCase
     }
 
     /**
-     * @param CryptoWrapperInterface $wrapper
      * @dataProvider wrapperProvider
      */
-    public function testInvalidSetupDecryptStackAndComponent(CryptoWrapperInterface $wrapper)
+    public function testInvalidSetupDecryptStackAndComponent(CryptoWrapperInterface $wrapper): void
     {
         self::expectException(ApplicationException::class);
         self::expectExceptionMessage('No stack or component id provided.');
@@ -196,10 +192,9 @@ class ConfigurationWrapperTest extends TestCase
     }
 
     /**
-     * @param CryptoWrapperInterface $wrapper
      * @dataProvider wrapperProvider
      */
-    public function testInvalidSetupDecryptProjectId(CryptoWrapperInterface $wrapper)
+    public function testInvalidSetupDecryptProjectId(CryptoWrapperInterface $wrapper): void
     {
         $wrapper->setComponentId('component-id');
         $wrapper->setStackId('my-stack');
@@ -209,10 +204,9 @@ class ConfigurationWrapperTest extends TestCase
     }
 
     /**
-     * @param CryptoWrapperInterface $wrapper
      * @dataProvider wrapperProvider
      */
-    public function testInvalidSetupDecryptConfigurationId(CryptoWrapperInterface $wrapper)
+    public function testInvalidSetupDecryptConfigurationId(CryptoWrapperInterface $wrapper): void
     {
         $wrapper->setComponentId('component-id');
         $wrapper->setStackId('my-stack');
@@ -220,20 +214,5 @@ class ConfigurationWrapperTest extends TestCase
         self::expectException(ApplicationException::class);
         self::expectExceptionMessage('No configuration id provided.');
         $wrapper->decrypt('mySecretValue');
-    }
-
-    /**
-     * @param CryptoWrapperInterface $wrapper
-     * @dataProvider wrapperProvider
-     */
-    public function testInvalidConfiguration(CryptoWrapperInterface $wrapper)
-    {
-        $wrapper->setStackId('my-stack');
-        $wrapper->setComponentId('my-component');
-        $wrapper->setProjectId('my-project');
-        $wrapper->setConfigurationId(new \stdClass());
-        self::expectException(ApplicationException::class);
-        self::expectExceptionMessage('Configuration id is invalid.');
-        $wrapper->encrypt('mySecretValue');
     }
 }
