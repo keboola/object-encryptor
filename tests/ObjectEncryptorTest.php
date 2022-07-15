@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\ObjectEncryptor\Tests;
 
+use Keboola\ObjectEncryptor\EncryptorOptions;
 use Keboola\ObjectEncryptor\Exception\ApplicationException;
 use Keboola\ObjectEncryptor\Exception\UserException;
 use Keboola\ObjectEncryptor\ObjectEncryptor;
@@ -21,20 +22,15 @@ use stdClass;
 
 class ObjectEncryptorTest extends TestCase
 {
-    private ObjectEncryptorFactory $factory;
-
     public function setUp(): void
     {
         parent::setUp();
-        $this->factory = new ObjectEncryptorFactory(
-            (string) getenv('TEST_AWS_KMS_KEY_ID'),
-            (string) getenv('TEST_AWS_REGION'),
-            (string) getenv('TEST_KEY_VAULT_URL')
-        );
+        /*
         $this->factory->setStackId('my-stack');
         $this->factory->setComponentId('dummy-component');
         $this->factory->setConfigurationId('123456');
         $this->factory->setProjectId('123');
+        */
         putenv('AWS_ACCESS_KEY_ID=' . getenv('TEST_AWS_ACCESS_KEY_ID'));
         putenv('AWS_SECRET_ACCESS_KEY='. getenv('TEST_AWS_SECRET_ACCESS_KEY'));
         putenv('AZURE_TENANT_ID=' . getenv('TEST_TENANT_ID'));
@@ -44,11 +40,18 @@ class ObjectEncryptorTest extends TestCase
 
     public function testEncryptorScalar(): void
     {
-        $encryptor = $this->factory->getEncryptor();
+        $options = new EncryptorOptions(
+            'my-stack',
+            (string) getenv('TEST_AWS_KMS_KEY_ID'),
+            (string) getenv('TEST_AWS_REGION'),
+            (string) getenv('TEST_KEY_VAULT_URL')
+        );
+        $factory = new ObjectEncryptorFactory();
+        $encryptor = $factory->getEncryptor($options);
         $originalText = 'secret';
-        $encrypted = $encryptor->encrypt($originalText, $encryptor->getRegisteredComponentWrapperClass());
+        $encrypted = $encryptor->encryptForComponent($originalText, 'my-component');
         self::assertStringStartsWith('KBC::ComponentSecureKV::', $encrypted);
-        self::assertEquals($originalText, $encryptor->decrypt($encrypted));
+        self::assertEquals($originalText, $encryptor->decryptForComponent($encrypted, 'my-component'));
     }
 
     public function cryptoWrapperProvider(): array
