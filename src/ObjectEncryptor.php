@@ -12,6 +12,8 @@ use Keboola\ObjectEncryptor\Wrapper\ComponentKMSWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ConfigurationAKVWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ConfigurationKMSWrapper;
 use Keboola\ObjectEncryptor\Wrapper\CryptoWrapperInterface;
+use Keboola\ObjectEncryptor\Wrapper\GenericAKVWrapper;
+use Keboola\ObjectEncryptor\Wrapper\GenericKMSWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ProjectAKVWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ProjectKMSWrapper;
 use stdClass;
@@ -25,14 +27,45 @@ class ObjectEncryptor
      */
     private array $wrappers = [];
 
+    public function encryptForComponent($data, string $componentId)
+    {
+    }
+
+    public function encryptForProject($data, string $componentId, string $projectId)
+    {
+    }
+
+    public function encryptForConfiguration($data, string $componentId, string $projectId, string $configurationId)
+    {
+    }
+
+    public function decryptForComponent($data, string $componentId)
+    {
+    }
+
+    public function decryptForProject($data, string $componentId, string $projectId)
+    {
+    }
+
+    public function decryptForConfiguration($data, string $componentId, string $projectId, string $configurationId)
+    {
+    }
+
+    public function __construct(EncryptorOptions $encryptorOptions)
+    {
+    }
+
+    //parametry povinny a neprazdny
+
     /**
      * @param string|array|stdClass $data Data to encrypt
      * @return string|array|stdClass
      * @throws ApplicationException
      * @throws UserException
      */
-    public function encrypt($data, string $wrapperName)
+    private function encrypt($data, string $wrapperName)
     {
+        // @todo to be deleted
         foreach ($this->wrappers as $cryptoWrapper) {
             if (get_class($cryptoWrapper) === $wrapperName) {
                 $wrapper = $cryptoWrapper;
@@ -60,8 +93,9 @@ class ObjectEncryptor
      * @throws ApplicationException
      * @throws UserException
      */
-    public function decrypt($data)
+    private function decrypt($data)
     {
+        // @todo to be deleted
         if (is_scalar($data)) {
             return $this->decryptValue($data);
         }
@@ -80,16 +114,18 @@ class ObjectEncryptor
      * @param CryptoWrapperInterface $wrapper
      * @throws ApplicationException
      */
-    public function pushWrapper(CryptoWrapperInterface $wrapper)
+    private function pushWrapper(CryptoWrapperInterface $wrapper)
     {
+        // @todo to be deleted
         if (isset($this->wrappers[$wrapper->getPrefix()])) {
             throw new ApplicationException('CryptoWrapper prefix ' . $wrapper->getPrefix() . ' is not unique.');
         }
         $this->wrappers[$wrapper->getPrefix()] = $wrapper;
     }
 
-    public function getRegisteredComponentWrapperClass(): string
+    private function getRegisteredComponentWrapperClass(): string
     {
+        // @todo to be deleted
         foreach ($this->wrappers as $wrapper) {
             if (get_class($wrapper) === ComponentKMSWrapper::class ||
                 get_class($wrapper) === ComponentAKVWrapper::class) {
@@ -99,8 +135,9 @@ class ObjectEncryptor
         throw new ApplicationException('No Component wrappers registered.');
     }
 
-    public function getRegisteredProjectWrapperClass(): string
+    private function getRegisteredProjectWrapperClass(): string
     {
+        // @todo to be deleted
         foreach ($this->wrappers as $wrapper) {
             if (get_class($wrapper) === ProjectKMSWrapper::class || get_class($wrapper) === ProjectAKVWrapper::class) {
                 return get_class($wrapper);
@@ -109,8 +146,9 @@ class ObjectEncryptor
         throw new ApplicationException('No Project wrappers registered.');
     }
 
-    public function getRegisteredConfigurationWrapperClass(): string
+    private function getRegisteredConfigurationWrapperClass(): string
     {
+        // @todo to be deleted
         foreach ($this->wrappers as $wrapper) {
             if (get_class($wrapper) === ConfigurationKMSWrapper::class ||
                 get_class($wrapper) === ConfigurationAKVWrapper::class) {
@@ -251,5 +289,81 @@ class ObjectEncryptor
             $result[$key] = $this->decryptItem($key, $value);
         }
         return $result;
+    }
+
+    /**
+     * @param ObjectEncryptor $encryptor
+     * @throws ApplicationException
+     */
+    private function addKMSWrappers(ObjectEncryptor $encryptor): void
+    {
+        $wrapper = new GenericKMSWrapper();
+        $wrapper->setKMSKeyId((string) $this->kmsKeyId);
+        $wrapper->setKMSRegion((string) $this->kmsKeyRegion);
+        $encryptor->pushWrapper($wrapper);
+
+        if ($this->componentId && $this->stackId) {
+            $wrapper = new ComponentKMSWrapper();
+            $wrapper->setKMSKeyId((string) $this->kmsKeyId);
+            $wrapper->setKMSRegion((string) $this->kmsKeyRegion);
+            $wrapper->setComponentId($this->componentId);
+            $wrapper->setStackId($this->stackId);
+            $encryptor->pushWrapper($wrapper);
+            if ($this->projectId) {
+                $wrapper = new ProjectKMSWrapper();
+                $wrapper->setKMSKeyId((string) $this->kmsKeyId);
+                $wrapper->setKMSRegion((string) $this->kmsKeyRegion);
+                $wrapper->setComponentId($this->componentId);
+                $wrapper->setStackId($this->stackId);
+                $wrapper->setProjectId($this->projectId);
+                $encryptor->pushWrapper($wrapper);
+                if ($this->configurationId) {
+                    $wrapper = new ConfigurationKMSWrapper();
+                    $wrapper->setKMSKeyId((string) $this->kmsKeyId);
+                    $wrapper->setKMSRegion((string) $this->kmsKeyRegion);
+                    $wrapper->setComponentId($this->componentId);
+                    $wrapper->setStackId($this->stackId);
+                    $wrapper->setProjectId($this->projectId);
+                    $wrapper->setConfigurationId($this->configurationId);
+                    $encryptor->pushWrapper($wrapper);
+                }
+            }
+        }
+    }
+
+    /**
+     * @param ObjectEncryptor $encryptor
+     * @throws ApplicationException
+     */
+    private function addAKVWrappers(ObjectEncryptor $encryptor): void
+    {
+        $wrapper = new GenericAKVWrapper();
+        $wrapper->setKeyVaultUrl((string) $this->akvUrl);
+        $encryptor->pushWrapper($wrapper);
+
+        if ($this->componentId && $this->stackId) {
+            $wrapper = new ComponentAKVWrapper();
+            $wrapper->setKeyVaultUrl((string) $this->akvUrl);
+            $wrapper->setComponentId($this->componentId);
+            $wrapper->setStackId($this->stackId);
+            $encryptor->pushWrapper($wrapper);
+            if ($this->projectId) {
+                $wrapper = new ProjectAKVWrapper();
+                $wrapper->setKeyVaultUrl((string) $this->akvUrl);
+                $wrapper->setComponentId($this->componentId);
+                $wrapper->setStackId($this->stackId);
+                $wrapper->setProjectId($this->projectId);
+                $encryptor->pushWrapper($wrapper);
+                if ($this->configurationId) {
+                    $wrapper = new ConfigurationAKVWrapper();
+                    $wrapper->setKeyVaultUrl((string) $this->akvUrl);
+                    $wrapper->setComponentId($this->componentId);
+                    $wrapper->setStackId($this->stackId);
+                    $wrapper->setProjectId($this->projectId);
+                    $wrapper->setConfigurationId($this->configurationId);
+                    $encryptor->pushWrapper($wrapper);
+                }
+            }
+        }
     }
 }

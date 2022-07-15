@@ -29,7 +29,7 @@ class ObjectEncryptorFactory
      * @param ?string $kmsRegion KMS Key Region.
      * @param ?string $akvUrl Azure Key Vault URL.
      */
-    public function __construct(?string $kmsKeyId, ?string $kmsRegion, ?string $akvUrl)
+    PUBLIC function __construct(?string $kmsKeyId, ?string $kmsRegion, ?string $akvUrl, $stackId)
     {
         $this->kmsKeyId = $kmsKeyId;
         $this->kmsKeyRegion = $kmsRegion;
@@ -52,8 +52,9 @@ class ObjectEncryptorFactory
      * @param string|null $configurationId Id of current configuration.
      * @throws ApplicationException
      */
-    public function setConfigurationId(?string $configurationId): void
+    private function setConfigurationId(?string $configurationId): void
     {
+        // @todo to be deleted
         if (!is_null($configurationId) && !is_scalar($configurationId)) {
             throw new ApplicationException('Invalid configuration id.');
         }
@@ -64,8 +65,9 @@ class ObjectEncryptorFactory
      * @param string|null $projectId Id of KBC Project.
      * @throws ApplicationException
      */
-    public function setProjectId(?string $projectId): void
+    private function setProjectId(?string $projectId): void
     {
+        // @todo to be deleted
         if (!is_null($projectId) && !is_scalar($projectId)) {
             throw new ApplicationException('Invalid project id.');
         }
@@ -76,8 +78,9 @@ class ObjectEncryptorFactory
      * @param string|null $stackId Id of KBC Stack.
      * @throws ApplicationException
      */
-    public function setStackId(?string $stackId): void
+    private function setStackId(?string $stackId): void
     {
+        // @todo to be deleted
         if (!is_null($stackId) && !is_scalar($stackId)) {
             throw new ApplicationException('Invalid stack id.');
         }
@@ -100,83 +103,38 @@ class ObjectEncryptorFactory
         }
     }
 
-    /**
-     * @param ObjectEncryptor $encryptor
-     * @throws ApplicationException
-     */
-    private function addKMSWrappers(ObjectEncryptor $encryptor): void
-    {
-        $wrapper = new GenericKMSWrapper();
-        $wrapper->setKMSKeyId((string) $this->kmsKeyId);
-        $wrapper->setKMSRegion((string) $this->kmsKeyRegion);
-        $encryptor->pushWrapper($wrapper);
+    /*
+{
+    $dataPlaneId = 12;
+    $dataPlane = getDataplane($dataPlaneId);
 
-        if ($this->componentId && $this->stackId) {
-            $wrapper = new ComponentKMSWrapper();
-            $wrapper->setKMSKeyId((string) $this->kmsKeyId);
-            $wrapper->setKMSRegion((string) $this->kmsKeyRegion);
-            $wrapper->setComponentId($this->componentId);
-            $wrapper->setStackId($this->stackId);
-            $encryptor->pushWrapper($wrapper);
-            if ($this->projectId) {
-                $wrapper = new ProjectKMSWrapper();
-                $wrapper->setKMSKeyId((string) $this->kmsKeyId);
-                $wrapper->setKMSRegion((string) $this->kmsKeyRegion);
-                $wrapper->setComponentId($this->componentId);
-                $wrapper->setStackId($this->stackId);
-                $wrapper->setProjectId($this->projectId);
-                $encryptor->pushWrapper($wrapper);
-                if ($this->configurationId) {
-                    $wrapper = new ConfigurationKMSWrapper();
-                    $wrapper->setKMSKeyId((string) $this->kmsKeyId);
-                    $wrapper->setKMSRegion((string) $this->kmsKeyRegion);
-                    $wrapper->setComponentId($this->componentId);
-                    $wrapper->setStackId($this->stackId);
-                    $wrapper->setProjectId($this->projectId);
-                    $wrapper->setConfigurationId($this->configurationId);
-                    $encryptor->pushWrapper($wrapper);
-                }
-            }
-        }
+    if ($dataPlane['keyVault'] == 'azure') {
+        $factory->getAzureEncryptor($dataPlane['kmsId'], $_ENV['AWS_REGION']);
+    } else {
+        $factory->getAWSEncryptor($dataPlane['kmsId'], $_ENV['AWS_REGION']);
     }
 
-    /**
-     * @param ObjectEncryptor $encryptor
-     * @throws ApplicationException
-     */
-    private function addAKVWrappers(ObjectEncryptor $encryptor): void
-    {
-        $wrapper = new GenericAKVWrapper();
-        $wrapper->setKeyVaultUrl((string) $this->akvUrl);
-        $encryptor->pushWrapper($wrapper);
 
-        if ($this->componentId && $this->stackId) {
-            $wrapper = new ComponentAKVWrapper();
-            $wrapper->setKeyVaultUrl((string) $this->akvUrl);
-            $wrapper->setComponentId($this->componentId);
-            $wrapper->setStackId($this->stackId);
-            $encryptor->pushWrapper($wrapper);
-            if ($this->projectId) {
-                $wrapper = new ProjectAKVWrapper();
-                $wrapper->setKeyVaultUrl((string) $this->akvUrl);
-                $wrapper->setComponentId($this->componentId);
-                $wrapper->setStackId($this->stackId);
-                $wrapper->setProjectId($this->projectId);
-                $encryptor->pushWrapper($wrapper);
-                if ($this->configurationId) {
-                    $wrapper = new ConfigurationAKVWrapper();
-                    $wrapper->setKeyVaultUrl((string) $this->akvUrl);
-                    $wrapper->setComponentId($this->componentId);
-                    $wrapper->setStackId($this->stackId);
-                    $wrapper->setProjectId($this->projectId);
-                    $wrapper->setConfigurationId($this->configurationId);
-                    $encryptor->pushWrapper($wrapper);
-                }
-            }
-        }
+
+    $dataPlane = getDataplane($dataPlaneId);
+    $options = new EncryptOptions($dataPlane['kmsId'], $_ENV['AWS_REGION']);
+    $factory->getEncryptor($options);
+}
+
+
+    PUBLIC function getEncryptor(EncryptOptions): ObjectEncryptor
+        PUBLIC function getAWSEncryptor($kmsKeyId, $kmsRegion): ObjectEncryptor
+        PUBLIC function getAzureEncryptor($keyVaultUrl): ObjectEncryptor
+*/
+    public function getAwsEncryptor(string $kmsKeyId, string $kmsRegion): ObjectEncryptor
+    {
     }
 
-    public function getEncryptor(): ObjectEncryptor
+    public function getAzureEncryptor(string $keyVaultUrl): ObjectEncryptor
+    {
+    }
+
+    public function getEncryptor(EncryptorOptions $encryptorOptions): ObjectEncryptor
     {
         $this->validateState();
 
