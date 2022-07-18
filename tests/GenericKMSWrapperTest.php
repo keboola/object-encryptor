@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Keboola\ObjectEncryptor\Tests;
 
 use Aws\CommandInterface;
@@ -73,7 +75,9 @@ class GenericKMSWrapperTest extends TestCase
     {
         $mockKmsClient = self::getMockBuilder(KmsClient::class)
             // Need to pass service explicitly, because AwsClient fails to detect it from mock
-            ->setConstructorArgs([['region' => getenv('TEST_AWS_REGION'), 'version' => '2014-11-01', 'service' => 'kms']])
+            ->setConstructorArgs([
+                ['region' => getenv('TEST_AWS_REGION'), 'version' => '2014-11-01', 'service' => 'kms'],
+            ])
             ->setMethods(['execute'])
             ->getMock();
         $callNo = 0;
@@ -107,7 +111,9 @@ class GenericKMSWrapperTest extends TestCase
     {
         $mockKmsClient = self::getMockBuilder(KmsClient::class)
             // Need to pass service explicitly, because AwsClient fails to detect it from mock
-            ->setConstructorArgs([['region' => getenv('TEST_AWS_REGION'), 'version' => '2014-11-01', 'service' => 'kms']])
+            ->setConstructorArgs([
+                ['region' => getenv('TEST_AWS_REGION'), 'version' => '2014-11-01', 'service' => 'kms'],
+            ])
             ->onlyMethods(['execute'])
             ->getMock();
         $mockKmsClient->method('execute')
@@ -134,7 +140,9 @@ class GenericKMSWrapperTest extends TestCase
     {
         $mockKmsClient = self::getMockBuilder(KmsClient::class)
             // Need to pass service explicitly, because AwsClient fails to detect it from mock
-            ->setConstructorArgs([['region' => getenv('TEST_AWS_REGION'), 'version' => '2014-11-01', 'service' => 'kms']])
+            ->setConstructorArgs([
+                ['region' => getenv('TEST_AWS_REGION'), 'version' => '2014-11-01', 'service' => 'kms'],
+            ])
             ->onlyMethods(['execute'])
             ->getMock();
         $mockKmsClient->method('execute')
@@ -170,7 +178,9 @@ class GenericKMSWrapperTest extends TestCase
     {
         $mockKmsClient = self::getMockBuilder(KmsClient::class)
             // Need to pass service explicitly, because AwsClient fails to detect it from mock
-            ->setConstructorArgs([['region' => getenv('TEST_AWS_REGION'), 'version' => '2014-11-01', 'service' => 'kms']])
+            ->setConstructorArgs([
+                ['region' => getenv('TEST_AWS_REGION'), 'version' => '2014-11-01', 'service' => 'kms'],
+            ])
             ->setMethods(['execute'])
             ->getMock();
         $mockKmsClient->method('execute')

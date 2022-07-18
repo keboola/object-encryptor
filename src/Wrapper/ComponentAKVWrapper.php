@@ -8,8 +8,8 @@ use Keboola\ObjectEncryptor\Exception\ApplicationException;
 
 class ComponentAKVWrapper extends GenericAKVWrapper
 {
-    const KEY_COMPONENT = 'componentId';
-    const KEY_STACK = 'stackId';
+    private const KEY_COMPONENT = 'componentId';
+    private const KEY_STACK = 'stackId';
 
     /**
      * @param string $stackId

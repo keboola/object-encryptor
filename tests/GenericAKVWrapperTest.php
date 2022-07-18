@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Keboola\ObjectEncryptor\Tests;
 
 use GuzzleHttp\Exception\ConnectException;
@@ -135,7 +137,7 @@ class GenericAKVWrapperTest extends TestCase
             ->setConstructorArgs([
                 new GuzzleClientFactory(new NullLogger()),
                 new AuthenticatorFactory(),
-                getenv('TEST_KEY_VAULT_URL')
+                (string) getenv('TEST_KEY_VAULT_URL'),
             ])
             ->onlyMethods(['setSecret', 'getSecret'])
             ->getMock();
@@ -198,7 +200,7 @@ class GenericAKVWrapperTest extends TestCase
             ->setConstructorArgs([
                 new GuzzleClientFactory(new NullLogger()),
                 new AuthenticatorFactory(),
-                getenv('TEST_KEY_VAULT_URL')
+                (string) getenv('TEST_KEY_VAULT_URL'),
             ])
             ->onlyMethods(['setSecret'])
             ->getMock();
@@ -220,7 +222,7 @@ class GenericAKVWrapperTest extends TestCase
             ->setConstructorArgs([
                 new GuzzleClientFactory(new NullLogger()),
                 new AuthenticatorFactory(),
-                getenv('TEST_KEY_VAULT_URL')
+                (string) getenv('TEST_KEY_VAULT_URL'),
             ])
             ->setMethods(['getSecret'])
             ->getMock();
@@ -247,7 +249,7 @@ class GenericAKVWrapperTest extends TestCase
             ->setConstructorArgs([
                 new GuzzleClientFactory(new NullLogger()),
                 new AuthenticatorFactory(),
-                getenv('TEST_KEY_VAULT_URL')
+                (string) getenv('TEST_KEY_VAULT_URL'),
             ])
             ->setMethods(['setSecret', 'getSecret'])
             ->getMock();
@@ -285,7 +287,7 @@ class GenericAKVWrapperTest extends TestCase
             ->setConstructorArgs([
                 new GuzzleClientFactory(new NullLogger()),
                 new AuthenticatorFactory(),
-                getenv('TEST_KEY_VAULT_URL')
+                (string) getenv('TEST_KEY_VAULT_URL'),
             ])
             ->setMethods(['setSecret', 'getSecret'])
             ->getMock();
@@ -303,7 +305,7 @@ class GenericAKVWrapperTest extends TestCase
                 return new SecretBundle([
                     'id' => 'https://test.vault.azure.net/secrets/foo/53af0dad94f248',
                     'value' => $secretInternal,
-                    'attributes' => []
+                    'attributes' => [],
                 ]);
             });
         $secret = 'secret';
@@ -311,7 +313,7 @@ class GenericAKVWrapperTest extends TestCase
             ->willReturnCallback(function ($secretName, $secretVersion) use ($mockClient, &$secretInternal) {
                 /** @var Client $mockClient */
                 $contents = unserialize(gzuncompress(base64_decode($secretInternal)));
-                $contents[GenericAKVWrapper::KEY_INDEX] = 'garbage';
+                $contents[1] = 'garbage';
                 return new SecretBundle([
                     'id' => 'https://test.vault.azure.net/secrets/foo/53af0dad94f248',
                     'attributes' => [],
