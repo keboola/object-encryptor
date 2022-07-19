@@ -11,8 +11,12 @@
     ],
     "autoload": {
         "psr-4": {
-            "Keboola\\ObjectEncryptor\\": "src",
-            "Keboola\\ObjectEncryptor\\Tests\\": "tests"
+            "Keboola\\ObjectEncryptor\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Keboola\\ObjectEncryptor\\Tests\\": "tests/"
         }
     },
     "require": {
@@ -31,7 +35,8 @@
         "keboola/coding-standard": "^13.0",
         "phpstan/phpstan": "^1.8",
         "phpstan/phpstan-phpunit": "^1.0.0",
-        "phpunit/phpunit": "^9.5"
+        "phpunit/phpunit": "^9.5",
+        "symfony/dotenv": "^5.4",
     },
     "scripts": {
         "tests": "phpunit --coverage-clover /tmp/build-logs/clover.xml --coverage-xml=/tmp/build-logs/coverage-xml --log-junit=/tmp/build-logs/phpunit.junit.xml",
@@ -40,7 +45,9 @@
         "infection": "infection --threads=4 --min-covered-msi=90 --coverage=/tmp/build-logs --only-covered",
         "build": [
             "@phpcs",
-            "@tests"
+            "@phpstan",
+            "@tests",
+            "@infection"            
         ],
         "ci": [
             "@composer validate --no-check-all --strict",

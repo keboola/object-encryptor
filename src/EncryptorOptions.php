@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Keboola\ObjectEncryptor;
 
 use Keboola\ObjectEncryptor\Exception\ApplicationException;
@@ -17,6 +19,7 @@ class EncryptorOptions
         $this->kmsKeyId = $kmsKeyId;
         $this->kmsKeyRegion = $kmsRegion;
         $this->akvUrl = $akvUrl;
+        $this->validateState();
     }
 
     public function getKmsKeyId(): ?string
@@ -44,14 +47,11 @@ class EncryptorOptions
      */
     private function validateState(): void
     {
-        if (!is_null($this->kmsKeyId) && !is_string($this->kmsKeyId)) {
-            throw new ApplicationException('Invalid KMS key Id.');
+        if (empty($this->stackId)) {
+            throw new ApplicationException('Invalid Stack Id.');
         }
-        if (!is_null($this->kmsKeyRegion) && !is_string($this->kmsKeyRegion)) {
-            throw new ApplicationException('Invalid KMS region.');
-        }
-        if (!is_null($this->akvUrl) && !is_string($this->akvUrl)) {
-            throw new ApplicationException('Invalid AKV URL.');
+        if (empty($this->kmsKeyId) && empty($this->kmsKeyRegion) && empty($this->akvUrl)) {
+            throw new ApplicationException('Neither KMS, nor KeyVault configured.');
         }
     }
 }

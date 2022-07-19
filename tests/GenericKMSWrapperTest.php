@@ -27,8 +27,8 @@ class GenericKMSWrapperTest extends TestCase
     private function getWrapper(): GenericKMSWrapper
     {
         $wrapper = new GenericKMSWrapper();
-        $wrapper->setKMSKeyId(getenv('TEST_AWS_KMS_KEY_ID'));
-        $wrapper->setKMSRegion(getenv('TEST_AWS_REGION'));
+        $wrapper->setKMSKeyId((string) getenv('TEST_AWS_KMS_KEY_ID'));
+        $wrapper->setKMSRegion((string) getenv('TEST_AWS_REGION'));
         return $wrapper;
     }
 
@@ -53,7 +53,7 @@ class GenericKMSWrapperTest extends TestCase
         self::assertEquals($secret, $wrapper->decrypt($encrypted));
 
         $wrapper = new GenericKMSWrapper();
-        $wrapper->setKMSRegion(getenv('TEST_AWS_REGION'));
+        $wrapper->setKMSRegion((string) getenv('TEST_AWS_REGION'));
         // This is ok, because KMS key is found automatically during decryption
         $wrapper->setKMSKeyId('non-existent');
         self::assertEquals($secret, $wrapper->decrypt($encrypted));
@@ -61,9 +61,8 @@ class GenericKMSWrapperTest extends TestCase
 
     /**
      * @dataProvider emptyValuesProvider()
-     * @param string|null|integer $secret
      */
-    public function testEncryptEmptyValue($secret): void
+    public function testEncryptEmptyValue(?string $secret): void
     {
         $wrapper = $this->getWrapper();
         $encrypted = $wrapper->encrypt($secret);
@@ -73,10 +72,10 @@ class GenericKMSWrapperTest extends TestCase
 
     public function testRetryEncrypt(): void
     {
-        $mockKmsClient = self::getMockBuilder(KmsClient::class)
+        $mockKmsClient = $this->getMockBuilder(KmsClient::class)
             // Need to pass service explicitly, because AwsClient fails to detect it from mock
             ->setConstructorArgs([
-                ['region' => getenv('TEST_AWS_REGION'), 'version' => '2014-11-01', 'service' => 'kms'],
+                ['region' => (string) getenv('TEST_AWS_REGION'), 'version' => '2014-11-01', 'service' => 'kms'],
             ])
             ->setMethods(['execute'])
             ->getMock();
@@ -92,7 +91,7 @@ class GenericKMSWrapperTest extends TestCase
                 }
             });
 
-        $mockWrapper = self::getMockBuilder(GenericKMSWrapper::class)
+        $mockWrapper = $this->getMockBuilder(GenericKMSWrapper::class)
             ->setMethods(['getClient'])
             ->getMock();
         $mockWrapper->method('getClient')
@@ -100,8 +99,8 @@ class GenericKMSWrapperTest extends TestCase
 
         $secret = 'secret';
         /** @var GenericKMSWrapper $mockWrapper */
-        $mockWrapper->setKMSKeyId(getenv('TEST_AWS_KMS_KEY_ID'));
-        $mockWrapper->setKMSRegion(getenv('TEST_AWS_REGION'));
+        $mockWrapper->setKMSKeyId((string) getenv('TEST_AWS_KMS_KEY_ID'));
+        $mockWrapper->setKMSRegion((string) getenv('TEST_AWS_REGION'));
         $encrypted = $mockWrapper->encrypt($secret);
         self::assertNotEquals($secret, $encrypted);
         self::assertEquals($secret, $mockWrapper->decrypt($encrypted));
@@ -109,10 +108,10 @@ class GenericKMSWrapperTest extends TestCase
 
     public function testRetryEncryptFail(): void
     {
-        $mockKmsClient = self::getMockBuilder(KmsClient::class)
+        $mockKmsClient = $this->getMockBuilder(KmsClient::class)
             // Need to pass service explicitly, because AwsClient fails to detect it from mock
             ->setConstructorArgs([
-                ['region' => getenv('TEST_AWS_REGION'), 'version' => '2014-11-01', 'service' => 'kms'],
+                ['region' => (string) getenv('TEST_AWS_REGION'), 'version' => '2014-11-01', 'service' => 'kms'],
             ])
             ->onlyMethods(['execute'])
             ->getMock();
@@ -121,7 +120,7 @@ class GenericKMSWrapperTest extends TestCase
                 new ConnectException('mock failed to connect', new Request('GET', 'some-uri'))
             );
 
-        $mockWrapper = self::getMockBuilder(GenericKMSWrapper::class)
+        $mockWrapper = $this->getMockBuilder(GenericKMSWrapper::class)
             ->setMethods(['getClient'])
             ->getMock();
         $mockWrapper->method('getClient')
@@ -129,8 +128,8 @@ class GenericKMSWrapperTest extends TestCase
 
         $secret = 'secret';
         /** @var GenericKMSWrapper $mockWrapper */
-        $mockWrapper->setKMSKeyId(getenv('TEST_AWS_KMS_KEY_ID'));
-        $mockWrapper->setKMSRegion(getenv('TEST_AWS_REGION'));
+        $mockWrapper->setKMSKeyId((string) getenv('TEST_AWS_KMS_KEY_ID'));
+        $mockWrapper->setKMSRegion((string) getenv('TEST_AWS_REGION'));
         self::expectException(ApplicationException::class);
         self::expectExceptionMessage('Ciphering failed: Failed to obtain encryption key.');
         $mockWrapper->encrypt($secret);
@@ -138,7 +137,7 @@ class GenericKMSWrapperTest extends TestCase
 
     public function testRetryDecrypt(): void
     {
-        $mockKmsClient = self::getMockBuilder(KmsClient::class)
+        $mockKmsClient = $this->getMockBuilder(KmsClient::class)
             // Need to pass service explicitly, because AwsClient fails to detect it from mock
             ->setConstructorArgs([
                 ['region' => getenv('TEST_AWS_REGION'), 'version' => '2014-11-01', 'service' => 'kms'],
@@ -156,7 +155,7 @@ class GenericKMSWrapperTest extends TestCase
                 }
             });
 
-        $mockWrapper = self::getMockBuilder(GenericKMSWrapper::class)
+        $mockWrapper = $this->getMockBuilder(GenericKMSWrapper::class)
             ->setMethods(['getClient'])
             ->getMock();
         $mockWrapper->method('getClient')
@@ -164,22 +163,22 @@ class GenericKMSWrapperTest extends TestCase
 
         $secret = 'secret';
         $wrapper = new GenericKMSWrapper();
-        $wrapper->setKMSKeyId(getenv('TEST_AWS_KMS_KEY_ID'));
-        $wrapper->setKMSRegion(getenv('TEST_AWS_REGION'));
+        $wrapper->setKMSKeyId((string) getenv('TEST_AWS_KMS_KEY_ID'));
+        $wrapper->setKMSRegion((string) getenv('TEST_AWS_REGION'));
         $encrypted = $wrapper->encrypt($secret);
         self::assertNotEquals($secret, $encrypted);
         /** @var GenericKMSWrapper $mockWrapper */
-        $mockWrapper->setKMSKeyId(getenv('TEST_AWS_KMS_KEY_ID'));
-        $mockWrapper->setKMSRegion(getenv('TEST_AWS_REGION'));
+        $mockWrapper->setKMSKeyId((string) getenv('TEST_AWS_KMS_KEY_ID'));
+        $mockWrapper->setKMSRegion((string) getenv('TEST_AWS_REGION'));
         self::assertEquals($secret, $mockWrapper->decrypt($encrypted));
     }
 
     public function testRetryDecryptFail(): void
     {
-        $mockKmsClient = self::getMockBuilder(KmsClient::class)
+        $mockKmsClient = $this->getMockBuilder(KmsClient::class)
             // Need to pass service explicitly, because AwsClient fails to detect it from mock
             ->setConstructorArgs([
-                ['region' => getenv('TEST_AWS_REGION'), 'version' => '2014-11-01', 'service' => 'kms'],
+                ['region' => (string) getenv('TEST_AWS_REGION'), 'version' => '2014-11-01', 'service' => 'kms'],
             ])
             ->setMethods(['execute'])
             ->getMock();
@@ -188,7 +187,7 @@ class GenericKMSWrapperTest extends TestCase
                 new ConnectException('mock failed to connect', new Request('GET', 'some-uri'))
             );
 
-        $mockWrapper = self::getMockBuilder(GenericKMSWrapper::class)
+        $mockWrapper = $this->getMockBuilder(GenericKMSWrapper::class)
             ->onlyMethods(['getClient'])
             ->getMock();
         $mockWrapper->method('getClient')
@@ -196,13 +195,13 @@ class GenericKMSWrapperTest extends TestCase
 
         $secret = 'secret';
         $wrapper = new GenericKMSWrapper();
-        $wrapper->setKMSKeyId(getenv('TEST_AWS_KMS_KEY_ID'));
-        $wrapper->setKMSRegion(getenv('TEST_AWS_REGION'));
+        $wrapper->setKMSKeyId((string) getenv('TEST_AWS_KMS_KEY_ID'));
+        $wrapper->setKMSRegion((string) getenv('TEST_AWS_REGION'));
         $encrypted = $wrapper->encrypt($secret);
         self::assertNotEquals($secret, $encrypted);
         /** @var GenericKMSWrapper $mockWrapper */
-        $mockWrapper->setKMSKeyId(getenv('TEST_AWS_KMS_KEY_ID'));
-        $mockWrapper->setKMSRegion(getenv('TEST_AWS_REGION'));
+        $mockWrapper->setKMSKeyId((string) getenv('TEST_AWS_KMS_KEY_ID'));
+        $mockWrapper->setKMSRegion((string) getenv('TEST_AWS_REGION'));
         self::expectException(ApplicationException::class);
         self::expectExceptionMessage('Deciphering failed.');
         $mockWrapper->decrypt($encrypted);
@@ -350,24 +349,13 @@ class GenericKMSWrapperTest extends TestCase
         $wrapper->decrypt('mySecretValue');
     }
 
-    public function testInvalidRegion(): void
-    {
-        $wrapper = new GenericKMSWrapper();
-        $wrapper->setKMSKeyId('my-key');
-        /** @noinspection PhpParamsInspection */
-        $wrapper->setKMSRegion(['a' => 'b']);
-        self::expectException(ApplicationException::class);
-        self::expectExceptionMessage('Cipher key settings are invalid.');
-        $wrapper->encrypt('mySecretValue');
-    }
-
     public function testInvalidCredentials(): void
     {
         putenv('AWS_ACCESS_KEY_ID=' . getenv('TEST_AWS_ACCESS_KEY_ID'));
         putenv('AWS_SECRET_ACCESS_KEY=some-garbage');
         $wrapper = new GenericKMSWrapper();
-        $wrapper->setKMSKeyId(getenv('TEST_AWS_KMS_KEY_ID'));
-        $wrapper->setKMSRegion(getenv('TEST_AWS_REGION'));
+        $wrapper->setKMSKeyId((string) getenv('TEST_AWS_KMS_KEY_ID'));
+        $wrapper->setKMSRegion((string) getenv('TEST_AWS_REGION'));
         self::expectException(ApplicationException::class);
         self::expectExceptionMessage('Ciphering failed: Failed to obtain encryption key.');
         $wrapper->encrypt('mySecretValue');
@@ -376,7 +364,7 @@ class GenericKMSWrapperTest extends TestCase
     public function testInvalidNonExistentRegion(): void
     {
         $wrapper = new GenericKMSWrapper();
-        $wrapper->setKMSKeyId(getenv('TEST_AWS_KMS_KEY_ID'));
+        $wrapper->setKMSKeyId((string) getenv('TEST_AWS_KMS_KEY_ID'));
         $wrapper->setKMSRegion('non-existent');
         self::expectException(ApplicationException::class);
         self::expectExceptionMessage('Ciphering failed: Failed to obtain encryption key.');

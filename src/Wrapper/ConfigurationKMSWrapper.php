@@ -6,23 +6,19 @@ namespace Keboola\ObjectEncryptor\Wrapper;
 
 use Keboola\ObjectEncryptor\Exception\ApplicationException;
 
+/**
+ * @internal Use ObjectEncryptor
+ */
 class ConfigurationKMSWrapper extends ProjectKMSWrapper
 {
     private const KEY_CONFIGURATION = 'configurationId';
 
-    /**
-     * @param string $configurationId
-     */
-    public function setConfigurationId($configurationId)
+    public function setConfigurationId(string $configurationId): void
     {
         $this->setMetadataValue(self::KEY_CONFIGURATION, $configurationId);
     }
 
-    /**
-     * Validate state of the wrapper before ciphering/deciphering
-     * @throws ApplicationException
-     */
-    protected function validateState()
+    protected function validateState(): void
     {
         parent::validateState();
         if (empty($this->getMetadataValue(self::KEY_CONFIGURATION))) {
@@ -33,9 +29,6 @@ class ConfigurationKMSWrapper extends ProjectKMSWrapper
         }
     }
 
-    /**
-     * @inheritdoc
-     */
     public function getPrefix(): string
     {
         return 'KBC::ConfigSecure::';

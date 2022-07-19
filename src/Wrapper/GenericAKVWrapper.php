@@ -20,6 +20,9 @@ use Retry\Policy\SimpleRetryPolicy;
 use Retry\RetryProxy;
 use Throwable;
 
+/**
+ * @internal Use ObjectEncryptor
+ */
 class GenericAKVWrapper implements CryptoWrapperInterface
 {
     // internal indexes in cipher structures
@@ -33,45 +36,24 @@ class GenericAKVWrapper implements CryptoWrapperInterface
     private string $keyVaultURL;
     private ?Client $client = null;
 
-    /**
-     * Set cipher metadata.
-     * @param string $key
-     * @param string $value
-     */
-    public function setMetadataValue($key, $value)
+    public function setMetadataValue(string $key, string $value): void
     {
         $this->metadata[$key] = $value;
     }
 
-    /**
-     * Get metadata value
-     * @param string $key
-     * @return string|null Value or null if key does not exist.
-     */
-    protected function getMetadataValue($key)
+    protected function getMetadataValue(string $key): ?string
     {
-        if (isset($this->metadata[$key])) {
-            return $this->metadata[$key];
-        } else {
-            return null;
-        }
+        return $this->metadata[$key] ?? null;
     }
 
-    /**
-     * Validate internal state
-     * @throws ApplicationException
-     */
-    protected function validateState()
+    protected function validateState(): void
     {
-        if (empty($this->keyVaultURL) || !is_string($this->keyVaultURL)) {
+        if (empty($this->keyVaultURL)) {
             throw new ApplicationException('Cipher key settings are invalid.');
         }
     }
 
-    /**
-     * @param string $keyVaultURL
-     */
-    public function setKeyVaultUrl($keyVaultURL)
+    public function setKeyVaultUrl(string $keyVaultURL): void
     {
         $this->keyVaultURL = $keyVaultURL;
     }
@@ -88,10 +70,7 @@ class GenericAKVWrapper implements CryptoWrapperInterface
         return $this->client;
     }
 
-    /**
-     * @return RetryProxy
-     */
-    private function getRetryProxy()
+    private function getRetryProxy(): RetryProxy
     {
         $retryPolicy = new SimpleRetryPolicy(3);
         $backOffPolicy = new ExponentialBackOffPolicy(1000);
@@ -100,33 +79,25 @@ class GenericAKVWrapper implements CryptoWrapperInterface
 
     /**
      * @param mixed $data
-     * @return string
      */
-    private function encode($data)
+    private function encode($data): string
     {
-        return base64_encode(gzcompress(serialize($data)));
+        return base64_encode((string) gzcompress(serialize($data)));
     }
 
     /**
-     * @param string $data
      * @return mixed
      * @throws UserException
      */
-    private function decode($data)
+    private function decode(string $data)
     {
         try {
-            return @unserialize(gzuncompress(base64_decode($data)));
+            return @unserialize((string) gzuncompress((string) base64_decode($data)));
         } catch (Throwable $e) {
             throw new UserException('Deciphering failed.', 0, $e);
         }
     }
 
-    /**
-     * @param ?string $data
-     * @return string
-     * @throws ApplicationException
-     * @throws UserException
-     */
     public function encrypt(?string $data): string
     {
         $this->validateState();
@@ -153,26 +124,15 @@ class GenericAKVWrapper implements CryptoWrapperInterface
         }
     }
 
-    /**
-     * @param array $cipherMetadata
-     * @param array $localMetadata
-     * @throws UserException
-     */
-    private function verifyMetadata($cipherMetadata, $localMetadata)
+    private function verifyMetadata(array $cipherMetadata, array $localMetadata): void
     {
         foreach ($cipherMetadata as $key => $value) {
-            if (empty($localMetadata[$key]) || ($cipherMetadata[$key] !== $localMetadata[$key])) {
+            if (empty($localMetadata[$key]) || ($value !== $localMetadata[$key])) {
                 throw new UserException('Deciphering failed.');
             }
         }
     }
 
-    /**
-     * @param string $encryptedData
-     * @return string
-     * @throws ApplicationException
-     * @throws UserException
-     */
     public function decrypt(string $encryptedData): string
     {
         $this->validateState();
@@ -189,6 +149,7 @@ class GenericAKVWrapper implements CryptoWrapperInterface
                     $encrypted[self::SECRET_VERSION]
                 )->getValue();
             });
+            assert(is_string($decryptedContext));
             $decryptedContext = $this->decode($decryptedContext);
             if (!is_array($decryptedContext) || (count($decryptedContext) !== 2) ||
                 empty($decryptedContext[self::KEY_INDEX]) || !isset($decryptedContext[self::METADATA_INDEX]) ||
@@ -208,9 +169,6 @@ class GenericAKVWrapper implements CryptoWrapperInterface
         }
     }
 
-    /**
-     * @inheritdoc
-     */
     public function getPrefix(): string
     {
         return 'KBC::SecureKV::';

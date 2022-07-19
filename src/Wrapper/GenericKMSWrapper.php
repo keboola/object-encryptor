@@ -6,6 +6,7 @@ namespace Keboola\ObjectEncryptor\Wrapper;
 
 use Aws\Kms\Exception\KmsException;
 use Aws\Kms\KmsClient;
+use Aws\Result;
 use Defuse\Crypto\Crypto;
 use Defuse\Crypto\Encoding;
 use Defuse\Crypto\Key;
@@ -16,62 +17,28 @@ use Retry\Policy\SimpleRetryPolicy;
 use Retry\RetryProxy;
 use Throwable;
 
+/**
+ * @internal Use ObjectEncryptor
+ */
 class GenericKMSWrapper implements CryptoWrapperInterface
 {
-    /**
-     * @var array Key value metadata.
-     */
-    private $metadata = [];
+    private array $metadata = [];
+    private array $metadataCache = [];
+    private ?Result $keyCache = null;
+    private string $keyId;
+    private string $region;
 
-    /**
-     * @var array Key value metadata cache.
-     */
-    private $metadataCache = [];
-
-    /**
-     * @var array Key cache.
-     */
-    private $keyCache = [];
-
-    /**
-     * @var string
-     */
-    private $keyId;
-
-    /**
-     * @var string
-     */
-    private $region;
-
-    /**
-     * Set cipher metadata.
-     * @param string $key
-     * @param string $value
-     */
-    public function setMetadataValue($key, $value)
+    public function setMetadataValue(string $key, string $value): void
     {
         $this->metadata[$key] = $value;
     }
 
-    /**
-     * Get metadata value
-     * @param string $key
-     * @return string|null Value or null if key does not exist.
-     */
-    protected function getMetadataValue($key)
+    protected function getMetadataValue(string $key): ?string
     {
-        if (isset($this->metadata[$key])) {
-            return $this->metadata[$key];
-        } else {
-            return null;
-        }
+        return $this->metadata[$key] ?? null;
     }
 
-    /**
-     * Get KMS client
-     * @return KmsClient
-     */
-    protected function getClient()
+    protected function getClient(): KmsClient
     {
         return new KmsClient([
             'region' => $this->region,
@@ -84,10 +51,9 @@ class GenericKMSWrapper implements CryptoWrapperInterface
 
     /**
      * Get key for encryption
-     * @return array
      * @throws ApplicationException
      */
-    private function getEncryptKey()
+    private function getEncryptKey(): array
     {
         try {
             $client = $this->getClient();
@@ -110,7 +76,8 @@ class GenericKMSWrapper implements CryptoWrapperInterface
             }
             $plainKey = $this->keyCache['Plaintext'];
             $encryptedKey = $this->keyCache['CiphertextBlob'];
-            $safeKey = Encoding::saveBytesToChecksummedAsciiSafeString(Key::KEY_CURRENT_VERSION, $plainKey);
+            assert(is_string($plainKey));
+            $safeKey = Encoding::saveBytesToChecksummedAsciiSafeString(Key::KEY_CURRENT_VERSION, (string) $plainKey);
             return ['kms' => $encryptedKey, 'local' => Key::loadFromAsciiSafeString($safeKey)];
         } catch (Throwable $e) {
             throw new ApplicationException('Failed to obtain encryption key.', $e->getCode(), $e);
@@ -121,68 +88,46 @@ class GenericKMSWrapper implements CryptoWrapperInterface
      * Validate internal state
      * @throws ApplicationException
      */
-    protected function validateState()
+    protected function validateState(): void
     {
         if (empty($this->region) || empty($this->keyId)) {
             throw new ApplicationException('Cipher key settings are missing.');
         }
-        if (!is_string($this->region) || !is_string($this->keyId)) {
-            throw new ApplicationException('Cipher key settings are invalid.');
-        }
     }
 
-    /**
-     * @param string $key
-     */
-    public function setKMSKeyId($key)
+    public function setKMSKeyId(string $key): void
     {
         $this->keyId = $key;
     }
 
-    /**
-     * @param string $region
-     */
-    public function setKMSRegion($region)
+    public function setKMSRegion(string $region): void
     {
         $this->region = $region;
     }
 
-    /**
-     * @inheritdoc
-     */
     public function getPrefix(): string
     {
         return 'KBC::Secure::';
     }
 
-    /**
-     * @inheritdoc
-     */
     public function encrypt(?string $data): string
     {
         $this->validateState();
-        if (!is_scalar($data) && !is_null($data)) {
-            throw new UserException('Cannot encrypt a non-scalar value.');
-        }
         try {
             $key = $this->getEncryptKey();
             $payload = Crypto::encrypt((string) $data, $key['local'], true);
             $resultBinary = [$payload, $key['kms']];
-            $result = base64_encode(gzcompress(serialize($resultBinary)));
-            return $result;
+            return base64_encode((string) gzcompress(serialize($resultBinary)));
         } catch (Throwable $e) {
             throw new ApplicationException('Ciphering failed: ' . $e->getMessage(), $e->getCode(), $e);
         }
     }
 
-    /**
-     * @inheritdoc
-     */
     public function decrypt(string $encryptedData): string
     {
         $this->validateState();
         try {
-            $encrypted = @unserialize(gzuncompress(base64_decode($encryptedData)));
+            $encrypted = @unserialize((string) gzuncompress(base64_decode($encryptedData)));
         } catch (Throwable $e) {
             throw new UserException('Deciphering failed.', 0, $e);
         }
@@ -211,10 +156,13 @@ class GenericKMSWrapper implements CryptoWrapperInterface
         }
         try {
             $decryptedKey = $result['Plaintext'];
-            $safeKey = Encoding::saveBytesToChecksummedAsciiSafeString(Key::KEY_CURRENT_VERSION, $decryptedKey);
+            assert(is_string($decryptedKey));
+            $safeKey = Encoding::saveBytesToChecksummedAsciiSafeString(
+                Key::KEY_CURRENT_VERSION,
+                (string) $decryptedKey
+            );
             $key = Key::loadFromAsciiSafeString($safeKey);
-            $payload = Crypto::decrypt($encrypted[0], $key, true);
-            return $payload;
+            return Crypto::decrypt($encrypted[0], $key, true);
         } catch (Throwable $e) {
             throw new UserException('Deciphering failed.', 0, $e);
         }
