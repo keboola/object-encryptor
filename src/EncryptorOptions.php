@@ -12,12 +12,19 @@ class EncryptorOptions
     private ?string $kmsKeyRegion;
     private ?string $akvUrl;
     private string $stackId;
+    private ?string $kmsRole;
 
-    public function __construct(string $stackId, ?string $kmsKeyId, ?string $kmsRegion, ?string $akvUrl)
-    {
+    public function __construct(
+        string $stackId,
+        ?string $kmsKeyId,
+        ?string $kmsRegion,
+        ?string $kmsRole,
+        ?string $akvUrl
+    ) {
         $this->stackId = $stackId;
         $this->kmsKeyId = $kmsKeyId;
         $this->kmsKeyRegion = $kmsRegion;
+        $this->kmsRole = $kmsRole;
         $this->akvUrl = $akvUrl;
         $this->validateState();
     }
@@ -30,6 +37,11 @@ class EncryptorOptions
     public function getKmsKeyRegion(): ?string
     {
         return $this->kmsKeyRegion;
+    }
+
+    public function getKmsRole(): ?string
+    {
+        return $this->kmsRole;
     }
 
     public function getAkvUrl(): ?string

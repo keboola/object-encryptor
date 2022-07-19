@@ -14,6 +14,7 @@ services:
       - TEST_AWS_ACCESS_KEY_ID
       - TEST_AWS_SECRET_ACCESS_KEY
       - TEST_AWS_KMS_KEY_ID
+      - TEST_AWS_ROLE_ID
     command: ["composer", "ci"]
 
   ci:

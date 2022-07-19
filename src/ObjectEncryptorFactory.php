@@ -6,15 +6,19 @@ namespace Keboola\ObjectEncryptor;
 
 class ObjectEncryptorFactory
 {
-    public static function getAwsEncryptor(string $stackId, string $kmsKeyId, string $kmsRegion): ObjectEncryptor
-    {
-        $encryptOptions = new EncryptorOptions($stackId, $kmsKeyId, $kmsRegion, null);
+    public static function getAwsEncryptor(
+        string $stackId,
+        string $kmsKeyId,
+        string $kmsRegion,
+        ?string $kmsRole
+    ): ObjectEncryptor {
+        $encryptOptions = new EncryptorOptions($stackId, $kmsKeyId, $kmsRegion, $kmsRole, null);
         return self::getEncryptor($encryptOptions);
     }
 
     public static function getAzureEncryptor(string $stackId, string $keyVaultUrl): ObjectEncryptor
     {
-        $encryptOptions = new EncryptorOptions($stackId, null, null, $keyVaultUrl);
+        $encryptOptions = new EncryptorOptions($stackId, null, null, null, $keyVaultUrl);
         return self::getEncryptor($encryptOptions);
     }
 

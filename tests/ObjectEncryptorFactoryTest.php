@@ -25,7 +25,21 @@ class ObjectEncryptorFactoryTest extends TestCase
         $encryptor = ObjectEncryptorFactory::getAwsEncryptor(
             'my-stack',
             (string) getenv('TEST_AWS_KMS_KEY_ID'),
-            (string) getenv('TEST_AWS_REGION')
+            (string) getenv('TEST_AWS_REGION'),
+            null
+        );
+        $encrypted = $encryptor->encryptForComponent('secret', 'my-component');
+        self::assertIsString($encrypted);
+        self::assertStringStartsWith('KBC::ComponentSecure::', (string) $encrypted);
+    }
+
+    public function testGetAwsEncryptorRole(): void
+    {
+        $encryptor = ObjectEncryptorFactory::getAwsEncryptor(
+            'my-stack',
+            (string) getenv('TEST_AWS_KMS_KEY_ID'),
+            (string) getenv('TEST_AWS_REGION'),
+            (string) getenv('TEST_AWS_ROLE_ID')
         );
         $encrypted = $encryptor->encryptForComponent('secret', 'my-component');
         self::assertIsString($encrypted);
@@ -50,6 +64,7 @@ class ObjectEncryptorFactoryTest extends TestCase
                 'my-stack',
                 (string) getenv('TEST_AWS_KMS_KEY_ID'),
                 (string) getenv('TEST_AWS_REGION'),
+                null,
                 (string) getenv('TEST_KEY_VAULT_URL')
             )
         );
@@ -61,7 +76,8 @@ class ObjectEncryptorFactoryTest extends TestCase
         $awsEncryptor = ObjectEncryptorFactory::getAwsEncryptor(
             'my-stack',
             (string) getenv('TEST_AWS_KMS_KEY_ID'),
-            (string) getenv('TEST_AWS_REGION')
+            (string) getenv('TEST_AWS_REGION'),
+            null
         );
         $awsEncrypted = $awsEncryptor->encryptForComponent('secret', 'my-component');
         self::assertIsString($awsEncrypted);

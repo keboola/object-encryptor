@@ -15,4 +15,5 @@ output_var 'TEST_AWS_ACCESS_KEY_ID' $(terraform_output 'aws_access_key_id')
 output_var 'TEST_AWS_SECRET_ACCESS_KEY' $(terraform_output 'aws_access_key_secret')
 output_var 'TEST_AWS_REGION' $(terraform_output 'aws_region')
 output_var 'TEST_AWS_KMS_KEY_ID' $(terraform_output 'aws_kms_key_id')
+output_var 'TEST_AWS_ROLE_ID' $(terraform_output 'aws_role_arn')
 echo ""

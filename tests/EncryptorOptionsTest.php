@@ -12,10 +12,11 @@ class EncryptorOptionsTest extends TestCase
 {
     public function testAccessors(): void
     {
-        $options = new EncryptorOptions('my-stack', 'my-kms-id', 'region', 'akv-url');
+        $options = new EncryptorOptions('my-stack', 'my-kms-id', 'region', 'role', 'akv-url');
         self::assertSame('my-stack', $options->getStackId());
         self::assertSame('my-kms-id', $options->getKmsKeyId());
         self::assertSame('region', $options->getKmsKeyRegion());
+        self::assertSame('role', $options->getKmsRole());
         self::assertSame('akv-url', $options->getAkvUrl());
     }
 
@@ -23,20 +24,20 @@ class EncryptorOptionsTest extends TestCase
     {
         $this->expectException(ApplicationException::class);
         $this->expectExceptionMessage('Stack Id must not be empty.');
-        new EncryptorOptions('', null, null, null);
+        new EncryptorOptions('', null, null, null, null);
     }
 
     public function testConstructEmptyConfig(): void
     {
         $this->expectException(ApplicationException::class);
         $this->expectExceptionMessage('Neither KMS, nor KeyVault configured.');
-        new EncryptorOptions('my-stack', null, null, null);
+        new EncryptorOptions('my-stack', null, null, null, null);
     }
 
     public function testConstructEmptyStringsConfig(): void
     {
         $this->expectException(ApplicationException::class);
         $this->expectExceptionMessage('Neither KMS, nor KeyVault configured.');
-        new EncryptorOptions('my-stack', '', '', '');
+        new EncryptorOptions('my-stack', '', '', '', '');
     }
 }
