@@ -823,7 +823,7 @@ class ObjectEncryptorTest extends TestCase
             $encryptor->decryptForConfiguration(
                 $encryptedGeneric,
                 'my-component',
-                'my-configuration',
+                'my-project',
                 'my-configuration'
             )
         );
@@ -832,7 +832,7 @@ class ObjectEncryptorTest extends TestCase
             $encryptor->decryptForConfiguration(
                 $encryptedComponent,
                 'my-component',
-                'my-configuration',
+                'my-project',
                 'my-configuration'
             )
         );
@@ -841,7 +841,7 @@ class ObjectEncryptorTest extends TestCase
             $encryptor->decryptForConfiguration(
                 $encryptedProject,
                 'my-component',
-                'my-configuration',
+                'my-project',
                 'my-configuration'
             )
         );
@@ -850,7 +850,7 @@ class ObjectEncryptorTest extends TestCase
             $encryptor->decryptForConfiguration(
                 $encryptedConfiguration,
                 'my-component',
-                'my-configuration',
+                'my-project',
                 'my-configuration'
             )
         );
