@@ -42,7 +42,7 @@
         "tests": "phpunit --coverage-clover /tmp/build-logs/clover.xml --coverage-xml=/tmp/build-logs/coverage-xml --log-junit=/tmp/build-logs/phpunit.junit.xml",
         "phpcs": "phpcs --extensions=php src tests",
         "phpstan": "phpstan analyse --no-progress -c phpstan.neon",
-        "infection": "infection --threads=4 --min-covered-msi=90 --coverage=/tmp/build-logs --only-covered",
+        "infection": "infection --threads=4 --min-covered-msi=80 --coverage=/tmp/build-logs --only-covered",
         "build": [
             "@phpcs",
             "@phpstan",
