@@ -22,6 +22,11 @@ class ObjectEncryptor
 {
     private EncryptorOptions $encryptorOptions;
 
+    public function __construct(EncryptorOptions $encryptorOptions)
+    {
+        $this->encryptorOptions = $encryptorOptions;
+    }
+
     /**
      * @template T of array|stdClass|string
      * @param T $data
@@ -127,11 +132,6 @@ class ObjectEncryptor
         return $this->decrypt($data, $wrappers);
     }
 
-    public function __construct(EncryptorOptions $encryptorOptions)
-    {
-        $this->encryptorOptions = $encryptorOptions;
-    }
-
     /**
      * @template T of array|stdClass|string
      * @param T $data Data to encrypt
@@ -156,9 +156,10 @@ class ObjectEncryptor
         if (is_array($data)) {
             return $this->encryptArray($data, $wrappers, $wrapper);
         }
-        if (is_object($data) && get_class($data) === stdClass::class) {
+        if ($data instanceof stdClass) {
             return $this->encryptObject($data, $wrappers, $wrapper);
         }
+        // @phpstan-ignore-next-line
         throw new ApplicationException('Only stdClass, array and string are supported types for encryption.');
     }
 
@@ -177,9 +178,10 @@ class ObjectEncryptor
         if (is_array($data)) {
             return $this->decryptArray($data, $wrappers);
         }
-        if (is_a($data, stdClass::class) && (get_class($data) === stdClass::class)) {
+        if ($data instanceof stdClass) {
             return $this->decryptObject($data, $wrappers);
         }
+        // @phpstan-ignore-next-line
         throw new ApplicationException('Only stdClass, array and string are supported types for decryption.');
     }
 
@@ -226,7 +228,7 @@ class ObjectEncryptor
             }
         } elseif (is_array($value)) {
             return $this->encryptArray($value, $wrappers, $wrapper);
-        } elseif (is_object($value) && get_class($value) === stdClass::class) {
+        } elseif ($value instanceof stdClass) {
             return $this->encryptObject($value, $wrappers, $wrapper);
         } else {
             throw new ApplicationException(
@@ -286,7 +288,7 @@ class ObjectEncryptor
             }
         } elseif (is_array($value)) {
             return $this->decryptArray($value, $wrappers);
-        } elseif (is_object($value) && get_class($value) === stdClass::class) {
+        } elseif ($value instanceof stdClass) {
             return $this->decryptObject($value, $wrappers);
         } else {
             throw new ApplicationException(

@@ -22,7 +22,7 @@ class EncryptorOptionsTest extends TestCase
     public function testConstructEmptyStack(): void
     {
         $this->expectException(ApplicationException::class);
-        $this->expectExceptionMessage('Invalid Stack Id.');
+        $this->expectExceptionMessage('Stack Id must not be empty.');
         new EncryptorOptions('', null, null, null);
     }
 
@@ -31,5 +31,12 @@ class EncryptorOptionsTest extends TestCase
         $this->expectException(ApplicationException::class);
         $this->expectExceptionMessage('Neither KMS, nor KeyVault configured.');
         new EncryptorOptions('my-stack', null, null, null);
+    }
+
+    public function testConstructEmptyStringsConfig(): void
+    {
+        $this->expectException(ApplicationException::class);
+        $this->expectExceptionMessage('Neither KMS, nor KeyVault configured.');
+        new EncryptorOptions('my-stack', '', '', '');
     }
 }

@@ -48,7 +48,7 @@ class EncryptorOptions
     private function validateState(): void
     {
         if (empty($this->stackId)) {
-            throw new ApplicationException('Invalid Stack Id.');
+            throw new ApplicationException('Stack Id must not be empty.');
         }
         if (empty($this->kmsKeyId) && empty($this->kmsKeyRegion) && empty($this->akvUrl)) {
             throw new ApplicationException('Neither KMS, nor KeyVault configured.');

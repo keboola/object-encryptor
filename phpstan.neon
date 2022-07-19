@@ -4,8 +4,5 @@ parameters:
     paths:
         - src
         - tests
-    ignoreErrors:
-        - '#Parameter \#1 \$data of method Keboola\\ObjectEncryptor\\ObjectEncryptor\:\:encryptObject\(\) expects stdClass, object given#'
-        - '#Parameter \#1 \$data of method Keboola\\ObjectEncryptor\\ObjectEncryptor\:\:decryptObject\(\) expects stdClass, object given#'
 includes:
     - vendor/phpstan/phpstan-phpunit/extension.neon

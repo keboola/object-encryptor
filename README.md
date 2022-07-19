@@ -11,7 +11,7 @@ The library supports PHP 7.4+.
 
 ## Usage
 Entry point to the library is the `ObjectEncryptorFactory` class which creates instances of `ObjectEncryptor` class which
-has `encryptGeneric`, `encryptForComponent`, `encryptForProject`, `encryptForConfiguration` and corresponding `decrypt` 
+has `encryptGeneric`, `encryptForComponent`, `encryptForProject`, `encryptForConfiguration` and corresponding `decryptXXX` 
 methods. The actual encryption and decryption mechanisms are implemented using **Crypto Wrappers**.
 Crypto wrappers implement different verification methods using cypher metadata.
 
@@ -30,6 +30,8 @@ $encryptor = ObjectEncryptorFactory::getEncryptor(
 $encryptor->encryptForComponent('secret', 'my-component');
 ```
 
+Alternatively, you can use `getAwsEncryptor` and `getAzureEncryptor` to get cloud specific object encryptors.
+
 ### Wrappers
 Depending on the provided keys and parameters, the following wrappers will be available:
 
@@ -46,7 +48,7 @@ During encryption, the wrapper has to be specified (each `encryptXXX` method use
 the wrapper is chosen automatically by the cipher prefix. This means that `decryptForConfiguration` method is also
 capable of decrypting ciphers created by `encryptForComponent` or `encryptForProject` ciphers. 
 If the wrapper is not available (key or parameters are not set or equal to those in the cipher), 
-the value cannot be deciphered.
+the value cannot be deciphered and an exception is thrown.
 
 ## Development
 Prerequisites:
