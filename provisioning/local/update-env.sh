@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-ENV_FILE=".env"
+ENV_FILE=".env.local"
 INSERT_MODE=prepend
 VERBOSE=false
 

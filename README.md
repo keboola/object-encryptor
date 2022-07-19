@@ -54,7 +54,7 @@ the value cannot be deciphered and an exception is thrown.
 Prerequisites:
 * configured `az` and `aws` CLI tools (run `az login` and `aws configure --profile keboola-dev-platform-services`)
 * installed `terraform` (https://www.terraform.io) and `jq` (https://stedolan.github.io/jq) to setup local env
-* intalled `docker` and `docker-compose` to run & develop the app
+* installed `docker` and `docker-compose` to run & develop the app
 
 ```
 cat <<EOF > ./provisioning/local/terraform.tfvars
