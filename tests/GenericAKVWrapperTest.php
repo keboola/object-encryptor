@@ -54,7 +54,7 @@ class GenericAKVWrapperTest extends TestCase
     private function getWrapper(): GenericAKVWrapper
     {
         $wrapper = new GenericAKVWrapper();
-        $wrapper->setKeyVaultUrl(getenv('TEST_KEY_VAULT_URL'));
+        $wrapper->setKeyVaultUrl((string) getenv('TEST_KEY_VAULT_URL'));
         return $wrapper;
     }
 
@@ -76,7 +76,7 @@ class GenericAKVWrapperTest extends TestCase
         $secret = 'mySecretValue';
         $wrapper = $this->getWrapper();
         $wrapper->setMetadataValue('componentId', 'keboola.a-very-long-component-id-with-some-extra-characters');
-        $wrapper->setMetadataValue('configurationId', 'a-very-long-coniguration-id-with-some-extra-characters');
+        $wrapper->setMetadataValue('configurationId', 'a-very-long-configuration-id-with-some-extra-characters');
         $wrapper->setMetadataValue('stackId', 'https://connection.azure.us-east-1.keboola.com');
         $wrapper->setMetadataValue('projectId', '123456789');
         $encrypted = $wrapper->encrypt($secret);
@@ -87,7 +87,7 @@ class GenericAKVWrapperTest extends TestCase
         $wrapper->setMetadataValue('stackId', 'https://connection.azure.us-east-1.keboola.com');
         $wrapper->setMetadataValue('projectId', '123456789');
         $wrapper->setMetadataValue('componentId', 'keboola.a-very-long-component-id-with-some-extra-characters');
-        $wrapper->setMetadataValue('configurationId', 'a-very-long-coniguration-id-with-some-extra-characters');
+        $wrapper->setMetadataValue('configurationId', 'a-very-long-configuration-id-with-some-extra-characters');
         self::assertEquals($secret, $wrapper->decrypt($encrypted));
     }
 
@@ -96,7 +96,7 @@ class GenericAKVWrapperTest extends TestCase
         $secret = 'mySecretValue';
         $wrapper = $this->getWrapper();
         $wrapper->setMetadataValue('componentId', 'keboola.a-very-long-component-id-with-some-extra-characters');
-        $wrapper->setMetadataValue('configurationId', 'a-very-long-coniguration-id-with-some-extra-characters');
+        $wrapper->setMetadataValue('configurationId', 'a-very-long-configuration-id-with-some-extra-characters');
         $wrapper->setMetadataValue('stackId', 'https://connection.azure.us-east-1.keboola.com');
         $encrypted = $wrapper->encrypt($secret);
         self::assertNotEquals($secret, $encrypted);
@@ -104,7 +104,7 @@ class GenericAKVWrapperTest extends TestCase
 
         $wrapper = $this->getWrapper();
         $wrapper->setMetadataValue('stackId', 'https://connection.azure.us-east-1.keboola.com');
-        $wrapper->setMetadataValue('configurationId', 'a-very-long-coniguration-id-with-some-extra-characters');
+        $wrapper->setMetadataValue('configurationId', 'a-very-long-configuration-id-with-some-extra-characters');
         self::expectException(UserException::class);
         self::expectExceptionMessage('Deciphering failed.');
         $wrapper->decrypt($encrypted);
@@ -127,13 +127,13 @@ class GenericAKVWrapperTest extends TestCase
             ->setMethods(['getClient'])
             ->getMock();
         $mockWrapper->method('getClient')->willReturn($mockClient);
-        $mockWrapper->setKeyVaultUrl(getenv('TEST_KEY_VAULT_URL'));
+        $mockWrapper->setKeyVaultUrl((string) getenv('TEST_KEY_VAULT_URL'));
         return $mockWrapper;
     }
 
     public function testRetryEncryptDecrypt(): void
     {
-        $mockClient = self::getMockBuilder(Client::class)
+        $mockClient = $this->getMockBuilder(Client::class)
             ->setConstructorArgs([
                 new GuzzleClientFactory(new NullLogger()),
                 new AuthenticatorFactory(),
@@ -150,7 +150,6 @@ class GenericAKVWrapperTest extends TestCase
                 $secretName
             ) use (
                 &$callNoSet,
-                $mockClient,
                 &$secretInternal
             ) {
                 $callNoSet++;
@@ -158,7 +157,6 @@ class GenericAKVWrapperTest extends TestCase
                 if ($callNoSet < 3) {
                     throw new ConnectException('mock failed to connect', new Request('GET', 'some-uri'));
                 } else {
-                    /** @var Client $mockClient */
                     return new SecretBundle([
                         'id' => 'https://test.vault.azure.net/secrets/foo/53af0dad94f248',
                         'value' => $secretInternal,
@@ -173,7 +171,6 @@ class GenericAKVWrapperTest extends TestCase
                 $secretVersion
             ) use (
                 &$callNoGet,
-                $mockClient,
                 &$secretInternal
             ) {
                 $callNoGet++;
@@ -216,9 +213,9 @@ class GenericAKVWrapperTest extends TestCase
         $mockWrapper->encrypt($secret);
     }
 
-    public function testRetryDecryptFail()
+    public function testRetryDecryptFail(): void
     {
-        $mockClient = self::getMockBuilder(Client::class)
+        $mockClient = $this->getMockBuilder(Client::class)
             ->setConstructorArgs([
                 new GuzzleClientFactory(new NullLogger()),
                 new AuthenticatorFactory(),
@@ -233,7 +230,7 @@ class GenericAKVWrapperTest extends TestCase
 
         $secret = 'secret';
         $wrapper = new GenericAKVWrapper();
-        $wrapper->setKeyVaultUrl(getenv('TEST_KEY_VAULT_URL'));
+        $wrapper->setKeyVaultUrl((string) getenv('TEST_KEY_VAULT_URL'));
         $encrypted = $wrapper->encrypt($secret);
         self::assertNotEquals($secret, $encrypted);
         $mockWrapper = $this->getMockWrapper($mockClient);
@@ -245,7 +242,7 @@ class GenericAKVWrapperTest extends TestCase
     /** @noinspection PhpUnusedParameterInspection */
     public function testInvalidSecretContents(): void
     {
-        $mockClient = self::getMockBuilder(Client::class)
+        $mockClient = $this->getMockBuilder(Client::class)
             ->setConstructorArgs([
                 new GuzzleClientFactory(new NullLogger()),
                 new AuthenticatorFactory(),
@@ -254,8 +251,7 @@ class GenericAKVWrapperTest extends TestCase
             ->setMethods(['setSecret', 'getSecret'])
             ->getMock();
         $mockClient->method('setSecret')
-            ->willReturnCallback(function (SetSecretRequest $setSecretRequest, $secretName) use ($mockClient) {
-                /** @var Client $mockClient */
+            ->willReturnCallback(function (SetSecretRequest $setSecretRequest, $secretName) {
                 return new SecretBundle([
                     'id' => 'https://test.vault.azure.net/secrets/foo/53af0dad94f248',
                     'value' => 'not-used',
@@ -264,8 +260,7 @@ class GenericAKVWrapperTest extends TestCase
             });
         $secret = 'secret';
         $mockClient->method('getSecret')
-            ->willReturnCallback(function ($secretName, $secretVersion) use ($mockClient, &$secretInternal) {
-                /** @var Client $mockClient */
+            ->willReturnCallback(function ($secretName, $secretVersion) {
                 return new SecretBundle([
                     'id' => 'https://test.vault.azure.net/secrets/foo/53af0dad94f248',
                     'attributes' => [],
@@ -280,10 +275,9 @@ class GenericAKVWrapperTest extends TestCase
         $mockWrapper->decrypt($encrypted);
     }
 
-    /** @noinspection PhpUnusedParameterInspection */
     public function testInvalidSecretCipher(): void
     {
-        $mockClient = self::getMockBuilder(Client::class)
+        $mockClient = $this->getMockBuilder(Client::class)
             ->setConstructorArgs([
                 new GuzzleClientFactory(new NullLogger()),
                 new AuthenticatorFactory(),
@@ -297,11 +291,9 @@ class GenericAKVWrapperTest extends TestCase
                 SetSecretRequest $setSecretRequest,
                 $secretName
             ) use (
-                $mockClient,
                 &$secretInternal
             ) {
                 $secretInternal = $setSecretRequest->getArray()['value'];
-                /** @var Client $mockClient */
                 return new SecretBundle([
                     'id' => 'https://test.vault.azure.net/secrets/foo/53af0dad94f248',
                     'value' => $secretInternal,
@@ -310,14 +302,14 @@ class GenericAKVWrapperTest extends TestCase
             });
         $secret = 'secret';
         $mockClient->method('getSecret')
-            ->willReturnCallback(function ($secretName, $secretVersion) use ($mockClient, &$secretInternal) {
-                /** @var Client $mockClient */
-                $contents = unserialize(gzuncompress(base64_decode($secretInternal)));
+            ->willReturnCallback(function ($secretName, $secretVersion) use (&$secretInternal) {
+                $contents = unserialize((string) gzuncompress(base64_decode($secretInternal)));
+                self::assertIsArray($contents);
                 $contents[1] = 'garbage';
                 return new SecretBundle([
                     'id' => 'https://test.vault.azure.net/secrets/foo/53af0dad94f248',
                     'attributes' => [],
-                    'value' => base64_encode(gzcompress(serialize($contents))),
+                    'value' => base64_encode((string) gzcompress(serialize($contents))),
                 ]);
             });
 
@@ -362,14 +354,14 @@ class GenericAKVWrapperTest extends TestCase
         $wrapper->setKeyVaultUrl('test-key');
         self::expectException(ApplicationException::class);
         self::expectExceptionMessage('Deciphering failed.');
-        $wrapper->decrypt(base64_encode(gzcompress(serialize([2 => 'test', 3 => 'test', 4 => 'test']))));
+        $wrapper->decrypt(base64_encode((string) gzcompress(serialize([2 => 'test', 3 => 'test', 4 => 'test']))));
     }
 
     public function testInvalidSetupInvalidCredentials(): void
     {
         putenv('AZURE_CLIENT_ID=invalid');
         $wrapper = new GenericAKVWrapper();
-        $wrapper->setKeyVaultUrl(getenv('TEST_KEY_VAULT_URL'));
+        $wrapper->setKeyVaultUrl((string) getenv('TEST_KEY_VAULT_URL'));
         self::expectException(ApplicationException::class);
         self::expectExceptionMessage('Ciphering failed: Failed to get authentication token');
         $wrapper->encrypt('test');

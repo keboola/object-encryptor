@@ -2,41 +2,39 @@
 
 # Object Encryptor
 Library provides interface for encrypting PHP arrays, stdclass objects and scalars. A cipher may contain additional metadata
-which limits the conditions under which it may be decrypted. The library supports three encryption methods:
-
-- [keboola/php-encryption](https://github.com/keboola/php-encryption) -- legacy, allows only deciphering.
-- [keboola-legacy/php-encryption](https://github.com/keboola/legacy-php-encryption) -- legacy version of [defuse/php-encryption](https://github.com/defuse/php-encryption), currently default.
-- [defuse/php-encryption](https://github.com/defuse/php-encryption) -- current encryption method with AWS KMS or Azure Key Vault managed keys.
+which limits the conditions under which it may be decrypted. The library uses the 
+[defuse/php-encryption](https://github.com/defuse/php-encryption) encryption method with AWS KMS or Azure Key 
+Vault managed keys.
 
 ## Requirements
-The library supports PHP 5.6, 7.4. Versions 7.1+ are supported through mcrypt polyfill.
+The library supports PHP 7.4+.
 
 ## Usage
 Entry point to the library is the `ObjectEncryptorFactory` class which creates instances of `ObjectEncryptor` class which
-has `encrypt` and `decrypt` methods. The actual encryption and decryption mechanisms are implemented using **Crypto Wrappers**.
+has `encryptGeneric`, `encryptForComponent`, `encryptForProject`, `encryptForConfiguration` and corresponding `decryptXXX` 
+methods. The actual encryption and decryption mechanisms are implemented using **Crypto Wrappers**.
 Crypto wrappers implement different verification methods using cypher metadata.
 
-### Initialization
+### Usage
 Initialize the library using the factory class:
 
 ```
-$kmsKeyId = 'alias/my-key';
-$kmsRegion = 'us-east-1';
-$akvUrl = 'https://my-test.vault.azure.net
-$keyVersion1 = '1234567890123456';
-$keyVersion0 = '123456789012345678901234567890ab';
-$factory = new ObjectEncryptorFactory($kmsKeyId, $kmsRegion, $keyVersion1, $keyVersion0);
+$encryptor = ObjectEncryptorFactory::getEncryptor(
+    new EncryptorOptions(
+        'my-stack',
+        $kmsKeyId,
+        $kmsRegion,
+        $akvUrl
+    )
+);
+$encryptor->encryptForComponent('secret', 'my-component');
 ```
 
-Additional parameters may be set with `setComponentId`, `setConfigurationId`, `setProjectId` and `setStackId` methods.
+Alternatively, you can use `getAwsEncryptor` and `getAzureEncryptor` to get cloud specific object encryptors.
 
 ### Wrappers
 Depending on the provided keys and parameters, the following wrappers will be available:
 
-- `Encryptor` - legacy decryptor for un-prefixed ciphers, requires `keyVersion0` 
-- `BaseWrapper` - legacy wrapper for `KBC::Encrypted` ciphers, requires `keyVersion1`
-- `ComponentWrapper` - legacy wrapper for `KBC::ComponentEncrypted==` ciphers, requires `keyVersion1` and `componentId`
-- `ComponentProjectWrapper` - legacy wrapper for `KBC::ComponentProjectEncrypted==` ciphers, requires `keyVersion1` and `componentId` and `projectId`
 - `GenericKMSWrapper` - current AWS wrapper for `KBC::Secure::` ciphers, requires `kmsKeyId` and `kmsRegion`. Also, the runner must have AWS credentials available (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`)
 - `ComponentKMSWrapper` - current AWS wrapper for `KBC::ComponentSecure::` ciphers, requires `kmsKeyId`, `kmsRegion`, `stackId` and `componentId`
 - `ProjectKMSWrapper` - current AWS wrapper for `KBC::ProjectSecure::` ciphers, requires `kmsKeyId`, `kmsRegion`, `stackId`, `componentId` and `projectId`.
@@ -46,30 +44,17 @@ Depending on the provided keys and parameters, the following wrappers will be av
 - `ProjectAKVWrapper` - current Azure wrapper for `KBC::ProjectSecureKV::` ciphers, requires `akvUrl`, `stackId`, `componentId` and `projectId`.
 - `ConfigurationAKVWrapper` - current Azure wrapper for `KBC::ConfigSecureKV::` ciphers, requires `akvUrl`, `stackId`, `componentId`, `projectId` and `configurationId`.
 
-During encryption, the wrapper has to be specified (or `BaseWrapper` is used). During decryption, the wrapper is chosen automatically by the 
-cipher prefix. If the wrapper is not available (key or parameters are not set or equal to those in the cipher), the value cannot be deciphered.
-
-## Usage
-
-```
-// intialize factory
-putenv('AWS_ACCESS_KEY_ID=AKIA...');
-putenv('AWS_SECRET_ACCESS_KEY=secret);
-$keyId = 'alias/some-key';
-$keyRegion = 'us-east-1';
-$legacyKey = '1234567890123456';
-$factory = new ObjectEncryptorFactory($keyId, $keyRegion, $legacyKey, '');
-$factory->setComponentId('dummy-component');
-// get encryptor
-$factory->getEncryptor()->encrypt('secret', GenericWrapper::class);
-$secret = $factory->getEncryptor()->decrypt($encrypted);
-```
+During encryption, the wrapper has to be specified (each `encryptXXX` method uses one). During decryption, 
+the wrapper is chosen automatically by the cipher prefix. This means that `decryptForConfiguration` method is also
+capable of decrypting ciphers created by `encryptForComponent` or `encryptForProject` ciphers. 
+If the wrapper is not available (key or parameters are not set or equal to those in the cipher), 
+the value cannot be deciphered and an exception is thrown.
 
 ## Development
 Prerequisites:
 * configured `az` and `aws` CLI tools (run `az login` and `aws configure --profile keboola-dev-platform-services`)
 * installed `terraform` (https://www.terraform.io) and `jq` (https://stedolan.github.io/jq) to setup local env
-* intalled `docker` and `docker-compose` to run & develop the app
+* installed `docker` and `docker-compose` to run & develop the app
 
 ```
 cat <<EOF > ./provisioning/local/terraform.tfvars

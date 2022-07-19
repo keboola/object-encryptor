@@ -36,15 +36,15 @@ trait DataProviderTrait
                 'Deciphering failed.',
             ],
             [
-                base64_encode(gzcompress('some garbage')),
+                base64_encode((string) gzcompress('some garbage')),
                 'Deciphering failed.',
             ],
             [
-                base64_encode(gzcompress(serialize('some garbage'))),
+                base64_encode((string) gzcompress(serialize('some garbage'))),
                 'Deciphering failed.',
             ],
             [
-                base64_encode(gzcompress(serialize(['some', 'garbage']))),
+                base64_encode((string) gzcompress(serialize(['some', 'garbage']))),
                 'Deciphering failed.',
             ],
         ];

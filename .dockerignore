@@ -1,5 +1,5 @@
 .idea
-.env
+.env*
 README.md
 composer.lock
 vendor

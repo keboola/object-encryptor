@@ -8,7 +8,6 @@ use Keboola\ObjectEncryptor\Exception\ApplicationException;
 use Keboola\ObjectEncryptor\Exception\UserException;
 use Keboola\ObjectEncryptor\Wrapper\ComponentAKVWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ComponentKMSWrapper;
-use Keboola\ObjectEncryptor\Wrapper\CryptoWrapperInterface;
 use PHPUnit\Framework\TestCase;
 
 class ComponentWrapperTest extends TestCase
@@ -24,15 +23,15 @@ class ComponentWrapperTest extends TestCase
     }
 
     /**
-     * @return CryptoWrapperInterface[][]
+     * @return ComponentKMSWrapper[][]|ComponentAKVWrapper[][]
      */
     public function wrapperProvider(): array
     {
         $componentWrapperKMS = new ComponentKMSWrapper();
-        $componentWrapperKMS->setKMSRegion(getenv('TEST_AWS_REGION'));
-        $componentWrapperKMS->setKMSKeyId(getenv('TEST_AWS_KMS_KEY_ID'));
+        $componentWrapperKMS->setKMSRegion((string) getenv('TEST_AWS_REGION'));
+        $componentWrapperKMS->setKMSKeyId((string) getenv('TEST_AWS_KMS_KEY_ID'));
         $componentWrapperAKV = new ComponentAKVWrapper();
-        $componentWrapperAKV->setKeyVaultUrl(getenv('TEST_KEY_VAULT_URL'));
+        $componentWrapperAKV->setKeyVaultUrl((string) getenv('TEST_KEY_VAULT_URL'));
 
         return [
             'KMS' => [
@@ -45,10 +44,10 @@ class ComponentWrapperTest extends TestCase
     }
 
     /**
-     * @param CryptoWrapperInterface $wrapper
+     * @param ComponentKMSWrapper|ComponentAKVWrapper $wrapper
      * @dataProvider wrapperProvider
      */
-    public function testEncrypt(CryptoWrapperInterface $wrapper): void
+    public function testEncrypt($wrapper): void
     {
         $wrapper->setStackId('my-stack');
         $wrapper->setComponentId('dummy-component');
@@ -59,10 +58,10 @@ class ComponentWrapperTest extends TestCase
     }
 
     /**
-     * @param CryptoWrapperInterface $wrapper
+     * @param ComponentKMSWrapper|ComponentAKVWrapper $wrapper
      * @dataProvider wrapperProvider
      */
-    public function testEncryptDifferentStack(CryptoWrapperInterface $wrapper): void
+    public function testEncryptDifferentStack($wrapper): void
     {
         $wrapper->setStackId('my-stack');
         $wrapper->setComponentId('dummy-component');
@@ -79,10 +78,10 @@ class ComponentWrapperTest extends TestCase
     }
 
     /**
-     * @param CryptoWrapperInterface $wrapper
+     * @param ComponentKMSWrapper|ComponentAKVWrapper $wrapper
      * @dataProvider wrapperProvider
      */
-    public function testEncryptDifferentComponent(CryptoWrapperInterface $wrapper): void
+    public function testEncryptDifferentComponent($wrapper): void
     {
         $wrapper->setStackId('my-stack');
         $wrapper->setComponentId('dummy-component');
@@ -115,10 +114,10 @@ class ComponentWrapperTest extends TestCase
     }
 
     /**
-     * @param CryptoWrapperInterface $wrapper
+     * @param ComponentKMSWrapper|ComponentAKVWrapper $wrapper
      * @dataProvider wrapperProvider
      */
-    public function testInvalidSetupEncryptStackAndComponent(CryptoWrapperInterface $wrapper): void
+    public function testInvalidSetupEncryptStackAndComponent($wrapper): void
     {
         self::expectException(ApplicationException::class);
         self::expectExceptionMessage('No stack or component id provided.');
@@ -126,10 +125,10 @@ class ComponentWrapperTest extends TestCase
     }
 
     /**
-     * @param CryptoWrapperInterface $wrapper
+     * @param ComponentKMSWrapper|ComponentAKVWrapper $wrapper
      * @dataProvider wrapperProvider
      */
-    public function testInvalidSetupEncryptStack(CryptoWrapperInterface $wrapper): void
+    public function testInvalidSetupEncryptStack($wrapper): void
     {
         $wrapper->setComponentId('component-id');
         self::expectException(ApplicationException::class);
@@ -138,10 +137,10 @@ class ComponentWrapperTest extends TestCase
     }
 
     /**
-     * @param CryptoWrapperInterface $wrapper
+     * @param ComponentKMSWrapper|ComponentAKVWrapper $wrapper
      * @dataProvider wrapperProvider
      */
-    public function testInvalidSetupEncryptComponent(CryptoWrapperInterface $wrapper): void
+    public function testInvalidSetupEncryptComponent($wrapper): void
     {
         $wrapper->setStackId('stack-id');
         self::expectException(ApplicationException::class);
@@ -166,10 +165,10 @@ class ComponentWrapperTest extends TestCase
     }
 
     /**
-     * @param CryptoWrapperInterface $wrapper
+     * @param ComponentKMSWrapper|ComponentAKVWrapper $wrapper
      * @dataProvider wrapperProvider
      */
-    public function testInvalidSetupDecryptStackAndComponent(CryptoWrapperInterface $wrapper): void
+    public function testInvalidSetupDecryptStackAndComponent($wrapper): void
     {
         self::expectException(ApplicationException::class);
         self::expectExceptionMessage('No stack or component id provided.');
@@ -177,10 +176,10 @@ class ComponentWrapperTest extends TestCase
     }
 
     /**
-     * @param CryptoWrapperInterface $wrapper
+     * @param ComponentKMSWrapper|ComponentAKVWrapper $wrapper
      * @dataProvider wrapperProvider
      */
-    public function testInvalidSetupDecryptStack(CryptoWrapperInterface $wrapper): void
+    public function testInvalidSetupDecryptStack($wrapper): void
     {
         $wrapper->setComponentId('component-id');
         self::expectException(ApplicationException::class);
@@ -189,10 +188,10 @@ class ComponentWrapperTest extends TestCase
     }
 
     /**
-     * @param CryptoWrapperInterface $wrapper
+     * @param ComponentKMSWrapper|ComponentAKVWrapper $wrapper
      * @dataProvider wrapperProvider
      */
-    public function testInvalidSetupDecryptComponent(CryptoWrapperInterface $wrapper): void
+    public function testInvalidSetupDecryptComponent($wrapper): void
     {
         $wrapper->setComponentId('stack-id');
         self::expectException(ApplicationException::class);

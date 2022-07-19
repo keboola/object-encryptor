@@ -2,7 +2,13 @@
 
 declare(strict_types=1);
 
+use Symfony\Component\Dotenv\Dotenv;
+
 require __DIR__ . '/../vendor/autoload.php';
+
+if (file_exists(dirname(__DIR__).'/.env')) {
+    (new Dotenv())->usePutenv(true)->bootEnv(dirname(__DIR__).'/.env', 'dev', []);
+}
 
 $requiredEnvs = [
     'TEST_TENANT_ID', 'TEST_CLIENT_ID', 'TEST_CLIENT_SECRET', 'TEST_KEY_VAULT_URL', 'TEST_AWS_REGION',
