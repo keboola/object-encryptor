@@ -9,11 +9,13 @@ remote backend and user account to use in CI.
 Initialize & run Terraform to create resources for CI. Notice no `tfstate` file is created, it's actually automatically
 saved to the remote S3 bucket si it can be accessed by the CI pipeline later.
 
-
 ```bash
-terraform init -var-file=../ci/terraform.tfvars -backend-config=../ci/s3.tfbackend 
-terraform apply -var-file=../ci/terraform.tfvars
+terraform init -backend-config=./s3.tfbackend 
+terraform apply 
 ```
+
+Then take the results from the terraform command and configure them manually in `push.yml`. Secrets are configured in 
+GitHub repository secrets.
 
 ## Ongoing updates
 As the CI does not apply changes (only uses existing state), anytime you change anything, you have to apply changes

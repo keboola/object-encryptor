@@ -17,7 +17,6 @@ use Retry\BackOff\ExponentialBackOffPolicy;
 use Retry\Policy\SimpleRetryPolicy;
 use Retry\RetryProxy;
 use Throwable;
-use function PHPUnit\Framework\assertIsArray;
 
 /**
  * @internal Use ObjectEncryptor
@@ -183,25 +182,25 @@ class GenericKMSWrapper implements CryptoWrapperInterface
 
     private function assumeRole(): ?array
     {
-        if ($this->role) {
-            $stsClient = new StsClient([
-                'region' => 'us-east-2',
-                'version' => '2011-06-15',
-                'retries' => 5,
-                'connect_timeout' => 10,
-                'timeout' => 120,
-            ]);
-            $result = $stsClient->assumeRole([
-                'RoleArn' => $this->role,
-                'RoleSessionName' => 'Encrypt-Decrypt',
-            ]);
-            assert(is_array($result['Credentials']));
-            return [
-                'key' => $result['Credentials']['AccessKeyId'],
-                'secret' => $result['Credentials']['SecretAccessKey'],
-                'token' => $result['Credentials']['SessionToken'],
-            ];
+        if (!$this->role) {
+            return null;
         }
-        return null;
+        $stsClient = new StsClient([
+            'region' => 'us-east-2',
+            'version' => '2011-06-15',
+            'retries' => 5,
+            'connect_timeout' => 10,
+            'timeout' => 120,
+        ]);
+        $result = $stsClient->assumeRole([
+            'RoleArn' => $this->role,
+            'RoleSessionName' => 'Encrypt-Decrypt',
+        ]);
+        assert(is_array($result['Credentials']));
+        return [
+            'key' => $result['Credentials']['AccessKeyId'],
+            'secret' => $result['Credentials']['SecretAccessKey'],
+            'token' => $result['Credentials']['SessionToken'],
+        ];
     }
 }

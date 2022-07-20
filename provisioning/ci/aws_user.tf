@@ -53,19 +53,19 @@ data "aws_iam_policy_document" "sts_access" {
   }
 }
 
-resource "aws_iam_user_policy" "object_encryptor_tests_kms" {
+resource "aws_iam_user_policy" "object_encryptor_user_kms_access" {
   user        = aws_iam_user.object_encryptor.name
   name_prefix = "kms-access-"
   policy      = data.aws_iam_policy_document.kms_access.json
 }
 
-resource "aws_iam_user_policy" "object_encryptor_tests_sts" {
+resource "aws_iam_user_policy" "object_encryptor_user_sts_access" {
   user        = aws_iam_user.object_encryptor.name
   name_prefix = "sts-access-"
   policy      = data.aws_iam_policy_document.sts_access.json
 }
 
-resource "aws_iam_role_policy" "object_encryptor_tests" {
+resource "aws_iam_role_policy" "object_encryptor_role_kms_access" {
   role        = aws_iam_role.object_encryptor.name
   name_prefix = "kms-access-"
   policy      = data.aws_iam_policy_document.kms_access.json
