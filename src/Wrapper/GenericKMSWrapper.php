@@ -23,6 +23,10 @@ use Throwable;
  */
 class GenericKMSWrapper implements CryptoWrapperInterface
 {
+    private const CONNECT_TIMEOUT = 10;
+    private const CONNECT_RETRIES = 5;
+    private const TRANSFER_TIMEOUT = 120;
+
     private array $metadata = [];
     private array $metadataCache = [];
     private ?Result $keyCache = null;
@@ -45,9 +49,9 @@ class GenericKMSWrapper implements CryptoWrapperInterface
         $options = [
             'region' => $this->region,
             'version' => '2014-11-01',
-            'retries' => 5,
-            'connect_timeout' => 10,
-            'timeout' => 120,
+            'retries' => self::CONNECT_RETRIES,
+            'connect_timeout' => self::CONNECT_TIMEOUT,
+            'timeout' => self::TRANSFER_TIMEOUT,
         ];
         if ($credentials) {
             $options['credentials'] = $credentials;
@@ -188,9 +192,9 @@ class GenericKMSWrapper implements CryptoWrapperInterface
         $stsClient = new StsClient([
             'region' => $this->region,
             'version' => '2011-06-15',
-            'retries' => 5,
-            'connect_timeout' => 10,
-            'timeout' => 120,
+            'retries' => self::CONNECT_RETRIES,
+            'connect_timeout' => self::CONNECT_TIMEOUT,
+            'timeout' => self::TRANSFER_TIMEOUT,
         ]);
         $result = $stsClient->assumeRole([
             'RoleArn' => $this->role,
