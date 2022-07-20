@@ -186,7 +186,7 @@ class GenericKMSWrapper implements CryptoWrapperInterface
             return null;
         }
         $stsClient = new StsClient([
-            'region' => 'us-east-2',
+            'region' => $this->region,
             'version' => '2011-06-15',
             'retries' => 5,
             'connect_timeout' => 10,
