@@ -255,7 +255,7 @@ class ObjectEncryptor
         ];
     }
 
-    private function checkKnownWrapper(string $value): bool
+    private function isKnownWrapper(string $value): bool
     {
         foreach ($this->getKnownWrapperPrefixes() as $prefix) {
             if (mb_substr($value, 0, mb_strlen($prefix)) === $prefix) {
@@ -268,7 +268,7 @@ class ObjectEncryptor
     private function encryptValue(string $value, array $wrappers, CryptoWrapperInterface $wrapper): string
     {
         // return self if already encrypted with any wrapper
-        if ($this->checkKnownWrapper($value)) {
+        if ($this->isKnownWrapper($value)) {
             return $value;
         }
 

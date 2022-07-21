@@ -215,14 +215,18 @@ class ObjectEncryptorTest extends TestCase
         self::assertStringStartsWith('KBC::ComponentSecureKV::', (string) $encryptedValue['#LegacySimilar']);
 
         // decrypt the two encrypted values, everything else should remain identical
-        $encryptedValue['#Similar'] = $encryptor->decryptForComponent(
-            $encryptedValue['#Similar'],
-            'my-component'
+        self::assertSame(
+            'KBC::ConfigSecureKVaaaaaaaaaaaaaaaaaaaaaaaaaa',
+            $encryptor->decryptForComponent($encryptedValue['#Similar'], 'my-component')
         );
-        $encryptedValue['#LegacySimilar'] = $encryptor->decryptForComponent(
-            $encryptedValue['#LegacySimilar'],
-            'my-component'
+        self::assertSame(
+            'KBC::Encryptedaaaaaaaaaaaaaaaaaaaaaaaaaa',
+            $encryptor->decryptForComponent($encryptedValue['#LegacySimilar'], 'my-component')
         );
+        unset($data['#LegacySimilar']);
+        unset($data['#Similar']);
+        unset($encryptedValue['#LegacySimilar']);
+        unset($encryptedValue['#Similar']);
         self::assertSame($data, $encryptedValue);
     }
 
