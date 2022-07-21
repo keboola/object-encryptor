@@ -189,7 +189,7 @@ class ObjectEncryptor
     {
         $selectedWrapper = null;
         foreach ($wrappers as $wrapper) {
-            if (substr($value, 0, mb_strlen($wrapper->getPrefix())) === $wrapper->getPrefix()) {
+            if (strpos($value, $wrapper->getPrefix()) === 0) {
                 $selectedWrapper = $wrapper;
             }
         }
@@ -258,7 +258,7 @@ class ObjectEncryptor
     private function isKnownWrapper(string $value): bool
     {
         foreach ($this->getKnownWrapperPrefixes() as $prefix) {
-            if (mb_substr($value, 0, mb_strlen($prefix)) === $prefix) {
+            if (strpos($value, $prefix) === 0) {
                 return true;
             }
         }
