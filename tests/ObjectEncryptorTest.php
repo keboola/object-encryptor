@@ -193,14 +193,37 @@ class ObjectEncryptorTest extends TestCase
     public function testEncryptorAlreadyEncrypted(): void
     {
         $encryptor = $this->getEncryptor();
-        $encryptedValue = $encryptor->encryptForComponent('test', 'my-component');
-        self::assertIsString($encryptedValue);
-        self::assertStringStartsWith('KBC::ComponentSecureKV::', (string) $encryptedValue);
+        $data = [
+            '#GenericKMSWrapper' => 'KBC::Secure::aaaaaaaaaaaaaaaaaaaaaaaaaa',
+            '#GenericAKVWrapper' => 'KBC::SecureKV::aaaaaaaaaaaaaaaaaaaaaaaaaa',
+            '#ComponentKMSWrapper' => 'KBC::ComponentSecure::aaaaaaaaaaaaaaaaaaaaaaaaaa',
+            '#ComponentAKVWrapper' => 'KBC::ComponentSecureKV::aaaaaaaaaaaaaaaaaaaaaaaaaa',
+            '#ProjectKMSWrapper' =>  'KBC::ProjectSecure::aaaaaaaaaaaaaaaaaaaaaaaaaa',
+            '#ProjectAKVWrapper' =>  'KBC::ProjectSecureKV::aaaaaaaaaaaaaaaaaaaaaaaaaa',
+            '#ConfigurationKMSWrapper' => 'KBC::ConfigSecure::aaaaaaaaaaaaaaaaaaaaaaaaaa',
+            '#ConfigurationAKVWrapper' => 'KBC::ConfigSecureKV::aaaaaaaaaaaaaaaaaaaaaaaaaa',
+            '#Similar' => 'KBC::ConfigSecureKVaaaaaaaaaaaaaaaaaaaaaaaaaa',
+            '#Legacy1' => 'KBC::Encrypted==aaaaaaaaaaaaaaaaaaaaaaaaaa',
+            '#Legacy2' => 'KBC::ComponentEncrypted==aaaaaaaaaaaaaaaaaaaaaaaaaa',
+            '#Legacy3' => 'KBC::ComponentProjectEncrypted==aaaaaaaaaaaaaaaaaaaaaaaaaa',
+            '#LegacySimilar' => 'KBC::Encryptedaaaaaaaaaaaaaaaaaaaaaaaaaa',
+        ];
+        $encryptedValue = $encryptor->encryptForComponent($data, 'my-component');
+        self::assertIsArray($encryptedValue);
+        // these two keys do not match exactly, and therefore are re-encrypted
+        self::assertStringStartsWith('KBC::ComponentSecureKV::', (string) $encryptedValue['#Similar']);
+        self::assertStringStartsWith('KBC::ComponentSecureKV::', (string) $encryptedValue['#LegacySimilar']);
 
-        $encryptedSecond = $encryptor->encryptForComponent($encryptedValue, 'my-component');
-        self::assertIsString($encryptedSecond);
-        self::assertStringStartsWith('KBC::ComponentSecureKV::', (string) $encryptedSecond);
-        self::assertEquals('test', $encryptor->decryptForComponent($encryptedSecond, 'my-component'));
+        // decrypt the two encrypted values, everything else should remain identical
+        $encryptedValue['#Similar'] = $encryptor->decryptForComponent(
+            $encryptedValue['#Similar'],
+            'my-component'
+        );
+        $encryptedValue['#LegacySimilar'] = $encryptor->decryptForComponent(
+            $encryptedValue['#LegacySimilar'],
+            'my-component'
+        );
+        self::assertSame($data, $encryptedValue);
     }
 
     public function testEncryptorSimpleArray(): void
