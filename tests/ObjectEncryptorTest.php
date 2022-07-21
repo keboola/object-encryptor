@@ -31,6 +31,7 @@ class ObjectEncryptorTest extends TestCase
             'my-stack',
             (string) getenv('TEST_AWS_KMS_KEY_ID'),
             (string) getenv('TEST_AWS_REGION'),
+            null,
             (string) getenv('TEST_KEY_VAULT_URL')
         );
         $factory = new ObjectEncryptorFactory();
@@ -54,7 +55,8 @@ class ObjectEncryptorTest extends TestCase
         $encryptor = ObjectEncryptorFactory::getAwsEncryptor(
             'my-stack',
             (string) getenv('TEST_AWS_KMS_KEY_ID'),
-            (string) getenv('TEST_AWS_REGION')
+            (string) getenv('TEST_AWS_REGION'),
+            null
         );
         self::expectException(ApplicationException::class);
         self::expectExceptionMessage('Encryption failed: Ciphering failed: Failed to obtain encryption key.');
@@ -768,7 +770,8 @@ class ObjectEncryptorTest extends TestCase
             'encryptor' => ObjectEncryptorFactory::getAwsEncryptor(
                 'my-stack',
                 (string) getenv('TEST_AWS_KMS_KEY_ID'),
-                (string) getenv('TEST_AWS_REGION')
+                (string) getenv('TEST_AWS_REGION'),
+                null
             ),
             'genericPrefix' => 'KBC::Secure::',
             'componentPrefix' => 'KBC::ComponentSecure::',

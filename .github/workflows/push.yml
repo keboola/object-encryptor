@@ -2,13 +2,14 @@ name: GitHub Actions
 on: [ push ]
 env:
   TEST_TENANT_ID: 9b85ee6f-4fb0-4a46-8cb7-4dcc6b262a89
-  TEST_CLIENT_ID: 04d6e451-e964-4cdf-ab2f-a6c77c3261fe
+  TEST_CLIENT_ID: 3a4162fa-43d4-4de7-a8c1-be3bc7765a8c
   TEST_CLIENT_SECRET: ${{ secrets.TEST_CLIENT_SECRET }}
-  TEST_KEY_VAULT_URL: https://testing-object-encryptor.vault.azure.net/
-  TEST_AWS_REGION: us-east-1
-  TEST_AWS_ACCESS_KEY_ID: AKIAQLZBTO5VKBAGWLNC
+  TEST_KEY_VAULT_URL: https://ci-object-encryptor.vault.azure.net/
+  TEST_AWS_REGION: eu-central-1
+  TEST_AWS_ACCESS_KEY_ID: AKIAW7VKHVHOHQU7WE7R
   TEST_AWS_SECRET_ACCESS_KEY: ${{ secrets.TEST_AWS_SECRET_ACCESS_KEY }}
-  TEST_AWS_KMS_KEY_ID: b3556450-c32c-4843-95ae-13b6dd0b03a1
+  TEST_AWS_KMS_KEY_ID: c474f77b-65db-4778-975b-6f167e27d385
+  TEST_AWS_ROLE_ID: arn:aws:iam::480319613404:role/ci-object-encryptor-role
 jobs:
   Build:
     runs-on: ubuntu-latest

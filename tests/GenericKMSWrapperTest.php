@@ -222,6 +222,22 @@ class GenericKMSWrapperTest extends TestCase
         self::assertEquals($secret, $wrapper->decrypt($encrypted));
     }
 
+    public function testEncryptRole(): void
+    {
+        $secret = 'mySecretValue';
+        $wrapper = $this->getWrapper();
+        $wrapper->setMetadataValue('key', 'value');
+        $wrapper->setKMSRole((string) getenv('TEST_AWS_ROLE_ID'));
+        $encrypted = $wrapper->encrypt($secret);
+        self::assertNotEquals($secret, $encrypted);
+        self::assertEquals($secret, $wrapper->decrypt($encrypted));
+
+        $wrapper = $this->getWrapper();
+        $wrapper->setMetadataValue('key', 'value');
+        $wrapper->decrypt($encrypted);
+        self::assertEquals($secret, $wrapper->decrypt($encrypted));
+    }
+
     public function testEncryptMetadataCacheHit(): void
     {
         $secret1 = 'mySecretValue1';
@@ -358,6 +374,17 @@ class GenericKMSWrapperTest extends TestCase
         $wrapper->setKMSRegion((string) getenv('TEST_AWS_REGION'));
         self::expectException(ApplicationException::class);
         self::expectExceptionMessage('Ciphering failed: Failed to obtain encryption key.');
+        $wrapper->encrypt('mySecretValue');
+    }
+
+    public function testInvalidRole(): void
+    {
+        $wrapper = new GenericKMSWrapper();
+        $wrapper->setKMSKeyId((string) getenv('TEST_AWS_KMS_KEY_ID'));
+        $wrapper->setKMSRegion((string) getenv('TEST_AWS_REGION'));
+        $wrapper->setKMSRole('invalidEncryptionRoleName');
+        self::expectException(ApplicationException::class);
+        self::expectExceptionMessage('Ciphering failed: Error executing "AssumeRole" ');
         $wrapper->encrypt('mySecretValue');
     }
 

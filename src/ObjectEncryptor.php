@@ -321,12 +321,14 @@ class ObjectEncryptor
         $wrapper = new GenericKMSWrapper();
         $wrapper->setKMSKeyId((string) $this->encryptorOptions->getKmsKeyId());
         $wrapper->setKMSRegion((string) $this->encryptorOptions->getKmsKeyRegion());
+        $wrapper->setKMSRole($this->encryptorOptions->getKmsRole());
         $wrappers[] = $wrapper;
 
         if ($componentId && $this->encryptorOptions->getStackId()) {
             $wrapper = new ComponentKMSWrapper();
             $wrapper->setKMSKeyId((string) $this->encryptorOptions->getKmsKeyId());
             $wrapper->setKMSRegion((string) $this->encryptorOptions->getKmsKeyRegion());
+            $wrapper->setKMSRole($this->encryptorOptions->getKmsRole());
             $wrapper->setComponentId($componentId);
             $wrapper->setStackId($this->encryptorOptions->getStackId());
             $wrappers[] = $wrapper;
@@ -334,6 +336,7 @@ class ObjectEncryptor
                 $wrapper = new ProjectKMSWrapper();
                 $wrapper->setKMSKeyId((string) $this->encryptorOptions->getKmsKeyId());
                 $wrapper->setKMSRegion((string) $this->encryptorOptions->getKmsKeyRegion());
+                $wrapper->setKMSRole($this->encryptorOptions->getKmsRole());
                 $wrapper->setComponentId($componentId);
                 $wrapper->setStackId($this->encryptorOptions->getStackId());
                 $wrapper->setProjectId($projectId);
@@ -342,6 +345,7 @@ class ObjectEncryptor
                     $wrapper = new ConfigurationKMSWrapper();
                     $wrapper->setKMSKeyId((string) $this->encryptorOptions->getKmsKeyId());
                     $wrapper->setKMSRegion((string) $this->encryptorOptions->getKmsKeyRegion());
+                    $wrapper->setKMSRole($this->encryptorOptions->getKmsRole());
                     $wrapper->setComponentId($componentId);
                     $wrapper->setStackId($this->encryptorOptions->getStackId());
                     $wrapper->setProjectId($projectId);
