@@ -189,7 +189,7 @@ class ObjectEncryptor
     {
         $selectedWrapper = null;
         foreach ($wrappers as $wrapper) {
-            if (substr($value, 0, mb_strlen($wrapper->getPrefix())) === $wrapper->getPrefix()) {
+            if (strpos($value, $wrapper->getPrefix()) === 0) {
                 $selectedWrapper = $wrapper;
             }
         }
@@ -237,10 +237,38 @@ class ObjectEncryptor
         }
     }
 
+    private function getKnownWrapperPrefixes(): array
+    {
+        return [
+            (new GenericKMSWrapper())->getPrefix(),
+            (new GenericAKVWrapper())->getPrefix(),
+            (new ComponentKMSWrapper())->getPrefix(),
+            (new ComponentAKVWrapper())->getPrefix(),
+            (new ProjectKMSWrapper())->getPrefix(),
+            (new ProjectAKVWrapper())->getPrefix(),
+            (new ConfigurationKMSWrapper())->getPrefix(),
+            (new ConfigurationAKVWrapper())->getPrefix(),
+            // legacy wrappers that are no longer implemented, but still exist in the real world
+            'KBC::Encrypted==',
+            'KBC::ComponentEncrypted==',
+            'KBC::ComponentProjectEncrypted==',
+        ];
+    }
+
+    private function isKnownWrapper(string $value): bool
+    {
+        foreach ($this->getKnownWrapperPrefixes() as $prefix) {
+            if (strpos($value, $prefix) === 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private function encryptValue(string $value, array $wrappers, CryptoWrapperInterface $wrapper): string
     {
         // return self if already encrypted with any wrapper
-        if ($this->findWrapper($value, $wrappers)) {
+        if ($this->isKnownWrapper($value)) {
             return $value;
         }
 
