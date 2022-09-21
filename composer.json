@@ -25,7 +25,7 @@
         "ext-json": "*",
         "aws/aws-sdk-php": "^3.209",
         "defuse/php-encryption": "^2.3",
-        "keboola/azure-key-vault-client": "dev-odin-PS-3733",
+        "keboola/azure-key-vault-client": "^2.0|^3.0",
         "keboola/common-exceptions": "^1.2",
         "phpseclib/mcrypt_compat": "^1.0",
         "vkartaviy/retry": "^0.2.2"
