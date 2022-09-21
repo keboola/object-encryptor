@@ -44,7 +44,7 @@ class GenericAKVWrapperTest extends TestCase
         $client = new Client(
             new GuzzleClientFactory(new NullLogger()),
             new AuthenticatorFactory(),
-            getenv('TEST_KEY_VAULT_URL')
+            (string) getenv('TEST_KEY_VAULT_URL')
         );
         foreach ($client->getAllSecrets() as $secret) {
             $client->deleteSecret($secret->getName());
