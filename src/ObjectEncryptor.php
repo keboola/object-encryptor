@@ -15,6 +15,8 @@ use Keboola\ObjectEncryptor\Wrapper\GenericAKVWrapper;
 use Keboola\ObjectEncryptor\Wrapper\GenericKMSWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ProjectAKVWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ProjectKMSWrapper;
+use Keboola\ObjectEncryptor\Wrapper\ProjectWideAKVWrapper;
+use Keboola\ObjectEncryptor\Wrapper\ProjectWideKMSWrapper;
 use stdClass;
 use Throwable;
 
@@ -92,6 +94,21 @@ class ObjectEncryptor
      * @param T $data
      * @return T
      */
+    public function encryptForProjectWide($data, string $projectId)
+    {
+        $wrappers = $this->getWrappers(null, $projectId, null);
+        return $this->encrypt(
+            $data,
+            $wrappers,
+            $this->encryptorOptions->getAkvUrl() ? ProjectWideAKVWrapper::class : ProjectWideKMSWrapper::class
+        );
+    }
+
+    /**
+     * @template T of array|stdClass|string
+     * @param T $data
+     * @return T
+     */
     public function decryptGeneric($data)
     {
         $wrappers = $this->getWrappers(null, null, null);
@@ -129,6 +146,17 @@ class ObjectEncryptor
     public function decryptForConfiguration($data, string $componentId, string $projectId, string $configurationId)
     {
         $wrappers = $this->getWrappers($componentId, $projectId, $configurationId);
+        return $this->decrypt($data, $wrappers);
+    }
+
+    /**
+     * @template T of array|stdClass|string
+     * @param T $data
+     * @return T
+     */
+    public function decryptForProjectWide($data, string $projectId)
+    {
+        $wrappers = $this->getWrappers(null, $projectId, null);
         return $this->decrypt($data, $wrappers);
     }
 
@@ -248,6 +276,8 @@ class ObjectEncryptor
             (new ProjectAKVWrapper())->getPrefix(),
             (new ConfigurationKMSWrapper())->getPrefix(),
             (new ConfigurationAKVWrapper())->getPrefix(),
+            (new ProjectWideAKVWrapper())->getPrefix(),
+            (new ProjectWideKMSWrapper())->getPrefix(),
             // legacy wrappers that are no longer implemented, but still exist in the real world
             'KBC::Encrypted==',
             'KBC::ComponentEncrypted==',
@@ -352,33 +382,44 @@ class ObjectEncryptor
         $wrapper->setKMSRole($this->encryptorOptions->getKmsRole());
         $wrappers[] = $wrapper;
 
-        if ($componentId && $this->encryptorOptions->getStackId()) {
-            $wrapper = new ComponentKMSWrapper();
-            $wrapper->setKMSKeyId((string) $this->encryptorOptions->getKmsKeyId());
-            $wrapper->setKMSRegion((string) $this->encryptorOptions->getKmsKeyRegion());
-            $wrapper->setKMSRole($this->encryptorOptions->getKmsRole());
-            $wrapper->setComponentId($componentId);
-            $wrapper->setStackId($this->encryptorOptions->getStackId());
-            $wrappers[] = $wrapper;
+        if ($this->encryptorOptions->getStackId()) {
             if ($projectId) {
-                $wrapper = new ProjectKMSWrapper();
-                $wrapper->setKMSKeyId((string) $this->encryptorOptions->getKmsKeyId());
-                $wrapper->setKMSRegion((string) $this->encryptorOptions->getKmsKeyRegion());
+                $wrapper = new ProjectWideKMSWrapper();
+                $wrapper->setKMSKeyId((string)$this->encryptorOptions->getKmsKeyId());
+                $wrapper->setKMSRegion((string)$this->encryptorOptions->getKmsKeyRegion());
                 $wrapper->setKMSRole($this->encryptorOptions->getKmsRole());
-                $wrapper->setComponentId($componentId);
                 $wrapper->setStackId($this->encryptorOptions->getStackId());
                 $wrapper->setProjectId($projectId);
                 $wrappers[] = $wrapper;
-                if ($configurationId) {
-                    $wrapper = new ConfigurationKMSWrapper();
-                    $wrapper->setKMSKeyId((string) $this->encryptorOptions->getKmsKeyId());
-                    $wrapper->setKMSRegion((string) $this->encryptorOptions->getKmsKeyRegion());
+            }
+            if ($componentId) {
+                $wrapper = new ComponentKMSWrapper();
+                $wrapper->setKMSKeyId((string)$this->encryptorOptions->getKmsKeyId());
+                $wrapper->setKMSRegion((string)$this->encryptorOptions->getKmsKeyRegion());
+                $wrapper->setKMSRole($this->encryptorOptions->getKmsRole());
+                $wrapper->setComponentId($componentId);
+                $wrapper->setStackId($this->encryptorOptions->getStackId());
+                $wrappers[] = $wrapper;
+                if ($projectId) {
+                    $wrapper = new ProjectKMSWrapper();
+                    $wrapper->setKMSKeyId((string)$this->encryptorOptions->getKmsKeyId());
+                    $wrapper->setKMSRegion((string)$this->encryptorOptions->getKmsKeyRegion());
                     $wrapper->setKMSRole($this->encryptorOptions->getKmsRole());
                     $wrapper->setComponentId($componentId);
                     $wrapper->setStackId($this->encryptorOptions->getStackId());
                     $wrapper->setProjectId($projectId);
-                    $wrapper->setConfigurationId($configurationId);
                     $wrappers[] = $wrapper;
+                    if ($configurationId) {
+                        $wrapper = new ConfigurationKMSWrapper();
+                        $wrapper->setKMSKeyId((string)$this->encryptorOptions->getKmsKeyId());
+                        $wrapper->setKMSRegion((string)$this->encryptorOptions->getKmsKeyRegion());
+                        $wrapper->setKMSRole($this->encryptorOptions->getKmsRole());
+                        $wrapper->setComponentId($componentId);
+                        $wrapper->setStackId($this->encryptorOptions->getStackId());
+                        $wrapper->setProjectId($projectId);
+                        $wrapper->setConfigurationId($configurationId);
+                        $wrappers[] = $wrapper;
+                    }
                 }
             }
         }
@@ -391,27 +432,36 @@ class ObjectEncryptor
         $wrapper = new GenericAKVWrapper();
         $wrapper->setKeyVaultUrl((string) $this->encryptorOptions->getAkvUrl());
         $wrappers[] = $wrapper;
-        if ($componentId && $this->encryptorOptions->getStackId()) {
-            $wrapper = new ComponentAKVWrapper();
-            $wrapper->setKeyVaultUrl((string) $this->encryptorOptions->getAkvUrl());
-            $wrapper->setComponentId($componentId);
-            $wrapper->setStackId($this->encryptorOptions->getStackId());
-            $wrappers[] = $wrapper;
+        if ($this->encryptorOptions->getStackId()) {
             if ($projectId) {
-                $wrapper = new ProjectAKVWrapper();
-                $wrapper->setKeyVaultUrl((string) $this->encryptorOptions->getAkvUrl());
-                $wrapper->setComponentId($componentId);
+                $wrapper = new ProjectWideAKVWrapper();
+                $wrapper->setKeyVaultUrl((string)$this->encryptorOptions->getAkvUrl());
                 $wrapper->setStackId($this->encryptorOptions->getStackId());
                 $wrapper->setProjectId($projectId);
                 $wrappers[] = $wrapper;
-                if ($configurationId) {
-                    $wrapper = new ConfigurationAKVWrapper();
-                    $wrapper->setKeyVaultUrl((string) $this->encryptorOptions->getAkvUrl());
+            }
+            if ($componentId) {
+                $wrapper = new ComponentAKVWrapper();
+                $wrapper->setKeyVaultUrl((string)$this->encryptorOptions->getAkvUrl());
+                $wrapper->setComponentId($componentId);
+                $wrapper->setStackId($this->encryptorOptions->getStackId());
+                $wrappers[] = $wrapper;
+                if ($projectId) {
+                    $wrapper = new ProjectAKVWrapper();
+                    $wrapper->setKeyVaultUrl((string)$this->encryptorOptions->getAkvUrl());
                     $wrapper->setComponentId($componentId);
                     $wrapper->setStackId($this->encryptorOptions->getStackId());
                     $wrapper->setProjectId($projectId);
-                    $wrapper->setConfigurationId($configurationId);
                     $wrappers[] = $wrapper;
+                    if ($configurationId) {
+                        $wrapper = new ConfigurationAKVWrapper();
+                        $wrapper->setKeyVaultUrl((string)$this->encryptorOptions->getAkvUrl());
+                        $wrapper->setComponentId($componentId);
+                        $wrapper->setStackId($this->encryptorOptions->getStackId());
+                        $wrapper->setProjectId($projectId);
+                        $wrapper->setConfigurationId($configurationId);
+                        $wrappers[] = $wrapper;
+                    }
                 }
             }
         }
