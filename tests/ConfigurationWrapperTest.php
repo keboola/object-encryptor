@@ -59,12 +59,6 @@ class ConfigurationWrapperTest extends TestCase
         $encrypted = $wrapper->encrypt($secret);
         self::assertNotEquals($secret, $encrypted);
         self::assertEquals($secret, $wrapper->decrypt($encrypted));
-
-        $wrapper->setStackId('my-stack');
-        $wrapper->setComponentId('dummy-component');
-        $wrapper->setConfigurationId('my-configuration');
-        $wrapper->setProjectId('my-project');
-        self::assertEquals($secret, $wrapper->decrypt($encrypted));
     }
 
     /**
