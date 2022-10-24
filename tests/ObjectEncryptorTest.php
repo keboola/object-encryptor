@@ -202,6 +202,8 @@ class ObjectEncryptorTest extends TestCase
             '#ProjectAKVWrapper' =>  'KBC::ProjectSecureKV::aaaaaaaaaaaaaaaaaaaaaaaaaa',
             '#ConfigurationKMSWrapper' => 'KBC::ConfigSecure::aaaaaaaaaaaaaaaaaaaaaaaaaa',
             '#ConfigurationAKVWrapper' => 'KBC::ConfigSecureKV::aaaaaaaaaaaaaaaaaaaaaaaaaa',
+            '#ProjectWideKMSWrapper' => 'KBC::ConfigSecure::aaaaaaaaaaaaaaaaaaaaaaaaaa',
+            '#ProjectWideAKVWrapper' => 'KBC::ConfigSecureKV::aaaaaaaaaaaaaaaaaaaaaaaaaa',
             '#Similar' => 'KBC::ConfigSecureKVaaaaaaaaaaaaaaaaaaaaaaaaaa',
             '#Legacy1' => 'KBC::Encrypted==aaaaaaaaaaaaaaaaaaaaaaaaaa',
             '#Legacy2' => 'KBC::ComponentEncrypted==aaaaaaaaaaaaaaaaaaaaaaaaaa',
@@ -792,6 +794,7 @@ class ObjectEncryptorTest extends TestCase
             'componentPrefix' => 'KBC::ComponentSecureKV::',
             'projectPrefix' => 'KBC::ProjectSecureKV::',
             'configurationPrefix' => 'KBC::ConfigSecureKV::',
+            'projectWidePrefix' => 'KBC::ProjectWideSecureKV::',
         ];
         yield 'aws' => [
             'encryptor' => ObjectEncryptorFactory::getAwsEncryptor(
@@ -804,6 +807,7 @@ class ObjectEncryptorTest extends TestCase
             'componentPrefix' => 'KBC::ComponentSecure::',
             'projectPrefix' => 'KBC::ProjectSecure::',
             'configurationPrefix' => 'KBC::ConfigSecure::',
+            'projectWidePrefix' => 'KBC::ProjectWideSecure::',
         ];
     }
 
@@ -815,7 +819,8 @@ class ObjectEncryptorTest extends TestCase
         string $genericPrefix,
         string $componentPrefix,
         string $projectPrefix,
-        string $configurationPrefix
+        string $configurationPrefix,
+        string $projectWidePrefix
     ): void {
         $encryptedGeneric = $encryptor->encryptGeneric('secret1');
         self::assertStringStartsWith($genericPrefix, $encryptedGeneric);
@@ -884,5 +889,10 @@ class ObjectEncryptorTest extends TestCase
                 'my-configuration'
             )
         );
+
+        $encryptedProjectWide = $encryptor->encryptForProjectWide('secret2', 'my-project');
+        self::assertStringStartsWith($projectWidePrefix, $encryptedProjectWide);
+        self::assertEquals('secret1', $encryptor->decryptForProjectWide($encryptedGeneric, 'my-project'));
+        self::assertEquals('secret2', $encryptor->decryptForProjectWide($encryptedProjectWide, 'my-project'));
     }
 }
