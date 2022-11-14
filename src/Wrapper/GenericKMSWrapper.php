@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\ObjectEncryptor\Wrapper;
 
+use Aws\Credentials\CredentialProvider;
 use Aws\Kms\Exception\KmsException;
 use Aws\Kms\KmsClient;
 use Aws\Result;
