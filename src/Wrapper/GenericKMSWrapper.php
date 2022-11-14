@@ -50,11 +50,28 @@ class GenericKMSWrapper implements CryptoWrapperInterface
             'region' => $this->region,
             'version' => '2014-11-01',
             'retries' => self::CONNECT_RETRIES,
-            'connect_timeout' => self::CONNECT_TIMEOUT,
-            'timeout' => self::TRANSFER_TIMEOUT,
+            'http' => [
+                'connect_timeout' => self::CONNECT_TIMEOUT,
+                'timeout' => self::TRANSFER_TIMEOUT,
+            ],
         ];
         if ($credentials) {
             $options['credentials'] = $credentials;
+        } else {
+            $stsClient = new StsClient([
+                'region' => $this->region,
+                'version' => '2011-06-15',
+                'retries' => self::CONNECT_RETRIES,
+                'http' => [
+                    'connect_timeout' => self::CONNECT_TIMEOUT,
+                    'timeout' => self::TRANSFER_TIMEOUT,
+                ],
+                'credentials' => false,
+            ]);
+            $options['credentials'] = CredentialProvider::defaultProvider([
+                'region' => $this->region,
+                'stsClient' => $stsClient,
+            ]);
         }
         return new KmsClient($options);
     }
@@ -193,8 +210,10 @@ class GenericKMSWrapper implements CryptoWrapperInterface
             'region' => $this->region,
             'version' => '2011-06-15',
             'retries' => self::CONNECT_RETRIES,
-            'connect_timeout' => self::CONNECT_TIMEOUT,
-            'timeout' => self::TRANSFER_TIMEOUT,
+            'http' => [
+                'connect_timeout' => self::CONNECT_TIMEOUT,
+                'timeout' => self::TRANSFER_TIMEOUT,
+            ],
         ]);
         $result = $stsClient->assumeRole([
             'RoleArn' => $this->role,
