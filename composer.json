@@ -27,12 +27,11 @@
         "defuse/php-encryption": "^2.3",
         "keboola/azure-key-vault-client": "^2.0|^3.0",
         "keboola/common-exceptions": "^1.2",
-        "phpseclib/mcrypt_compat": "^1.0",
         "vkartaviy/retry": "^0.2.2"
     },
     "require-dev": {
         "infection/infection": "^0.18.2",
-        "keboola/coding-standard": "^13.0",
+        "keboola/coding-standard": "^14.0",
         "phpstan/phpstan": "^1.8",
         "phpstan/phpstan-phpunit": "^1.0.0",
         "phpunit/phpunit": "^9.5",
