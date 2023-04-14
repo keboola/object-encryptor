@@ -27,6 +27,7 @@ class GenericKMSWrapper implements CryptoWrapperInterface
     private const CONNECT_TIMEOUT = 10;
     private const CONNECT_RETRIES = 5;
     private const TRANSFER_TIMEOUT = 120;
+    private const MAX_RETRIES = 15;
 
     private array $metadata = [];
     private array $metadataCache = [];
@@ -86,7 +87,7 @@ class GenericKMSWrapper implements CryptoWrapperInterface
         try {
             $client = $this->getClient($this->assumeRole());
             if (($this->metadata !== $this->metadataCache) || empty($this->keyCache)) {
-                $retryPolicy = new SimpleRetryPolicy(3);
+                $retryPolicy = new SimpleRetryPolicy(self::MAX_RETRIES);
                 $backOffPolicy = new ExponentialBackOffPolicy(1000);
                 $proxy = new RetryProxy($retryPolicy, $backOffPolicy);
                 $proxy->call(function () use ($client, &$result) {
@@ -169,7 +170,7 @@ class GenericKMSWrapper implements CryptoWrapperInterface
             throw new UserException('Deciphering failed.');
         }
         try {
-            $retryPolicy = new SimpleRetryPolicy(3);
+            $retryPolicy = new SimpleRetryPolicy(self::MAX_RETRIES);
             $backOffPolicy = new ExponentialBackOffPolicy(1000);
             $proxy = new RetryProxy($retryPolicy, $backOffPolicy);
             $client = $this->getClient($this->assumeRole());
