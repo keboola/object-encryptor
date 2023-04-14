@@ -24,9 +24,6 @@ class ProjectAKVWrapper extends ComponentAKVWrapper
         if (empty($this->getMetadataValue(self::KEY_PROJECT))) {
             throw new ApplicationException('No project id provided.');
         }
-        if (!is_string($this->getMetadataValue(self::KEY_PROJECT))) {
-            throw new ApplicationException('Project id is invalid.');
-        }
     }
 
     public function getPrefix(): string
