@@ -27,7 +27,7 @@ class GenericKMSWrapper implements CryptoWrapperInterface
     private const CONNECT_TIMEOUT = 10;
     private const CONNECT_RETRIES = 5;
     private const TRANSFER_TIMEOUT = 120;
-    private const MAX_RETRIES = 15;
+    private const MAX_RETRIES = 10;
 
     private array $metadata = [];
     private array $metadataCache = [];
