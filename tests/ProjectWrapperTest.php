@@ -28,7 +28,7 @@ class ProjectWrapperTest extends TestCase
     public function wrapperProvider(): array
     {
         $projectWrapperKMS = self::createPartialMock(ProjectKMSWrapper::class, ['getRetries']);
-        $projectWrapperKMS->method('getRetries')->willReturn(0);
+        $projectWrapperKMS->method('getRetries')->willReturn(1);
 
         $projectWrapperKMS->setKMSRegion((string) getenv('TEST_AWS_REGION'));
         $projectWrapperKMS->setKMSKeyId((string) getenv('TEST_AWS_KMS_KEY_ID'));
