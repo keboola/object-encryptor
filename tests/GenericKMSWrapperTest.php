@@ -26,7 +26,8 @@ class GenericKMSWrapperTest extends TestCase
 
     private function getWrapper(): GenericKMSWrapper
     {
-        $wrapper = new GenericKMSWrapper();
+        $wrapper = self::createPartialMock(GenericKMSWrapper::class, ['getRetries']);
+        $wrapper->method('getRetries')->willReturn(1);
         $wrapper->setKMSKeyId((string) getenv('TEST_AWS_KMS_KEY_ID'));
         $wrapper->setKMSRegion((string) getenv('TEST_AWS_REGION'));
         return $wrapper;
@@ -369,7 +370,9 @@ class GenericKMSWrapperTest extends TestCase
     {
         putenv('AWS_ACCESS_KEY_ID=' . getenv('TEST_AWS_ACCESS_KEY_ID'));
         putenv('AWS_SECRET_ACCESS_KEY=some-garbage');
-        $wrapper = new GenericKMSWrapper();
+        $wrapper = self::createPartialMock(GenericKMSWrapper::class, ['getRetries']);
+        $wrapper->method('getRetries')->willReturn(0);
+
         $wrapper->setKMSKeyId((string) getenv('TEST_AWS_KMS_KEY_ID'));
         $wrapper->setKMSRegion((string) getenv('TEST_AWS_REGION'));
         $this->expectException(ApplicationException::class);
@@ -390,7 +393,9 @@ class GenericKMSWrapperTest extends TestCase
 
     public function testInvalidNonExistentRegion(): void
     {
-        $wrapper = new GenericKMSWrapper();
+        $wrapper = self::createPartialMock(GenericKMSWrapper::class, ['getRetries']);
+        $wrapper->method('getRetries')->willReturn(0);
+
         $wrapper->setKMSKeyId((string) getenv('TEST_AWS_KMS_KEY_ID'));
         $wrapper->setKMSRegion('non-existent');
         $this->expectException(ApplicationException::class);

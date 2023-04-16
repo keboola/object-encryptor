@@ -6,6 +6,7 @@ namespace Keboola\ObjectEncryptor\Tests;
 
 use Keboola\ObjectEncryptor\Exception\ApplicationException;
 use Keboola\ObjectEncryptor\Exception\UserException;
+use Keboola\ObjectEncryptor\Wrapper\ConfigurationKMSWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ProjectAKVWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ProjectKMSWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ProjectWideAKVWrapper;
@@ -29,7 +30,9 @@ class ProjectWideWrapperTest extends TestCase
      */
     public function wrapperProvider(): array
     {
-        $projectWrapperKMS = new ProjectWideKMSWrapper();
+        $projectWrapperKMS = self::createPartialMock(ProjectWideKMSWrapper::class, ['getRetries']);
+        $projectWrapperKMS->method('getRetries')->willReturn(1);
+
         $projectWrapperKMS->setKMSRegion((string) getenv('TEST_AWS_REGION'));
         $projectWrapperKMS->setKMSKeyId((string) getenv('TEST_AWS_KMS_KEY_ID'));
 

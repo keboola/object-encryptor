@@ -8,6 +8,7 @@ use Keboola\ObjectEncryptor\Exception\ApplicationException;
 use Keboola\ObjectEncryptor\Exception\UserException;
 use Keboola\ObjectEncryptor\Wrapper\ComponentAKVWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ComponentKMSWrapper;
+use Keboola\ObjectEncryptor\Wrapper\GenericKMSWrapper;
 use PHPUnit\Framework\TestCase;
 
 class ComponentWrapperTest extends TestCase
@@ -27,9 +28,11 @@ class ComponentWrapperTest extends TestCase
      */
     public function wrapperProvider(): array
     {
-        $componentWrapperKMS = new ComponentKMSWrapper();
+        $componentWrapperKMS = self::createPartialMock(ComponentKMSWrapper::class, ['getRetries']);
+        $componentWrapperKMS->method('getRetries')->willReturn(1);
         $componentWrapperKMS->setKMSRegion((string) getenv('TEST_AWS_REGION'));
         $componentWrapperKMS->setKMSKeyId((string) getenv('TEST_AWS_KMS_KEY_ID'));
+
         $componentWrapperAKV = new ComponentAKVWrapper();
         $componentWrapperAKV->setKeyVaultUrl((string) getenv('TEST_KEY_VAULT_URL'));
 
