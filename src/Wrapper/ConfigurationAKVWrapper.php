@@ -26,7 +26,7 @@ class ConfigurationAKVWrapper extends ProjectAKVWrapper
         }
     }
 
-    public function getPrefix(): string
+    public static function getPrefix(): string
     {
         return 'KBC::ConfigSecureKV::';
     }

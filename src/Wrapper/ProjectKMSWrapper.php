@@ -26,7 +26,7 @@ class ProjectKMSWrapper extends ComponentKMSWrapper
         }
     }
 
-    public function getPrefix(): string
+    public static function getPrefix(): string
     {
         return 'KBC::ProjectSecure::';
     }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\ObjectEncryptor\Wrapper;
 
+use Keboola\ObjectEncryptor\EncryptorOptions;
 use Keboola\ObjectEncryptor\Exception\ApplicationException;
 
 /**
@@ -14,14 +15,15 @@ class ProjectWideKMSWrapper extends GenericKMSWrapper
     private const KEY_STACK = 'stackId';
     private const KEY_PROJECT = 'projectId';
 
-    public function setStackId(string $stackId): void
-    {
-        $this->setMetadataValue(self::KEY_STACK, $stackId);
-    }
-
     public function setProjectId(string $projectId): void
     {
         $this->setMetadataValue(self::KEY_PROJECT, $projectId);
+    }
+
+    public function __construct(EncryptorOptions $encryptorOptions)
+    {
+        parent::__construct($encryptorOptions);
+        $this->setMetadataValue(self::KEY_STACK, $encryptorOptions->getStackId());
     }
 
     protected function validateState(): void
@@ -35,7 +37,7 @@ class ProjectWideKMSWrapper extends GenericKMSWrapper
         }
     }
 
-    public function getPrefix(): string
+    public static function getPrefix(): string
     {
         return 'KBC::ProjectWideSecure::';
     }

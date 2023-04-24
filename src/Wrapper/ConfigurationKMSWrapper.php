@@ -26,7 +26,7 @@ class ConfigurationKMSWrapper extends ProjectKMSWrapper
         }
     }
 
-    public function getPrefix(): string
+    public static function getPrefix(): string
     {
         return 'KBC::ConfigSecure::';
     }

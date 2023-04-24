@@ -12,6 +12,7 @@ use Aws\Sts\StsClient;
 use Defuse\Crypto\Crypto;
 use Defuse\Crypto\Encoding;
 use Defuse\Crypto\Key;
+use Keboola\ObjectEncryptor\EncryptorOptions;
 use Keboola\ObjectEncryptor\Exception\ApplicationException;
 use Keboola\ObjectEncryptor\Exception\UserException;
 use Retry\BackOff\ExponentialBackOffPolicy;
@@ -27,14 +28,25 @@ class GenericKMSWrapper implements CryptoWrapperInterface
     private const CONNECT_TIMEOUT = 10;
     private const CONNECT_RETRIES = 5;
     private const TRANSFER_TIMEOUT = 120;
-    private const MAX_RETRIES = 10;
 
     private array $metadata = [];
     private array $metadataCache = [];
     private ?Result $keyCache = null;
     private string $keyId;
     private string $region;
-    private ?string $role = null;
+    private ?string $role;
+    private int $backoffMaxTries;
+
+    public function __construct(EncryptorOptions $encryptorOptions)
+    {
+        $this->backoffMaxTries = $encryptorOptions->getBackoffMaxTries();
+        $this->keyId = (string) $encryptorOptions->getKmsKeyId();
+        $this->region = (string) $encryptorOptions->getKmsKeyRegion();
+        $this->role = $encryptorOptions->getKmsRole();
+        if (empty($this->region) || empty($this->keyId)) {
+            throw new ApplicationException('Cipher key settings are missing.');
+        }
+    }
 
     public function setMetadataValue(string $key, string $value): void
     {
@@ -44,11 +56,6 @@ class GenericKMSWrapper implements CryptoWrapperInterface
     protected function getMetadataValue(string $key): ?string
     {
         return $this->metadata[$key] ?? null;
-    }
-
-    public function getRetries(): int
-    {
-        return self::MAX_RETRIES;
     }
 
     protected function getClient(?array $credentials): KmsClient
@@ -92,7 +99,7 @@ class GenericKMSWrapper implements CryptoWrapperInterface
         try {
             $client = $this->getClient($this->assumeRole());
             if (($this->metadata !== $this->metadataCache) || empty($this->keyCache)) {
-                $retryPolicy = new SimpleRetryPolicy($this->getRetries());
+                $retryPolicy = new SimpleRetryPolicy($this->backoffMaxTries);
                 $backOffPolicy = new ExponentialBackOffPolicy(1000);
                 $proxy = new RetryProxy($retryPolicy, $backOffPolicy);
                 $proxy->call(function () use ($client, &$result) {
@@ -124,9 +131,6 @@ class GenericKMSWrapper implements CryptoWrapperInterface
      */
     protected function validateState(): void
     {
-        if (empty($this->region) || empty($this->keyId)) {
-            throw new ApplicationException('Cipher key settings are missing.');
-        }
     }
 
     public function setKMSKeyId(string $key): void
@@ -144,7 +148,7 @@ class GenericKMSWrapper implements CryptoWrapperInterface
         $this->role = $role;
     }
 
-    public function getPrefix(): string
+    public static function getPrefix(): string
     {
         return 'KBC::Secure::';
     }
@@ -154,6 +158,7 @@ class GenericKMSWrapper implements CryptoWrapperInterface
         $this->validateState();
         try {
             $this->assumeRole();
+            $v = getenv();
             $key = $this->getEncryptKey();
             $payload = Crypto::encrypt((string) $data, $key['local'], true);
             $resultBinary = [$payload, $key['kms']];
@@ -175,7 +180,7 @@ class GenericKMSWrapper implements CryptoWrapperInterface
             throw new UserException('Deciphering failed.');
         }
         try {
-            $retryPolicy = new SimpleRetryPolicy($this->getRetries());
+            $retryPolicy = new SimpleRetryPolicy($this->backoffMaxTries);
             $backOffPolicy = new ExponentialBackOffPolicy(1000);
             $proxy = new RetryProxy($retryPolicy, $backOffPolicy);
             $client = $this->getClient($this->assumeRole());

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\ObjectEncryptor\Wrapper;
 
+use Keboola\ObjectEncryptor\EncryptorOptions;
 use Keboola\ObjectEncryptor\Exception\ApplicationException;
 
 /**
@@ -14,25 +15,26 @@ class ComponentKMSWrapper extends GenericKMSWrapper
     private const KEY_COMPONENT = 'componentId';
     private const KEY_STACK = 'stackId';
 
-    public function setStackId(string $stackId): void
-    {
-        $this->setMetadataValue(self::KEY_STACK, $stackId);
-    }
-
     public function setComponentId(string $componentId): void
     {
         $this->setMetadataValue(self::KEY_COMPONENT, $componentId);
     }
 
+    public function __construct(EncryptorOptions $encryptorOptions)
+    {
+        parent::__construct($encryptorOptions);
+        $this->setMetadataValue(self::KEY_STACK, $encryptorOptions->getStackId());
+    }
+
     protected function validateState(): void
     {
         parent::validateState();
-        if (empty($this->getMetadataValue(self::KEY_STACK)) || empty($this->getMetadataValue(self::KEY_COMPONENT))) {
-            throw new ApplicationException('No stack or component id provided.');
+        if (empty($this->getMetadataValue(self::KEY_COMPONENT))) {
+            throw new ApplicationException('No component id provided.');
         }
     }
 
-    public function getPrefix(): string
+    public static function getPrefix(): string
     {
         return 'KBC::ComponentSecure::';
     }

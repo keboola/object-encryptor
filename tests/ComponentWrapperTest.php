@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace Keboola\ObjectEncryptor\Tests;
 
+use Keboola\ObjectEncryptor\EncryptorOptions;
 use Keboola\ObjectEncryptor\Exception\ApplicationException;
 use Keboola\ObjectEncryptor\Exception\UserException;
 use Keboola\ObjectEncryptor\Wrapper\ComponentAKVWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ComponentKMSWrapper;
-use Keboola\ObjectEncryptor\Wrapper\GenericKMSWrapper;
-use PHPUnit\Framework\TestCase;
 
-class ComponentWrapperTest extends TestCase
+class ComponentWrapperTest extends AbstractTestCase
 {
     public function setUp(): void
     {
@@ -28,13 +27,18 @@ class ComponentWrapperTest extends TestCase
      */
     public function wrapperProvider(): array
     {
-        $componentWrapperKMS = self::createPartialMock(ComponentKMSWrapper::class, ['getRetries']);
-        $componentWrapperKMS->method('getRetries')->willReturn(1);
-        $componentWrapperKMS->setKMSRegion((string) getenv('TEST_AWS_REGION'));
-        $componentWrapperKMS->setKMSKeyId((string) getenv('TEST_AWS_KMS_KEY_ID'));
+        $componentWrapperKMS = new ComponentKMSWrapper(new EncryptorOptions(
+            stackId: 'some-stack',
+            kmsKeyId: self::getkmsKeyId(),
+            kmsRegion: self::getkmsRegion(),
+            backoffMaxTries: 1,
+        ));
 
-        $componentWrapperAKV = new ComponentAKVWrapper();
-        $componentWrapperAKV->setKeyVaultUrl((string) getenv('TEST_KEY_VAULT_URL'));
+        $componentWrapperAKV = new ComponentAKVWrapper(new EncryptorOptions(
+            stackId: 'some-stack',
+            akvUrl: self::getAkvUrl(),
+            backoffMaxTries: 1,
+        ));
 
         return [
             'KMS' => [
@@ -52,7 +56,6 @@ class ComponentWrapperTest extends TestCase
      */
     public function testEncrypt($wrapper): void
     {
-        $wrapper->setStackId('my-stack');
         $wrapper->setComponentId('dummy-component');
         $secret = 'mySecretValue';
         $encrypted = $wrapper->encrypt($secret);
@@ -60,20 +63,52 @@ class ComponentWrapperTest extends TestCase
         self::assertEquals($secret, $wrapper->decrypt($encrypted));
     }
 
-    /**
-     * @param ComponentKMSWrapper|ComponentAKVWrapper $wrapper
-     * @dataProvider wrapperProvider
-     */
-    public function testEncryptDifferentStack($wrapper): void
+    public function testEncryptDifferentStackKMS(): void
     {
-        $wrapper->setStackId('my-stack');
+        $wrapper = new ComponentKMSWrapper(new EncryptorOptions(
+            stackId: 'some-stack',
+            kmsKeyId: self::getKmsKeyId(),
+            kmsRegion: self::getKmsRegion(),
+            backoffMaxTries: 1,
+        ));
         $wrapper->setComponentId('dummy-component');
         $secret = 'mySecretValue';
+
         $encrypted = $wrapper->encrypt($secret);
         self::assertNotEquals($secret, $encrypted);
         self::assertEquals($secret, $wrapper->decrypt($encrypted));
 
-        $wrapper->setStackId('some-other-stack');
+        $wrapper = new ComponentKMSWrapper(new EncryptorOptions(
+            stackId: 'some-other-stack',
+            kmsKeyId: self::getKmsKeyId(),
+            kmsRegion: self::getKmsRegion(),
+            backoffMaxTries: 1,
+        ));
+        $wrapper->setComponentId('dummy-component');
+        self::expectException(UserException::class);
+        self::expectExceptionMessage('Deciphering failed.');
+        $wrapper->decrypt($encrypted);
+    }
+
+    public function testEncryptDifferentStackAKV(): void
+    {
+        $wrapper = new ComponentAKVWrapper(new EncryptorOptions(
+            stackId: 'some-stack',
+            akvUrl: self::getAkvUrl(),
+            backoffMaxTries: 1,
+        ));
+        $wrapper->setComponentId('dummy-component');
+        $secret = 'mySecretValue';
+
+        $encrypted = $wrapper->encrypt($secret);
+        self::assertNotEquals($secret, $encrypted);
+        self::assertEquals($secret, $wrapper->decrypt($encrypted));
+
+        $wrapper = new ComponentAKVWrapper(new EncryptorOptions(
+            stackId: 'some-other-stack',
+            akvUrl: self::getAkvUrl(),
+            backoffMaxTries: 1,
+        ));
         $wrapper->setComponentId('dummy-component');
         self::expectException(UserException::class);
         self::expectExceptionMessage('Deciphering failed.');
@@ -86,57 +121,38 @@ class ComponentWrapperTest extends TestCase
      */
     public function testEncryptDifferentComponent($wrapper): void
     {
-        $wrapper->setStackId('my-stack');
         $wrapper->setComponentId('dummy-component');
         $secret = 'mySecretValue';
         $encrypted = $wrapper->encrypt($secret);
         self::assertNotEquals($secret, $encrypted);
         self::assertEquals($secret, $wrapper->decrypt($encrypted));
 
-        $wrapper->setStackId('my-stack');
         $wrapper->setComponentId('some-other-component');
         self::expectException(UserException::class);
         self::expectExceptionMessage('Deciphering failed.');
         $wrapper->decrypt($encrypted);
     }
 
-    public function testInvalidSetupEncryptKMS(): void
+    public function testInvalidSetupKMS(): void
     {
-        $wrapper = new ComponentKMSWrapper();
         self::expectException(ApplicationException::class);
         self::expectExceptionMessage('Cipher key settings are missing.');
-        $wrapper->encrypt('mySecretValue');
+        new ComponentKMSWrapper(new EncryptorOptions(
+            stackId: 'some-stack',
+            kmsKeyId: 'some-key',
+            kmsRegion: null,
+        ));
     }
 
-    public function testInvalidSetupEncryptAKV(): void
+    public function testInvalidSetupAKV(): void
     {
-        $wrapper = new ComponentAKVWrapper();
         self::expectException(ApplicationException::class);
         self::expectExceptionMessage('Cipher key settings are invalid.');
-        $wrapper->encrypt('mySecretValue');
-    }
-
-    /**
-     * @param ComponentKMSWrapper|ComponentAKVWrapper $wrapper
-     * @dataProvider wrapperProvider
-     */
-    public function testInvalidSetupEncryptStackAndComponent($wrapper): void
-    {
-        self::expectException(ApplicationException::class);
-        self::expectExceptionMessage('No stack or component id provided.');
-        $wrapper->encrypt('mySecretValue');
-    }
-
-    /**
-     * @param ComponentKMSWrapper|ComponentAKVWrapper $wrapper
-     * @dataProvider wrapperProvider
-     */
-    public function testInvalidSetupEncryptStack($wrapper): void
-    {
-        $wrapper->setComponentId('component-id');
-        self::expectException(ApplicationException::class);
-        self::expectExceptionMessage('No stack or component id provided.');
-        $wrapper->encrypt('mySecretValue');
+        new ComponentAKVWrapper(new EncryptorOptions(
+            stackId: 'some-stack',
+            kmsKeyId: 'some-key',
+            kmsRegion: 'some-region',
+        ));
     }
 
     /**
@@ -145,49 +161,9 @@ class ComponentWrapperTest extends TestCase
      */
     public function testInvalidSetupEncryptComponent($wrapper): void
     {
-        $wrapper->setStackId('stack-id');
         self::expectException(ApplicationException::class);
-        self::expectExceptionMessage('No stack or component id provided.');
+        self::expectExceptionMessage('No component id provided.');
         $wrapper->encrypt('mySecretValue');
-    }
-
-    public function testInvalidSetupDecryptKMS(): void
-    {
-        $wrapper = new ComponentKMSWrapper();
-        self::expectException(ApplicationException::class);
-        self::expectExceptionMessage('Cipher key settings are missing.');
-        $wrapper->decrypt('mySecretValue');
-    }
-
-    public function testInvalidSetupDecryptAKV(): void
-    {
-        $wrapper = new ComponentAKVWrapper();
-        self::expectException(ApplicationException::class);
-        self::expectExceptionMessage('Cipher key settings are invalid.');
-        $wrapper->decrypt('mySecretValue');
-    }
-
-    /**
-     * @param ComponentKMSWrapper|ComponentAKVWrapper $wrapper
-     * @dataProvider wrapperProvider
-     */
-    public function testInvalidSetupDecryptStackAndComponent($wrapper): void
-    {
-        self::expectException(ApplicationException::class);
-        self::expectExceptionMessage('No stack or component id provided.');
-        $wrapper->decrypt('mySecretValue');
-    }
-
-    /**
-     * @param ComponentKMSWrapper|ComponentAKVWrapper $wrapper
-     * @dataProvider wrapperProvider
-     */
-    public function testInvalidSetupDecryptStack($wrapper): void
-    {
-        $wrapper->setComponentId('component-id');
-        self::expectException(ApplicationException::class);
-        self::expectExceptionMessage('No stack or component id provided.');
-        $wrapper->decrypt('mySecretValue');
     }
 
     /**
@@ -196,9 +172,8 @@ class ComponentWrapperTest extends TestCase
      */
     public function testInvalidSetupDecryptComponent($wrapper): void
     {
-        $wrapper->setComponentId('stack-id');
         self::expectException(ApplicationException::class);
-        self::expectExceptionMessage('No stack or component id provided.');
+        self::expectExceptionMessage('No component id provided.');
         $wrapper->decrypt('mySecretValue');
     }
 }

@@ -10,10 +10,9 @@ use Keboola\ObjectEncryptor\Exception\ApplicationException;
 use Keboola\ObjectEncryptor\Exception\UserException;
 use Keboola\ObjectEncryptor\ObjectEncryptor;
 use Keboola\ObjectEncryptor\ObjectEncryptorFactory;
-use PHPUnit\Framework\TestCase;
 use stdClass;
 
-class ObjectEncryptorTest extends TestCase
+class ObjectEncryptorTest extends AbstractTestCase
 {
     public function setUp(): void
     {
@@ -29,10 +28,10 @@ class ObjectEncryptorTest extends TestCase
     {
         $options = new EncryptorOptions(
             'my-stack',
-            (string) getenv('TEST_AWS_KMS_KEY_ID'),
-            (string) getenv('TEST_AWS_REGION'),
+            self::getKmsKeyId(),
+            self::getKmsRegion(),
             null,
-            (string) getenv('TEST_KEY_VAULT_URL')
+            self::getAkvUrl()
         );
         $factory = new ObjectEncryptorFactory();
         return $factory->getEncryptor($options);
@@ -50,12 +49,12 @@ class ObjectEncryptorTest extends TestCase
 
     public function testEncryptorStackNoAwsCredentials(): void
     {
-        putenv('AWS_ACCESS_KEY_ID=');
-        putenv('AWS_SECRET_ACCESS_KEY=');
+        putenv('AWS_ACCESS_KEY_ID=fail');
+        putenv('AWS_SECRET_ACCESS_KEY=fail');
         $encryptor = ObjectEncryptorFactory::getAwsEncryptor(
             'my-stack',
-            (string) getenv('TEST_AWS_KMS_KEY_ID'),
-            (string) getenv('TEST_AWS_REGION'),
+            self::getKmsKeyId(),
+            self::getKmsRegion(),
             null
         );
         self::expectException(ApplicationException::class);
@@ -788,7 +787,7 @@ class ObjectEncryptorTest extends TestCase
         yield 'azure' => [
             'encryptor' => ObjectEncryptorFactory::getAzureEncryptor(
                 'my-stack',
-                (string) getenv('TEST_KEY_VAULT_URL')
+                self::getAkvUrl()
             ),
             'genericPrefix' => 'KBC::SecureKV::',
             'componentPrefix' => 'KBC::ComponentSecureKV::',
@@ -799,8 +798,8 @@ class ObjectEncryptorTest extends TestCase
         yield 'aws' => [
             'encryptor' => ObjectEncryptorFactory::getAwsEncryptor(
                 'my-stack',
-                (string) getenv('TEST_AWS_KMS_KEY_ID'),
-                (string) getenv('TEST_AWS_REGION'),
+                self::getKmsKeyId(),
+                self::getKmsRegion(),
                 null
             ),
             'genericPrefix' => 'KBC::Secure::',
