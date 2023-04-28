@@ -6,9 +6,8 @@ namespace Keboola\ObjectEncryptor\Tests;
 
 use Keboola\ObjectEncryptor\EncryptorOptions;
 use Keboola\ObjectEncryptor\ObjectEncryptorFactory;
-use PHPUnit\Framework\TestCase;
 
-class ObjectEncryptorFactoryTest extends TestCase
+class ObjectEncryptorFactoryTest extends AbstractTestCase
 {
     public function setUp(): void
     {
@@ -24,8 +23,8 @@ class ObjectEncryptorFactoryTest extends TestCase
     {
         $encryptor = ObjectEncryptorFactory::getAwsEncryptor(
             'my-stack',
-            (string) getenv('TEST_AWS_KMS_KEY_ID'),
-            (string) getenv('TEST_AWS_REGION'),
+            self::getKmsKeyId(),
+            self::getKmsRegion(),
             null
         );
         $encrypted = $encryptor->encryptForComponent('secret', 'my-component');
@@ -37,9 +36,9 @@ class ObjectEncryptorFactoryTest extends TestCase
     {
         $encryptor = ObjectEncryptorFactory::getAwsEncryptor(
             'my-stack',
-            (string) getenv('TEST_AWS_KMS_KEY_ID'),
-            (string) getenv('TEST_AWS_REGION'),
-            (string) getenv('TEST_AWS_ROLE_ID')
+            self::getKmsKeyId(),
+            self::getKmsRegion(),
+            self::getKmsRoleId()
         );
         $encrypted = $encryptor->encryptForComponent('secret', 'my-component');
         self::assertIsString($encrypted);
@@ -50,7 +49,7 @@ class ObjectEncryptorFactoryTest extends TestCase
     {
         $encryptor = ObjectEncryptorFactory::getAzureEncryptor(
             'my-stack',
-            (string) getenv('TEST_KEY_VAULT_URL')
+            self::getAkvUrl()
         );
         $encrypted = $encryptor->encryptForComponent('secret', 'my-component');
         self::assertIsString($encrypted);
@@ -62,10 +61,10 @@ class ObjectEncryptorFactoryTest extends TestCase
         $encryptor = ObjectEncryptorFactory::getEncryptor(
             new EncryptorOptions(
                 'my-stack',
-                (string) getenv('TEST_AWS_KMS_KEY_ID'),
-                (string) getenv('TEST_AWS_REGION'),
+                self::getKmsKeyId(),
+                self::getKmsRegion(),
                 null,
-                (string) getenv('TEST_KEY_VAULT_URL')
+                self::getAkvUrl()
             )
         );
         $encrypted = $encryptor->encryptForComponent('secret', 'my-component');
@@ -75,8 +74,8 @@ class ObjectEncryptorFactoryTest extends TestCase
 
         $awsEncryptor = ObjectEncryptorFactory::getAwsEncryptor(
             'my-stack',
-            (string) getenv('TEST_AWS_KMS_KEY_ID'),
-            (string) getenv('TEST_AWS_REGION'),
+            self::getKmsKeyId(),
+            self::getKmsRegion(),
             null
         );
         $awsEncrypted = $awsEncryptor->encryptForComponent('secret', 'my-component');

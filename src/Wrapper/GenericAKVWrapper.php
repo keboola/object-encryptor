@@ -12,6 +12,7 @@ use Keboola\AzureKeyVaultClient\GuzzleClientFactory;
 use Keboola\AzureKeyVaultClient\Requests\SecretAttributes;
 use Keboola\AzureKeyVaultClient\Requests\SetSecretRequest;
 use Keboola\AzureKeyVaultClient\Responses\SecretBundle;
+use Keboola\ObjectEncryptor\EncryptorOptions;
 use Keboola\ObjectEncryptor\Exception\ApplicationException;
 use Keboola\ObjectEncryptor\Exception\UserException;
 use Psr\Log\NullLogger;
@@ -36,6 +37,15 @@ class GenericAKVWrapper implements CryptoWrapperInterface
     private string $keyVaultURL;
     private ?Client $client = null;
 
+    public function __construct(EncryptorOptions $encryptorOptions)
+    {
+        // there is no way to pass backOffMaxTries option to the Azure Key Vault client. Yet.
+        $this->keyVaultURL = (string) $encryptorOptions->getAkvUrl();
+        if (empty($this->keyVaultURL)) {
+            throw new ApplicationException('Cipher key settings are invalid.');
+        }
+    }
+
     public function setMetadataValue(string $key, string $value): void
     {
         $this->metadata[$key] = $value;
@@ -44,18 +54,6 @@ class GenericAKVWrapper implements CryptoWrapperInterface
     protected function getMetadataValue(string $key): ?string
     {
         return $this->metadata[$key] ?? null;
-    }
-
-    protected function validateState(): void
-    {
-        if (empty($this->keyVaultURL)) {
-            throw new ApplicationException('Cipher key settings are invalid.');
-        }
-    }
-
-    public function setKeyVaultUrl(string $keyVaultURL): void
-    {
-        $this->keyVaultURL = $keyVaultURL;
     }
 
     public function getClient(): Client
@@ -96,6 +94,14 @@ class GenericAKVWrapper implements CryptoWrapperInterface
         } catch (Throwable $e) {
             throw new UserException('Deciphering failed.', 0, $e);
         }
+    }
+
+    /**
+     * Validate internal state
+     * @throws ApplicationException
+     */
+    protected function validateState(): void
+    {
     }
 
     public function encrypt(?string $data): string
@@ -169,7 +175,7 @@ class GenericAKVWrapper implements CryptoWrapperInterface
         }
     }
 
-    public function getPrefix(): string
+    public static function getPrefix(): string
     {
         return 'KBC::SecureKV::';
     }

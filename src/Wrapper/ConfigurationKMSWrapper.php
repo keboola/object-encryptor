@@ -24,12 +24,9 @@ class ConfigurationKMSWrapper extends ProjectKMSWrapper
         if (empty($this->getMetadataValue(self::KEY_CONFIGURATION))) {
             throw new ApplicationException('No configuration id provided.');
         }
-        if (!is_string($this->getMetadataValue(self::KEY_CONFIGURATION))) {
-            throw new ApplicationException('Configuration id is invalid.');
-        }
     }
 
-    public function getPrefix(): string
+    public static function getPrefix(): string
     {
         return 'KBC::ConfigSecure::';
     }
