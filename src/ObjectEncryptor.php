@@ -6,6 +6,8 @@ namespace Keboola\ObjectEncryptor;
 
 use Keboola\ObjectEncryptor\Exception\ApplicationException;
 use Keboola\ObjectEncryptor\Exception\UserException;
+use Keboola\ObjectEncryptor\Wrapper\BranchTypeAKVWrapper;
+use Keboola\ObjectEncryptor\Wrapper\BranchTypeKMSWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ComponentAKVWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ComponentKMSWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ConfigurationAKVWrapper;
@@ -22,6 +24,9 @@ use Throwable;
 
 class ObjectEncryptor
 {
+    public const BRANCH_TYPE_DEFAULT = 'default';
+    public const BRANCH_TYPE_DEV = 'dev';
+
     private EncryptorOptions $encryptorOptions;
 
     public function __construct(EncryptorOptions $encryptorOptions)
@@ -36,7 +41,7 @@ class ObjectEncryptor
      */
     public function encryptGeneric($data)
     {
-        $wrappers = $this->getWrappers(null, null, null);
+        $wrappers = $this->getWrappers(null, null, null, null);
         return $this->encrypt(
             $data,
             $wrappers,
@@ -51,7 +56,7 @@ class ObjectEncryptor
      */
     public function encryptForComponent($data, string $componentId)
     {
-        $wrappers = $this->getWrappers($componentId, null, null);
+        $wrappers = $this->getWrappers($componentId, null, null, null);
         return $this->encrypt(
             $data,
             $wrappers,
@@ -66,7 +71,7 @@ class ObjectEncryptor
      */
     public function encryptForProject($data, string $componentId, string $projectId)
     {
-        $wrappers = $this->getWrappers($componentId, $projectId, null);
+        $wrappers = $this->getWrappers($componentId, $projectId, null, null);
         return $this->encrypt(
             $data,
             $wrappers,
@@ -81,7 +86,7 @@ class ObjectEncryptor
      */
     public function encryptForConfiguration($data, string $componentId, string $projectId, string $configurationId)
     {
-        $wrappers = $this->getWrappers($componentId, $projectId, $configurationId);
+        $wrappers = $this->getWrappers($componentId, $projectId, $configurationId, null);
         return $this->encrypt(
             $data,
             $wrappers,
@@ -96,7 +101,7 @@ class ObjectEncryptor
      */
     public function encryptForProjectWide($data, string $projectId)
     {
-        $wrappers = $this->getWrappers(null, $projectId, null);
+        $wrappers = $this->getWrappers(null, $projectId, null, null);
         return $this->encrypt(
             $data,
             $wrappers,
@@ -107,11 +112,27 @@ class ObjectEncryptor
     /**
      * @template T of array|stdClass|string
      * @param T $data
+     * @param self::BRANCH_TYPE_DEFAULT | self::BRANCH_TYPE_DEV $branchType
+     * @return T
+     */
+    public function encryptForBranchType($data, string $componentId, string $projectId, string $branchType)
+    {
+        $wrappers = $this->getWrappers($componentId, $projectId, null, $branchType);
+        return $this->encrypt(
+            $data,
+            $wrappers,
+            $this->encryptorOptions->getAkvUrl() ? BranchTypeAKVWrapper::class : BranchTypeKMSWrapper::class
+        );
+    }
+
+    /**
+     * @template T of array|stdClass|string
+     * @param T $data
      * @return T
      */
     public function decryptGeneric($data)
     {
-        $wrappers = $this->getWrappers(null, null, null);
+        $wrappers = $this->getWrappers(null, null, null, null);
         return $this->decrypt($data, $wrappers);
     }
 
@@ -123,7 +144,7 @@ class ObjectEncryptor
      */
     public function decryptForComponent($data, string $componentId)
     {
-        $wrappers = $this->getWrappers($componentId, null, null);
+        $wrappers = $this->getWrappers($componentId, null, null, null);
         return $this->decrypt($data, $wrappers);
     }
 
@@ -134,7 +155,7 @@ class ObjectEncryptor
      */
     public function decryptForProject($data, string $componentId, string $projectId)
     {
-        $wrappers = $this->getWrappers($componentId, $projectId, null);
+        $wrappers = $this->getWrappers($componentId, $projectId, null, null);
         return $this->decrypt($data, $wrappers);
     }
 
@@ -145,7 +166,7 @@ class ObjectEncryptor
      */
     public function decryptForConfiguration($data, string $componentId, string $projectId, string $configurationId)
     {
-        $wrappers = $this->getWrappers($componentId, $projectId, $configurationId);
+        $wrappers = $this->getWrappers($componentId, $projectId, $configurationId, null);
         return $this->decrypt($data, $wrappers);
     }
 
@@ -156,7 +177,19 @@ class ObjectEncryptor
      */
     public function decryptForProjectWide($data, string $projectId)
     {
-        $wrappers = $this->getWrappers(null, $projectId, null);
+        $wrappers = $this->getWrappers(null, $projectId, null, null);
+        return $this->decrypt($data, $wrappers);
+    }
+
+    /**
+     * @template T of array|stdClass|string
+     * @param T $data
+     * @param self::BRANCH_TYPE_DEFAULT | self::BRANCH_TYPE_DEV $branchType
+     * @return T
+     */
+    public function decryptForBranchType($data, string $componentId, string $projectId, string $branchType)
+    {
+        $wrappers = $this->getWrappers($componentId, $projectId, null, $branchType);
         return $this->decrypt($data, $wrappers);
     }
 
@@ -217,7 +250,7 @@ class ObjectEncryptor
     {
         $selectedWrapper = null;
         foreach ($wrappers as $wrapper) {
-            if (strpos($value, $wrapper->getPrefix()) === 0) {
+            if (str_starts_with($value, $wrapper->getPrefix())) {
                 $selectedWrapper = $wrapper;
             }
         }
@@ -278,6 +311,8 @@ class ObjectEncryptor
             ConfigurationAKVWrapper::getPrefix(),
             ProjectWideAKVWrapper::getPrefix(),
             ProjectWideKMSWrapper::getPrefix(),
+            BranchTypeAKVWrapper::getPrefix(),
+            BranchTypeKMSWrapper::getPrefix(),
             // legacy wrappers that are no longer implemented, but still exist in the real world
             'KBC::Encrypted==',
             'KBC::ComponentEncrypted==',
@@ -288,7 +323,7 @@ class ObjectEncryptor
     private function isKnownWrapper(string $value): bool
     {
         foreach ($this->getKnownWrapperPrefixes() as $prefix) {
-            if (strpos($value, $prefix) === 0) {
+            if (str_starts_with($value, $prefix)) {
                 return true;
             }
         }
@@ -373,8 +408,15 @@ class ObjectEncryptor
         return $result;
     }
 
-    private function getKMSWrappers(?string $componentId, ?string $projectId, ?string $configurationId): array
-    {
+    /**
+     * @param self::BRANCH_TYPE_DEFAULT | self::BRANCH_TYPE_DEV | null $branchType
+     */
+    private function getKMSWrappers(
+        ?string $componentId,
+        ?string $projectId,
+        ?string $configurationId,
+        ?string $branchType,
+    ): array {
         $wrappers = [];
         $wrapper = new GenericKMSWrapper($this->encryptorOptions);
         $wrappers[] = $wrapper;
@@ -401,14 +443,28 @@ class ObjectEncryptor
                         $wrapper->setConfigurationId($configurationId);
                         $wrappers[] = $wrapper;
                     }
+                    if ($branchType) {
+                        $wrapper = new BranchTypeKMSWrapper($this->encryptorOptions);
+                        $wrapper->setComponentId($componentId);
+                        $wrapper->setProjectId($projectId);
+                        $wrapper->setBranchType($branchType);
+                        $wrappers[] = $wrapper;
+                    }
                 }
             }
         }
         return $wrappers;
     }
 
-    private function getAKVWrappers(?string $componentId, ?string $projectId, ?string $configurationId): array
-    {
+    /**
+     * @param self::BRANCH_TYPE_DEFAULT | self::BRANCH_TYPE_DEV | null $branchType
+     */
+    private function getAKVWrappers(
+        ?string $componentId,
+        ?string $projectId,
+        ?string $configurationId,
+        ?string $branchType,
+    ): array {
         $wrappers = [];
         $wrapper = new GenericAKVWrapper($this->encryptorOptions);
         $wrappers[] = $wrapper;
@@ -434,21 +490,41 @@ class ObjectEncryptor
                         $wrapper->setConfigurationId($configurationId);
                         $wrappers[] = $wrapper;
                     }
+                    if ($branchType) {
+                        $wrapper = new BranchTypeAKVWrapper($this->encryptorOptions);
+                        $wrapper->setComponentId($componentId);
+                        $wrapper->setProjectId($projectId);
+                        $wrapper->setBranchType($branchType);
+                        $wrappers[] = $wrapper;
+                    }
                 }
             }
         }
         return $wrappers;
     }
 
-    private function getWrappers(?string $componentId, ?string $projectId, ?string $configurationId): array
-    {
+    /**
+     * @param self::BRANCH_TYPE_DEFAULT | self::BRANCH_TYPE_DEV | null $branchType
+     */
+    private function getWrappers(
+        ?string $componentId,
+        ?string $projectId,
+        ?string $configurationId,
+        ?string $branchType,
+    ): array {
         $wrappers = [];
         if ($this->encryptorOptions->getAkvUrl()) {
-            $wrappers = array_merge($wrappers, $this->getAKVWrappers($componentId, $projectId, $configurationId));
+            $wrappers = array_merge(
+                $wrappers,
+                $this->getAKVWrappers($componentId, $projectId, $configurationId, $branchType)
+            );
         }
 
         if ($this->encryptorOptions->getKmsKeyRegion() && $this->encryptorOptions->getKmsKeyId()) {
-            $wrappers = array_merge($wrappers, $this->getKMSWrappers($componentId, $projectId, $configurationId));
+            $wrappers = array_merge(
+                $wrappers,
+                $this->getKMSWrappers($componentId, $projectId, $configurationId, $branchType)
+            );
         }
         return $wrappers;
     }

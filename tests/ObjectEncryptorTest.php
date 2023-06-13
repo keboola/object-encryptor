@@ -203,6 +203,8 @@ class ObjectEncryptorTest extends AbstractTestCase
             '#ConfigurationAKVWrapper' => 'KBC::ConfigSecureKV::aaaaaaaaaaaaaaaaaaaaaaaaaa',
             '#ProjectWideKMSWrapper' => 'KBC::ConfigSecure::aaaaaaaaaaaaaaaaaaaaaaaaaa',
             '#ProjectWideAKVWrapper' => 'KBC::ConfigSecureKV::aaaaaaaaaaaaaaaaaaaaaaaaaa',
+            '#BranchTypeKMSWrapper' => 'KBC::BranchTypeSecure::aaaaaaaaaaaaaaaaaaaaaaaaaa',
+            '#BranchTypeAKVWrapper' => 'KBC::BranchTypeSecureKV::aaaaaaaaaaaaaaaaaaaaaaaaaa',
             '#Similar' => 'KBC::ConfigSecureKVaaaaaaaaaaaaaaaaaaaaaaaaaa',
             '#Legacy1' => 'KBC::Encrypted==aaaaaaaaaaaaaaaaaaaaaaaaaa',
             '#Legacy2' => 'KBC::ComponentEncrypted==aaaaaaaaaaaaaaaaaaaaaaaaaa',
@@ -262,15 +264,15 @@ class ObjectEncryptorTest extends AbstractTestCase
 
         $result = $encryptor->encryptForComponent($object, 'my-component');
         self::assertIsObject($result);
-        self::assertObjectHasAttribute('key1', $result);
-        self::assertObjectHasAttribute('#key2', $result);
+        self::assertTrue(property_exists($result, 'key1'));
+        self::assertTrue(property_exists($result, '#key2'));
         self::assertEquals('value1', $result->key1);
         self::assertStringStartsWith('KBC::ComponentSecure', $result->{'#key2'});
 
         $decrypted = $encryptor->decryptForComponent($result, 'my-component');
         self::assertIsObject($decrypted);
-        self::assertObjectHasAttribute('key1', $decrypted);
-        self::assertObjectHasAttribute('#key2', $decrypted);
+        self::assertTrue(property_exists($decrypted, 'key1'));
+        self::assertTrue(property_exists($decrypted, '#key2'));
         self::assertEquals('value1', $decrypted->key1);
         self::assertEquals('value2', $decrypted->{'#key2'});
     }
@@ -325,8 +327,8 @@ class ObjectEncryptorTest extends AbstractTestCase
 
         $result = $encryptor->encryptForComponent($object, 'my-component');
         self::assertIsObject($result);
-        self::assertObjectHasAttribute('key1', $result);
-        self::assertObjectHasAttribute('#key2', $result);
+        self::assertTrue(property_exists($result, 'key1'));
+        self::assertTrue(property_exists($result, '#key2'));
         self::assertEquals('value1', $result->key1);
         self::assertStringStartsWith('KBC::ComponentSecure', $result->{'#key2'});
         self::assertStringStartsWith('KBC::ComponentSecure', $result->{'#key3'});
@@ -336,8 +338,8 @@ class ObjectEncryptorTest extends AbstractTestCase
 
         $decrypted = $encryptor->decryptForComponent($result, 'my-component');
         self::assertIsObject($decrypted);
-        self::assertObjectHasAttribute('key1', $decrypted);
-        self::assertObjectHasAttribute('#key2', $decrypted);
+        self::assertTrue(property_exists($decrypted, 'key1'));
+        self::assertTrue(property_exists($decrypted, '#key2'));
         self::assertEquals('value1', $decrypted->key1);
         self::assertEquals('value2', $decrypted->{'#key2'});
         self::assertEquals(true, $decrypted->{'#key3'});
@@ -380,15 +382,15 @@ class ObjectEncryptorTest extends AbstractTestCase
 
         $result = $encryptor->encryptForComponent($object, 'my-component');
         self::assertIsObject($result);
-        self::assertObjectHasAttribute('key1', $result);
-        self::assertObjectHasAttribute('#key2', $result);
+        self::assertTrue(property_exists($result, 'key1'));
+        self::assertTrue(property_exists($result, '#key2'));
         self::assertEquals('value1', $result->key1);
         self::assertEquals($encryptedValue, $result->{'#key2'});
 
         $decrypted = $encryptor->decryptForComponent($result, 'my-component');
         self::assertIsObject($decrypted);
-        self::assertObjectHasAttribute('key1', $decrypted);
-        self::assertObjectHasAttribute('#key2', $decrypted);
+        self::assertTrue(property_exists($decrypted, 'key1'));
+        self::assertTrue(property_exists($decrypted, '#key2'));
         self::assertEquals('value1', $decrypted->key1);
         self::assertEquals('test', $decrypted->{'#key2'});
     }
@@ -443,11 +445,11 @@ class ObjectEncryptorTest extends AbstractTestCase
 
         $decrypted = $encryptor->decryptForComponent($result, 'my-component');
         self::assertIsObject($decrypted);
-        self::assertObjectHasAttribute('key1', $decrypted);
-        self::assertObjectHasAttribute('key2', $decrypted);
-        self::assertObjectHasAttribute('nestedKey1', $decrypted->key2);
-        self::assertObjectHasAttribute('nestedKey2', $decrypted->key2);
-        self::assertObjectHasAttribute('#finalKey', $decrypted->key2->nestedKey2);
+        self::assertTrue(property_exists($decrypted, 'key1'));
+        self::assertTrue(property_exists($decrypted, 'key2'));
+        self::assertTrue(property_exists($decrypted->key2, 'nestedKey1'));
+        self::assertTrue(property_exists($decrypted->key2, 'nestedKey2'));
+        self::assertTrue(property_exists($decrypted->key2->nestedKey2, '#finalKey'));
         self::assertEquals('value1', $decrypted->key1);
         self::assertEquals('value2', $decrypted->key2->nestedKey1);
         self::assertEquals('value3', $decrypted->key2->nestedKey2->{'#finalKey'});
@@ -519,13 +521,13 @@ class ObjectEncryptorTest extends AbstractTestCase
 
         $decrypted = $encryptor->decryptForComponent($result, 'my-component');
         self::assertIsObject($decrypted);
-        self::assertObjectHasAttribute('key1', $decrypted);
-        self::assertObjectHasAttribute('key2', $decrypted);
-        self::assertObjectHasAttribute('#key3', $decrypted);
-        self::assertObjectHasAttribute('nestedKey1', $decrypted->key2);
-        self::assertObjectHasAttribute('nestedKey2', $decrypted->key2);
-        self::assertObjectHasAttribute('#finalKey', $decrypted->key2->nestedKey2);
-        self::assertObjectHasAttribute('anotherNestedKey', $decrypted->{'#key3'});
+        self::assertTrue(property_exists($decrypted, 'key1'));
+        self::assertTrue(property_exists($decrypted, 'key2'));
+        self::assertTrue(property_exists($decrypted, '#key3'));
+        self::assertTrue(property_exists($decrypted->key2, 'nestedKey1'));
+        self::assertTrue(property_exists($decrypted->key2, 'nestedKey2'));
+        self::assertTrue(property_exists($decrypted->key2->nestedKey2, '#finalKey'));
+        self::assertTrue(property_exists($decrypted->{'#key3'}, 'anotherNestedKey'));
         self::assertEquals('value1', $decrypted->key1);
         self::assertEquals('value2', $decrypted->key2->nestedKey1);
         self::assertEquals('value3', $decrypted->key2->nestedKey2->{'#finalKey'});
@@ -593,12 +595,12 @@ class ObjectEncryptorTest extends AbstractTestCase
 
         $decrypted = $encryptor->decryptForComponent($result, 'my-component');
         self::assertIsObject($decrypted);
-        self::assertObjectHasAttribute('key1', $decrypted);
-        self::assertObjectHasAttribute('key2', $decrypted);
-        self::assertObjectHasAttribute('nestedKey1', $decrypted->key2);
-        self::assertObjectHasAttribute('nestedKey2', $decrypted->key2);
-        self::assertObjectHasAttribute('#finalKey', $decrypted->key2->nestedKey2);
-        self::assertObjectHasAttribute('#finalKeyEncrypted', $decrypted->key2->nestedKey2);
+        self::assertTrue(property_exists($decrypted, 'key1'));
+        self::assertTrue(property_exists($decrypted, 'key2'));
+        self::assertTrue(property_exists($decrypted->key2, 'nestedKey1'));
+        self::assertTrue(property_exists($decrypted->key2, 'nestedKey2'));
+        self::assertTrue(property_exists($decrypted->key2->nestedKey2, '#finalKey'));
+        self::assertTrue(property_exists($decrypted->key2->nestedKey2, '#finalKeyEncrypted'));
         self::assertEquals('value1', $decrypted->key1);
         self::assertEquals('value2', $decrypted->key2->nestedKey1);
         self::assertEquals('value3', $decrypted->key2->nestedKey2->{'#finalKey'});
@@ -657,12 +659,12 @@ class ObjectEncryptorTest extends AbstractTestCase
 
         $decrypted = $encryptor->decryptForComponent($result, 'my-component');
         self::assertIsObject($decrypted);
-        self::assertObjectHasAttribute('key1', $decrypted);
-        self::assertObjectHasAttribute('key2', $decrypted);
+        self::assertTrue(property_exists($decrypted, 'key1'));
+        self::assertTrue(property_exists($decrypted, 'key2'));
         self::assertCount(2, $result->key2);
-        self::assertObjectHasAttribute('nestedKey1', $decrypted->key2[0]);
-        self::assertObjectHasAttribute('nestedKey2', $decrypted->key2[1]);
-        self::assertObjectHasAttribute('#finalKey', $decrypted->key2[1]->nestedKey2);
+        self::assertTrue(property_exists($decrypted->key2[0], 'nestedKey1'));
+        self::assertTrue(property_exists($decrypted->key2[1], 'nestedKey2'));
+        self::assertTrue(property_exists($decrypted->key2[1]->nestedKey2, '#finalKey'));
         self::assertEquals('value1', $decrypted->key1);
         self::assertEquals('value2', $decrypted->key2[0]->nestedKey1);
         self::assertEquals('value3', $decrypted->key2[1]->nestedKey2->{'#finalKey'});
@@ -697,8 +699,8 @@ class ObjectEncryptorTest extends AbstractTestCase
         self::assertStringStartsWith('KBC::ProjectSecureKV::', $object->{'#key2'});
 
         $decrypted = $encryptor->decryptForProject($object, 'my-component', 'my-project');
-        self::assertObjectHasAttribute('#key1', $decrypted);
-        self::assertObjectHasAttribute('#key2', $decrypted);
+        self::assertTrue(property_exists($decrypted, '#key1'));
+        self::assertTrue(property_exists($decrypted, '#key2'));
         self::assertEquals('value1', $decrypted->{'#key1'});
         self::assertEquals('value2', $decrypted->{'#key2'});
     }
@@ -754,29 +756,30 @@ class ObjectEncryptorTest extends AbstractTestCase
 
         $decrypted = $encryptor->decryptForComponent($result, 'my-component');
         self::assertIsObject($decrypted);
-        self::assertObjectHasAttribute('key1', $decrypted);
-        self::assertObjectHasAttribute('key2', $decrypted);
-        self::assertObjectHasAttribute('#key3', $decrypted);
-        self::assertObjectHasAttribute('array', $decrypted);
-        self::assertObjectHasAttribute('emptyArray', $decrypted);
-        self::assertObjectHasAttribute('emptyObject', $decrypted);
-        self::assertObjectHasAttribute('nestedKey1', $decrypted->key2);
-        self::assertObjectHasAttribute('nestedKey2', $decrypted->key2);
-        self::assertObjectHasAttribute('#finalKey', $decrypted->key2->nestedKey2);
+        self::assertTrue(property_exists($decrypted, 'key1'));
+        self::assertTrue(property_exists($decrypted, 'key2'));
+        self::assertTrue(property_exists($decrypted, '#key3'));
+        self::assertTrue(property_exists($decrypted, 'array'));
+        self::assertTrue(property_exists($decrypted, 'emptyArray'));
+        self::assertTrue(property_exists($decrypted, 'emptyObject'));
+        self::assertTrue(property_exists($decrypted->key2, 'nestedKey1'));
+        self::assertTrue(property_exists($decrypted->key2, 'nestedKey2'));
+        self::assertTrue(property_exists($decrypted->key2->nestedKey2, '#finalKey'));
+
         self::assertIsArray($decrypted->array);
         self::assertIsArray($decrypted->emptyArray);
         self::assertIsObject($decrypted->emptyObject);
         self::assertIsObject($decrypted->key2);
-        self::assertObjectHasAttribute('anotherNestedKey', $decrypted->{'#key3'});
+        self::assertTrue(property_exists($decrypted->{'#key3'}, 'anotherNestedKey'));
         self::assertIsObject($decrypted->{'#key3'});
         self::assertEquals('value1', $decrypted->key1);
-        self::assertObjectHasAttribute('nestedKey1', $decrypted->key2);
+        self::assertTrue(property_exists($decrypted->key2, 'nestedKey1'));
         self::assertEquals('value2', $decrypted->key2->nestedKey1);
-        self::assertObjectHasAttribute('anotherNestedKey', $decrypted->{'#key3'});
+        self::assertTrue(property_exists($decrypted->{'#key3'}, 'anotherNestedKey'));
         self::assertEquals('someValue', $decrypted->{'#key3'}->{'anotherNestedKey'});
-        self::assertObjectHasAttribute('#encryptedNestedKey', $decrypted->{'#key3'});
+        self::assertTrue(property_exists($decrypted->{'#key3'}, '#encryptedNestedKey'));
         self::assertEquals('someValue2', $decrypted->{'#key3'}->{'#encryptedNestedKey'});
-        self::assertObjectHasAttribute('nestedKey2', $decrypted->key2);
+        self::assertTrue(property_exists($decrypted->key2, 'nestedKey2'));
         self::assertEquals('value3', $decrypted->key2->nestedKey2->{'#finalKey'});
 
         self::assertEquals(json_encode($decrypted), json_encode(json_decode($json)));
@@ -794,6 +797,7 @@ class ObjectEncryptorTest extends AbstractTestCase
             'projectPrefix' => 'KBC::ProjectSecureKV::',
             'configurationPrefix' => 'KBC::ConfigSecureKV::',
             'projectWidePrefix' => 'KBC::ProjectWideSecureKV::',
+            'branchTypePrefix' => 'KBC::BranchTypeSecureKV::',
         ];
         yield 'aws' => [
             'encryptor' => ObjectEncryptorFactory::getAwsEncryptor(
@@ -807,6 +811,7 @@ class ObjectEncryptorTest extends AbstractTestCase
             'projectPrefix' => 'KBC::ProjectSecure::',
             'configurationPrefix' => 'KBC::ConfigSecure::',
             'projectWidePrefix' => 'KBC::ProjectWideSecure::',
+            'branchTypePrefix' => 'KBC::BranchTypeSecure::',
         ];
     }
 
@@ -819,7 +824,8 @@ class ObjectEncryptorTest extends AbstractTestCase
         string $componentPrefix,
         string $projectPrefix,
         string $configurationPrefix,
-        string $projectWidePrefix
+        string $projectWidePrefix,
+        string $branchTypePrefix,
     ): void {
         $encryptedGeneric = $encryptor->encryptGeneric('secret1');
         self::assertStringStartsWith($genericPrefix, $encryptedGeneric);
@@ -893,5 +899,49 @@ class ObjectEncryptorTest extends AbstractTestCase
         self::assertStringStartsWith($projectWidePrefix, $encryptedProjectWide);
         self::assertEquals('secret1', $encryptor->decryptForProjectWide($encryptedGeneric, 'my-project'));
         self::assertEquals('secret2', $encryptor->decryptForProjectWide($encryptedProjectWide, 'my-project'));
+
+        $encryptedBranchType = $encryptor->encryptForBranchType(
+            'secret4',
+            'my-component',
+            'my-project',
+            ObjectEncryptor::BRANCH_TYPE_DEV,
+        );
+        self::assertStringStartsWith($branchTypePrefix, $encryptedBranchType);
+        self::assertEquals(
+            'secret1',
+            $encryptor->decryptForBranchType(
+                $encryptedGeneric,
+                'my-component',
+                'my-project',
+                ObjectEncryptor::BRANCH_TYPE_DEV,
+            )
+        );
+        self::assertEquals(
+            'secret2',
+            $encryptor->decryptForBranchType(
+                $encryptedComponent,
+                'my-component',
+                'my-project',
+                ObjectEncryptor::BRANCH_TYPE_DEV,
+            )
+        );
+        self::assertEquals(
+            'secret3',
+            $encryptor->decryptForBranchType(
+                $encryptedProject,
+                'my-component',
+                'my-project',
+                ObjectEncryptor::BRANCH_TYPE_DEV,
+            )
+        );
+        self::assertEquals(
+            'secret4',
+            $encryptor->decryptForBranchType(
+                $encryptedBranchType,
+                'my-component',
+                'my-project',
+                ObjectEncryptor::BRANCH_TYPE_DEV,
+            )
+        );
     }
 }
