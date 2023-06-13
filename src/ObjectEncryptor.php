@@ -18,6 +18,8 @@ use Keboola\ObjectEncryptor\Wrapper\GenericKMSWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ProjectAKVWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ProjectKMSWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ProjectWideAKVWrapper;
+use Keboola\ObjectEncryptor\Wrapper\ProjectWideBranchTypeAKVWrapper;
+use Keboola\ObjectEncryptor\Wrapper\ProjectWideBranchTypeKMSWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ProjectWideKMSWrapper;
 use stdClass;
 use Throwable;
@@ -128,6 +130,24 @@ class ObjectEncryptor
     /**
      * @template T of array|stdClass|string
      * @param T $data
+     * @param self::BRANCH_TYPE_DEFAULT | self::BRANCH_TYPE_DEV $branchType
+     * @return T
+     */
+    public function encryptForProjectWideBranchType($data, string $projectId, string $branchType)
+    {
+        $wrappers = $this->getWrappers(null, $projectId, null, $branchType);
+        return $this->encrypt(
+            $data,
+            $wrappers,
+            $this->encryptorOptions->getAkvUrl() ?
+                ProjectWideBranchTypeAKVWrapper::class :
+                ProjectWideBranchTypeKMSWrapper::class
+        );
+    }
+
+    /**
+     * @template T of array|stdClass|string
+     * @param T $data
      * @return T
      */
     public function decryptGeneric($data)
@@ -190,6 +210,18 @@ class ObjectEncryptor
     public function decryptForBranchType($data, string $componentId, string $projectId, string $branchType)
     {
         $wrappers = $this->getWrappers($componentId, $projectId, null, $branchType);
+        return $this->decrypt($data, $wrappers);
+    }
+
+    /**
+     * @template T of array|stdClass|string
+     * @param T $data
+     * @param self::BRANCH_TYPE_DEFAULT | self::BRANCH_TYPE_DEV $branchType
+     * @return T
+     */
+    public function decryptForProjectWideBranchType($data, string $projectId, string $branchType)
+    {
+        $wrappers = $this->getWrappers(null, $projectId, null, $branchType);
         return $this->decrypt($data, $wrappers);
     }
 
@@ -313,6 +345,8 @@ class ObjectEncryptor
             ProjectWideKMSWrapper::getPrefix(),
             BranchTypeAKVWrapper::getPrefix(),
             BranchTypeKMSWrapper::getPrefix(),
+            ProjectWideBranchTypeAKVWrapper::getPrefix(),
+            ProjectWideBranchTypeKMSWrapper::getPrefix(),
             // legacy wrappers that are no longer implemented, but still exist in the real world
             'KBC::Encrypted==',
             'KBC::ComponentEncrypted==',
@@ -426,6 +460,12 @@ class ObjectEncryptor
                 $wrapper = new ProjectWideKMSWrapper($this->encryptorOptions);
                 $wrapper->setProjectId($projectId);
                 $wrappers[] = $wrapper;
+                if ($branchType) {
+                    $wrapper = new ProjectWideBranchTypeKMSWrapper($this->encryptorOptions);
+                    $wrapper->setProjectId($projectId);
+                    $wrapper->setBranchType($branchType);
+                    $wrappers[] = $wrapper;
+                }
             }
             if ($componentId) {
                 $wrapper = new ComponentKMSWrapper($this->encryptorOptions);
@@ -473,6 +513,12 @@ class ObjectEncryptor
                 $wrapper = new ProjectWideAKVWrapper($this->encryptorOptions);
                 $wrapper->setProjectId($projectId);
                 $wrappers[] = $wrapper;
+                if ($branchType) {
+                    $wrapper = new ProjectWideBranchTypeAKVWrapper($this->encryptorOptions);
+                    $wrapper->setProjectId($projectId);
+                    $wrapper->setBranchType($branchType);
+                    $wrappers[] = $wrapper;
+                }
             }
             if ($componentId) {
                 $wrapper = new ComponentAKVWrapper($this->encryptorOptions);
