@@ -4,11 +4,6 @@ declare(strict_types=1);
 
 namespace Keboola\ObjectEncryptor\Tests;
 
-use Keboola\ObjectEncryptor\EncryptorOptions;
-use Keboola\ObjectEncryptor\Exception\ApplicationException;
-use Keboola\ObjectEncryptor\Exception\UserException;
-use Keboola\ObjectEncryptor\Wrapper\ComponentAKVWrapper;
-use Keboola\ObjectEncryptor\Wrapper\ComponentKMSWrapper;
 use PHPUnit\Framework\TestCase;
 
 class AbstractTestCase extends TestCase
