@@ -9,7 +9,7 @@ use Keboola\ObjectEncryptor\Exception\ApplicationException;
 /**
  * @internal Use ObjectEncryptor
  */
-class BranchTypeAKVWrapper extends ProjectAKVWrapper
+class BranchTypeProjectAKVWrapper extends ProjectAKVWrapper
 {
     private const KEY_BRANCH_TYPE = 'branchType';
 

@@ -207,6 +207,8 @@ class ObjectEncryptorTest extends AbstractTestCase
             '#BranchTypeAKVWrapper' => 'KBC::BranchTypeSecureKV::aaaaaaaaaaaaaaaaaaaaaaaaaa',
             '#ProjectWideBranchTypeKMSWrapper' => 'KBC::BranchTypeSecure::aaaaaaaaaaaaaaaaaaaaaaaaaa',
             '#ProjectWideBranchTypeAKVWrapper' => 'KBC::BranchTypeSecureKV::aaaaaaaaaaaaaaaaaaaaaaaaaa',
+            '#BranchTypeConfigurationKMSWrapper' => 'KBC::BranchTypeConfigSecure::aaaaaaaaaaaaaaaaaaaaaaaaaa',
+            '#BranchTypeConfigurationAKVWrapper' => 'KBC::BranchTypeConfigSecureKV::aaaaaaaaaaaaaaaaaaaaaaaaaa',
             '#Similar' => 'KBC::ConfigSecureKVaaaaaaaaaaaaaaaaaaaaaaaaaa',
             '#Legacy1' => 'KBC::Encrypted==aaaaaaaaaaaaaaaaaaaaaaaaaa',
             '#Legacy2' => 'KBC::ComponentEncrypted==aaaaaaaaaaaaaaaaaaaaaaaaaa',
@@ -801,6 +803,7 @@ class ObjectEncryptorTest extends AbstractTestCase
             'projectWidePrefix' => 'KBC::ProjectWideSecureKV::',
             'branchTypePrefix' => 'KBC::BranchTypeSecureKV::',
             'projectWideBranchTypePrefix' => 'KBC::ProjectWideBranchTypeSecureKV::',
+            'branchTypeConfigurationPrefix' => 'KBC::BranchTypeConfigSecureKV::',
         ];
         yield 'aws' => [
             'encryptor' => ObjectEncryptorFactory::getAwsEncryptor(
@@ -816,6 +819,7 @@ class ObjectEncryptorTest extends AbstractTestCase
             'projectWidePrefix' => 'KBC::ProjectWideSecure::',
             'branchTypePrefix' => 'KBC::BranchTypeSecure::',
             'projectWideBranchTypePrefix' => 'KBC::ProjectWideBranchTypeSecure::',
+            'branchTypeConfigurationPrefix' => 'KBC::BranchTypeConfigSecure::',
         ];
     }
 
@@ -831,6 +835,7 @@ class ObjectEncryptorTest extends AbstractTestCase
         string $projectWidePrefix,
         string $branchTypePrefix,
         string $projectWideBranchTypePrefix,
+        string $branchTypeConfigurationPrefix,
     ): void {
         $encryptedGeneric = $encryptor->encryptGeneric('secret1');
         self::assertStringStartsWith($genericPrefix, $encryptedGeneric);
@@ -909,7 +914,7 @@ class ObjectEncryptorTest extends AbstractTestCase
             'secret5',
             'my-component',
             'my-project',
-            ObjectEncryptor::BRANCH_TYPE_DEV,
+            ObjectEncryptor::BRANCH_TYPE_DEFAULT,
         );
         self::assertStringStartsWith($branchTypePrefix, $encryptedBranchType);
         self::assertEquals(
@@ -918,7 +923,7 @@ class ObjectEncryptorTest extends AbstractTestCase
                 $encryptedGeneric,
                 'my-component',
                 'my-project',
-                ObjectEncryptor::BRANCH_TYPE_DEV,
+                ObjectEncryptor::BRANCH_TYPE_DEFAULT,
             )
         );
         self::assertEquals(
@@ -927,7 +932,7 @@ class ObjectEncryptorTest extends AbstractTestCase
                 $encryptedComponent,
                 'my-component',
                 'my-project',
-                ObjectEncryptor::BRANCH_TYPE_DEV,
+                ObjectEncryptor::BRANCH_TYPE_DEFAULT,
             )
         );
         self::assertEquals(
@@ -936,7 +941,7 @@ class ObjectEncryptorTest extends AbstractTestCase
                 $encryptedProject,
                 'my-component',
                 'my-project',
-                ObjectEncryptor::BRANCH_TYPE_DEV,
+                ObjectEncryptor::BRANCH_TYPE_DEFAULT,
             )
         );
         self::assertEquals(
@@ -945,7 +950,7 @@ class ObjectEncryptorTest extends AbstractTestCase
                 $encryptedBranchType,
                 'my-component',
                 'my-project',
-                ObjectEncryptor::BRANCH_TYPE_DEV,
+                ObjectEncryptor::BRANCH_TYPE_DEFAULT,
             )
         );
 
@@ -968,6 +973,95 @@ class ObjectEncryptorTest extends AbstractTestCase
             $encryptor->decryptForProjectWideBranchType(
                 $encryptedProjectWideBranchType,
                 'my-project',
+                ObjectEncryptor::BRANCH_TYPE_DEFAULT,
+            )
+        );
+
+        $encryptedBranchTypeConfiguration = $encryptor->encryptForBranchTypeConfiguration(
+            'secret7',
+            'my-component',
+            'my-project',
+            'my-configuration',
+            ObjectEncryptor::BRANCH_TYPE_DEFAULT,
+        );
+        self::assertStringStartsWith($branchTypeConfigurationPrefix, $encryptedBranchTypeConfiguration);
+        self::assertEquals(
+            'secret1',
+            $encryptor->decryptForBranchTypeConfiguration(
+                $encryptedGeneric,
+                'my-component',
+                'my-project',
+                'my-configuration',
+                ObjectEncryptor::BRANCH_TYPE_DEFAULT,
+            )
+        );
+        self::assertEquals(
+            'secret2',
+            $encryptor->decryptForBranchTypeConfiguration(
+                $encryptedComponent,
+                'my-component',
+                'my-project',
+                'my-configuration',
+                ObjectEncryptor::BRANCH_TYPE_DEFAULT,
+            )
+        );
+        self::assertEquals(
+            'secret3',
+            $encryptor->decryptForBranchTypeConfiguration(
+                $encryptedProject,
+                'my-component',
+                'my-project',
+                'my-configuration',
+                ObjectEncryptor::BRANCH_TYPE_DEFAULT,
+            )
+        );
+        self::assertEquals(
+            'secret4',
+            $encryptor->decryptForBranchTypeConfiguration(
+                $encryptedConfiguration,
+                'my-component',
+                'my-project',
+                'my-configuration',
+                ObjectEncryptor::BRANCH_TYPE_DEFAULT,
+            )
+        );
+        self::assertEquals(
+            'secret5',
+            $encryptor->decryptForBranchTypeConfiguration(
+                $encryptedBranchType,
+                'my-component',
+                'my-project',
+                'my-configuration',
+                ObjectEncryptor::BRANCH_TYPE_DEFAULT,
+            )
+        );
+        self::assertEquals(
+            'secret2',
+            $encryptor->decryptForBranchTypeConfiguration(
+                $encryptedProjectWide,
+                'my-component',
+                'my-project',
+                'my-configuration',
+                ObjectEncryptor::BRANCH_TYPE_DEFAULT,
+            )
+        );
+        self::assertEquals(
+            'secret6',
+            $encryptor->decryptForBranchTypeConfiguration(
+                $encryptedProjectWideBranchType,
+                'my-component',
+                'my-project',
+                'my-configuration',
+                ObjectEncryptor::BRANCH_TYPE_DEFAULT,
+            )
+        );
+        self::assertEquals(
+            'secret7',
+            $encryptor->decryptForBranchTypeConfiguration(
+                $encryptedBranchTypeConfiguration,
+                'my-component',
+                'my-project',
+                'my-configuration',
                 ObjectEncryptor::BRANCH_TYPE_DEFAULT,
             )
         );

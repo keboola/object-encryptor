@@ -8,12 +8,10 @@ use Keboola\ObjectEncryptor\EncryptorOptions;
 use Keboola\ObjectEncryptor\Exception\ApplicationException;
 use Keboola\ObjectEncryptor\Exception\UserException;
 use Keboola\ObjectEncryptor\ObjectEncryptor;
-use Keboola\ObjectEncryptor\Wrapper\BranchTypeAKVWrapper;
-use Keboola\ObjectEncryptor\Wrapper\BranchTypeKMSWrapper;
-use Keboola\ObjectEncryptor\Wrapper\ConfigurationAKVWrapper;
-use Keboola\ObjectEncryptor\Wrapper\ConfigurationKMSWrapper;
+use Keboola\ObjectEncryptor\Wrapper\BranchTypeProjectAKVWrapper;
+use Keboola\ObjectEncryptor\Wrapper\BranchTypeProjectKMSWrapper;
 
-class BranchTypeWrapperTest extends AbstractTestCase
+class BranchTypeProjectWrapperTest extends AbstractTestCase
 {
     public function setUp(): void
     {
@@ -26,18 +24,18 @@ class BranchTypeWrapperTest extends AbstractTestCase
     }
 
     /**
-     * @return BranchTypeAKVWrapper[][]|BranchTypeKMSWrapper[][]
+     * @return BranchTypeProjectAKVWrapper[][]|BranchTypeProjectKMSWrapper[][]
      */
     public function wrapperProvider(): array
     {
-        $branchTypeWrapperKMS = new BranchTypeKMSWrapper(new EncryptorOptions(
+        $branchTypeWrapperKMS = new BranchTypeProjectKMSWrapper(new EncryptorOptions(
             stackId: 'some-stack',
             kmsKeyId: self::getKmsKeyId(),
             kmsRegion: self::getKmsRegion(),
             backoffMaxTries: 1,
         ));
 
-        $branchTypeWrapperAKV = new BranchTypeAKVWrapper(new EncryptorOptions(
+        $branchTypeWrapperAKV = new BranchTypeProjectAKVWrapper(new EncryptorOptions(
             stackId: 'some-stack',
             akvUrl: self::getAkvUrl(),
         ));
@@ -53,7 +51,7 @@ class BranchTypeWrapperTest extends AbstractTestCase
     }
 
     /**
-     * @param BranchTypeAKVWrapper|BranchTypeKMSWrapper $wrapper
+     * @param BranchTypeProjectAKVWrapper|BranchTypeProjectKMSWrapper $wrapper
      * @dataProvider wrapperProvider
      */
     public function testEncrypt($wrapper): void
@@ -69,7 +67,7 @@ class BranchTypeWrapperTest extends AbstractTestCase
     }
 
     /**
-     * @param BranchTypeAKVWrapper|BranchTypeKMSWrapper $wrapper
+     * @param BranchTypeProjectAKVWrapper|BranchTypeProjectKMSWrapper $wrapper
      * @dataProvider wrapperProvider
      */
     public function testEncryptDifferentBranchType($wrapper): void
@@ -92,7 +90,7 @@ class BranchTypeWrapperTest extends AbstractTestCase
     }
 
     /**
-     * @param BranchTypeAKVWrapper|BranchTypeKMSWrapper $wrapper
+     * @param BranchTypeProjectAKVWrapper|BranchTypeProjectKMSWrapper $wrapper
      * @dataProvider wrapperProvider
      */
     public function testEncryptDifferentProject($wrapper): void
@@ -117,7 +115,7 @@ class BranchTypeWrapperTest extends AbstractTestCase
     {
         self::expectException(ApplicationException::class);
         self::expectExceptionMessage('Cipher key settings are missing.');
-        new ConfigurationKMSWrapper(new EncryptorOptions(
+        new BranchTypeProjectKMSWrapper(new EncryptorOptions(
             stackId: 'some-stack',
             akvUrl: 'some-url',
         ));
@@ -127,7 +125,7 @@ class BranchTypeWrapperTest extends AbstractTestCase
     {
         self::expectException(ApplicationException::class);
         self::expectExceptionMessage('Cipher key settings are invalid.');
-        new ConfigurationAKVWrapper(new EncryptorOptions(
+        new BranchTypeProjectAKVWrapper(new EncryptorOptions(
             stackId: 'some-stack',
             kmsKeyId: 'some-key-id',
             kmsRegion: 'some-region',
@@ -135,7 +133,7 @@ class BranchTypeWrapperTest extends AbstractTestCase
     }
 
     /**
-     * @param BranchTypeAKVWrapper|BranchTypeKMSWrapper $wrapper
+     * @param BranchTypeProjectAKVWrapper|BranchTypeProjectKMSWrapper $wrapper
      * @dataProvider wrapperProvider
      */
     public function testInvalidSetupEncryptComponentId($wrapper): void
@@ -146,7 +144,7 @@ class BranchTypeWrapperTest extends AbstractTestCase
     }
 
     /**
-     * @param BranchTypeAKVWrapper|BranchTypeKMSWrapper $wrapper
+     * @param BranchTypeProjectAKVWrapper|BranchTypeProjectKMSWrapper $wrapper
      * @dataProvider wrapperProvider
      */
     public function testInvalidSetupEncryptProjectId($wrapper): void
@@ -158,10 +156,10 @@ class BranchTypeWrapperTest extends AbstractTestCase
     }
 
     /**
-     * @param BranchTypeAKVWrapper|BranchTypeKMSWrapper $wrapper
+     * @param BranchTypeProjectAKVWrapper|BranchTypeProjectKMSWrapper $wrapper
      * @dataProvider wrapperProvider
      */
-    public function testInvalidSetupEncryptConfigurationId($wrapper): void
+    public function testInvalidSetupEncryptBranchType($wrapper): void
     {
         $wrapper->setComponentId('component-id');
         $wrapper->setProjectId('my-project');
@@ -171,7 +169,7 @@ class BranchTypeWrapperTest extends AbstractTestCase
     }
 
     /**
-     * @param BranchTypeAKVWrapper|BranchTypeKMSWrapper $wrapper
+     * @param BranchTypeProjectAKVWrapper|BranchTypeProjectKMSWrapper $wrapper
      * @dataProvider wrapperProvider
      */
     public function testInvalidSetupDecryptComponentId($wrapper): void
@@ -182,7 +180,7 @@ class BranchTypeWrapperTest extends AbstractTestCase
     }
 
     /**
-     * @param BranchTypeAKVWrapper|BranchTypeKMSWrapper $wrapper
+     * @param BranchTypeProjectAKVWrapper|BranchTypeProjectKMSWrapper $wrapper
      * @dataProvider wrapperProvider
      */
     public function testInvalidSetupDecryptProjectId($wrapper): void
@@ -194,10 +192,10 @@ class BranchTypeWrapperTest extends AbstractTestCase
     }
 
     /**
-     * @param BranchTypeAKVWrapper|BranchTypeKMSWrapper $wrapper
+     * @param BranchTypeProjectAKVWrapper|BranchTypeProjectKMSWrapper $wrapper
      * @dataProvider wrapperProvider
      */
-    public function testInvalidSetupDecryptConfigurationId($wrapper): void
+    public function testInvalidSetupDecryptBranchType($wrapper): void
     {
         $wrapper->setComponentId('component-id');
         $wrapper->setProjectId('my-project');
