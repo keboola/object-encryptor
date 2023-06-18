@@ -1,6 +1,6 @@
 provider "aws" {
   allowed_account_ids = ["025303414634"] # Dev-Platform-Services
-  region  = "eu-central-1"
+  region              = "eu-central-1"
 
   default_tags {
     tags = {
