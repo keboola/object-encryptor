@@ -107,8 +107,14 @@ terraform -chdir="${SCRIPT_PATH}" output -json > "${TF_OUTPUTS_FILE}"
 "${SCRIPT_PATH}/env-scripts/extract-variables-${ENV_NAME}.sh" >> "${ENV_TF_FILE}"
 
 echo "Writing variables"
-sed -i -e "/${DELIMITER_START}/,/${DELIMITER_END}/{ /${DELIMITER_START}/{p; r ${ENV_TF_FILE}
-        }; /${DELIMITER_END}/p; d }" "${ENV_FILE}"
+if [[ "$OSTYPE" == "darwin"* ]];
+then
+  sed -i '' -e "/${DELIMITER_START}/,/${DELIMITER_END}/{ /${DELIMITER_START}/{p; r ${ENV_TF_FILE}
+        }; /${DELIMITER_END}/p; d; }" "${ENV_FILE}";
+else
+  sed -i -e "/${DELIMITER_START}/,/${DELIMITER_END}/{ /${DELIMITER_START}/{p; r ${ENV_TF_FILE}
+        }; /${DELIMITER_END}/p; d; }" "${ENV_FILE}";
+fi
 
 echo "Purging Symfony cache"
 rm -rf var/cache
