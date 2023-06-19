@@ -8,12 +8,10 @@ use Keboola\ObjectEncryptor\EncryptorOptions;
 use Keboola\ObjectEncryptor\Exception\ApplicationException;
 use Keboola\ObjectEncryptor\Exception\UserException;
 use Keboola\ObjectEncryptor\ObjectEncryptor;
-use Keboola\ObjectEncryptor\Wrapper\ProjectAKVWrapper;
-use Keboola\ObjectEncryptor\Wrapper\ProjectKMSWrapper;
-use Keboola\ObjectEncryptor\Wrapper\ProjectWideBranchTypeAKVWrapper;
-use Keboola\ObjectEncryptor\Wrapper\ProjectWideBranchTypeKMSWrapper;
+use Keboola\ObjectEncryptor\Wrapper\BranchTypeProjectWideAKVWrapper;
+use Keboola\ObjectEncryptor\Wrapper\BranchTypeProjectWideKMSWrapper;
 
-class ProjectWideBranchTypeWrapperTest extends AbstractTestCase
+class BranchTypeProjectWideWrapperTest extends AbstractTestCase
 {
     public function setUp(): void
     {
@@ -26,18 +24,18 @@ class ProjectWideBranchTypeWrapperTest extends AbstractTestCase
     }
 
     /**
-     * @return ProjectWideBranchTypeAKVWrapper[][]|ProjectWideBranchTypeKMSWrapper[][]
+     * @return BranchTypeProjectWideAKVWrapper[][]|BranchTypeProjectWideKMSWrapper[][]
      */
     public function wrapperProvider(): array
     {
-        $projectWrapperKMS = new ProjectWideBranchTypeKMSWrapper(new EncryptorOptions(
+        $projectWrapperKMS = new BranchTypeProjectWideKMSWrapper(new EncryptorOptions(
             stackId: 'some-stack',
             kmsKeyId: self::getKmsKeyId(),
             kmsRegion: self::getKmsRegion(),
             backoffMaxTries: 1,
         ));
 
-        $projectWrapperAKV = new ProjectWideBranchTypeAKVWrapper(new EncryptorOptions(
+        $projectWrapperAKV = new BranchTypeProjectWideAKVWrapper(new EncryptorOptions(
             stackId: 'some-stack',
             akvUrl: self::getAkvUrl(),
         ));
@@ -54,7 +52,7 @@ class ProjectWideBranchTypeWrapperTest extends AbstractTestCase
 
     /**
      * @dataProvider wrapperProvider
-     * @param ProjectWideBranchTypeAKVWrapper|ProjectWideBranchTypeKMSWrapper $wrapper
+     * @param BranchTypeProjectWideAKVWrapper|BranchTypeProjectWideKMSWrapper $wrapper
      */
     public function testEncrypt($wrapper): void
     {
@@ -68,7 +66,7 @@ class ProjectWideBranchTypeWrapperTest extends AbstractTestCase
 
     /**
      * @dataProvider wrapperProvider
-     * @param ProjectWideBranchTypeAKVWrapper|ProjectWideBranchTypeKMSWrapper $wrapper
+     * @param BranchTypeProjectWideAKVWrapper|BranchTypeProjectWideKMSWrapper $wrapper
      */
     public function testEncryptDifferentProject($wrapper): void
     {
@@ -90,7 +88,7 @@ class ProjectWideBranchTypeWrapperTest extends AbstractTestCase
     {
         self::expectException(ApplicationException::class);
         self::expectExceptionMessage('Cipher key settings are missing.');
-        new ProjectKMSWrapper(new EncryptorOptions(
+        new BranchTypeProjectWideKMSWrapper(new EncryptorOptions(
             stackId: 'some-stack',
             akvUrl: 'some-url'
         ));
@@ -100,7 +98,7 @@ class ProjectWideBranchTypeWrapperTest extends AbstractTestCase
     {
         self::expectException(ApplicationException::class);
         self::expectExceptionMessage('Cipher key settings are invalid.');
-        new ProjectAKVWrapper(new EncryptorOptions(
+        new BranchTypeProjectWideAKVWrapper(new EncryptorOptions(
             stackId: 'some-stack',
             kmsKeyId: 'some-key',
             kmsRegion: 'some-region',
@@ -109,7 +107,7 @@ class ProjectWideBranchTypeWrapperTest extends AbstractTestCase
 
     /**
      * @dataProvider wrapperProvider
-     * @param ProjectWideBranchTypeAKVWrapper|ProjectWideBranchTypeKMSWrapper $wrapper
+     * @param BranchTypeProjectWideAKVWrapper|BranchTypeProjectWideKMSWrapper $wrapper
      */
     public function testInvalidSetupEncryptProjectId($wrapper): void
     {
@@ -120,7 +118,7 @@ class ProjectWideBranchTypeWrapperTest extends AbstractTestCase
 
     /**
      * @dataProvider wrapperProvider
-     * @param ProjectWideBranchTypeAKVWrapper|ProjectWideBranchTypeKMSWrapper $wrapper
+     * @param BranchTypeProjectWideAKVWrapper|BranchTypeProjectWideKMSWrapper $wrapper
      */
     public function testInvalidSetupDecryptProjectId($wrapper): void
     {

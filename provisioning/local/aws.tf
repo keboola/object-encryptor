@@ -1,6 +1,6 @@
 provider "aws" {
-  profile = "keboola-dev-platform-services"
-  region  = "eu-central-1"
+  allowed_account_ids = ["025303414634"] # Dev-Platform-Services
+  region              = "eu-central-1"
 
   default_tags {
     tags = {

@@ -9,7 +9,7 @@ use Keboola\ObjectEncryptor\Exception\ApplicationException;
 /**
  * @internal Use ObjectEncryptor
  */
-class BranchTypeKMSWrapper extends ProjectKMSWrapper
+class BranchTypeProjectWideKMSWrapper extends ProjectWideKMSWrapper
 {
     private const KEY_BRANCH_TYPE = 'branchType';
 
@@ -28,6 +28,6 @@ class BranchTypeKMSWrapper extends ProjectKMSWrapper
 
     public static function getPrefix(): string
     {
-        return 'KBC::BranchTypeSecure::';
+        return 'KBC::ProjectWideBranchTypeSecure::';
     }
 }

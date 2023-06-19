@@ -25,8 +25,8 @@ resource "aws_iam_access_key" "object_encryptor" {
 
 data "aws_iam_policy_document" "kms_access" {
   statement {
-    sid     = "UseKMSKeys"
-    effect  = "Allow"
+    sid    = "UseKMSKeys"
+    effect = "Allow"
     actions = [
       "kms:Encrypt",
       "kms:Decrypt",
@@ -42,7 +42,7 @@ data "aws_iam_policy_document" "kms_access" {
 
 data "aws_iam_policy_document" "sts_access" {
   statement {
-    sid = "AssumeRole"
+    sid    = "AssumeRole"
     effect = "Allow"
     actions = [
       "sts:AssumeRole"
