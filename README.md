@@ -52,7 +52,7 @@ the value cannot be deciphered and an exception is thrown.
 
 ## Development
 Prerequisites:
-* configured `az` and `aws` CLI tools (run `az login` and `aws configure --profile keboola-dev-platform-services`)
+* configured `az` and `aws` CLI tools (run `az login` and `aws configure --profile YOUR_AWS_PROFILE_NAME`)
 * installed `terraform` (https://www.terraform.io) and `jq` (https://stedolan.github.io/jq) to setup local env
 * installed `docker` and `docker-compose` to run & develop the app
 
@@ -61,7 +61,7 @@ cat <<EOF > ./provisioning/local/terraform.tfvars
 name_prefix = "name" # your name/nickname to make your resource unique & recognizable
 EOF
 
-terraform -chdir=./provisioning/local init
+terraform -chdir=./provisioning/local init -backend-config="key=object-encryptor/${NAME_PREFIX}.tfstate"
 terraform -chdir=./provisioning/local apply
 ./provisioning/local/update-env.sh aws # or azure
 
