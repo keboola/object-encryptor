@@ -2,7 +2,7 @@ version: "3"
 services:
   # for development purposes
   tests: &tests
-    build: 
+    build:
       context: .
       dockerfile: Dockerfile
     environment:
@@ -17,9 +17,14 @@ services:
       - TEST_AWS_ROLE_ID
     command: ["composer", "ci"]
 
+  dev:
+    <<: *tests
+    volumes:
+      - .:/code
+
   ci:
     <<: *tests
-    build: 
+    build:
       context: .
       dockerfile: Dockerfile
     command: ["composer", "ci"]

@@ -282,6 +282,7 @@ class ObjectEncryptor
                 break;
             }
         }
+        /** @var CryptoWrapperInterface $wrapper */
         if (empty($wrapper)) {
             throw new ApplicationException('Invalid crypto wrapper ' . $wrapperName);
         }
@@ -333,6 +334,10 @@ class ObjectEncryptor
 
     private function decryptValue(string $value, array $wrappers): string
     {
+        if (RegexHelper::matchesVariable($value)) {
+            return $value;
+        }
+
         $wrapper = $this->findWrapper($value, $wrappers);
         if (!$wrapper) {
             throw new UserException(sprintf('Value "%s" is not an encrypted value.', $value), 0);
@@ -410,6 +415,10 @@ class ObjectEncryptor
 
     private function encryptValue(string $value, array $wrappers, CryptoWrapperInterface $wrapper): string
     {
+        if (RegexHelper::matchesVariable($value)) {
+            return $value;
+        }
+
         // return self if already encrypted with any wrapper
         if ($this->isKnownWrapper($value)) {
             return $value;

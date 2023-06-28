@@ -473,6 +473,7 @@ class ObjectEncryptorTest extends AbstractTestCase
             '#key3' => [
                 'anotherNestedKey' => 'someValue',
                 '#encryptedNestedKey' => 'someValue2',
+                '#encryptedVariable' => '{{ variable }}',
             ],
         ];
         $result = $encryptor->encryptForComponent($array, 'my-component');
@@ -482,6 +483,7 @@ class ObjectEncryptorTest extends AbstractTestCase
         self::assertEquals('someValue', $result['#key3']['anotherNestedKey']);
         self::assertStringStartsWith('KBC::ComponentSecure', $result['#key3']['#encryptedNestedKey']);
         self::assertStringStartsWith('KBC::ComponentSecure', $result['key2']['nestedKey2']['#finalKey']);
+        self::assertEquals('{{ variable }}', $result['#key3']['#encryptedVariable']);
 
         $decrypted = $encryptor->decryptForComponent($result, 'my-component');
         self::assertIsArray($decrypted);
@@ -497,6 +499,7 @@ class ObjectEncryptorTest extends AbstractTestCase
         self::assertEquals('value3', $decrypted['key2']['nestedKey2']['#finalKey']);
         self::assertEquals('someValue', $decrypted['#key3']['anotherNestedKey']);
         self::assertEquals('someValue2', $decrypted['#key3']['#encryptedNestedKey']);
+        self::assertEquals('{{ variable }}', $result['#key3']['#encryptedVariable']);
     }
 
     public function testEncryptorNestedObjectWithArrayKeyHashmark(): void
@@ -747,7 +750,8 @@ class ObjectEncryptorTest extends AbstractTestCase
             },
             "array": ["a", "b"],
             "emptyArray": [],
-            "emptyObject": {}
+            "emptyObject": {},
+            "#key4": "{{ variable }}"
         }';
 
         $result = $encryptor->encryptForComponent(json_decode($json), 'my-component');
@@ -755,6 +759,7 @@ class ObjectEncryptorTest extends AbstractTestCase
         self::assertEquals('value1', $result->key1);
         self::assertEquals('value2', $result->key2->nestedKey1);
         self::assertEquals('someValue', $result->{'#key3'}->anotherNestedKey);
+        self::assertEquals('{{ variable }}', $result->{'#key4'});
         self::assertStringStartsWith('KBC::ComponentSecureKV::', $result->{'#key3'}->{'#encryptedNestedKey'});
         self::assertStringStartsWith('KBC::ComponentSecureKV::', $result->key2->nestedKey2->{'#finalKey'});
 
@@ -763,6 +768,7 @@ class ObjectEncryptorTest extends AbstractTestCase
         self::assertTrue(property_exists($decrypted, 'key1'));
         self::assertTrue(property_exists($decrypted, 'key2'));
         self::assertTrue(property_exists($decrypted, '#key3'));
+        self::assertTrue(property_exists($decrypted, '#key4'));
         self::assertTrue(property_exists($decrypted, 'array'));
         self::assertTrue(property_exists($decrypted, 'emptyArray'));
         self::assertTrue(property_exists($decrypted, 'emptyObject'));
@@ -785,6 +791,7 @@ class ObjectEncryptorTest extends AbstractTestCase
         self::assertEquals('someValue2', $decrypted->{'#key3'}->{'#encryptedNestedKey'});
         self::assertTrue(property_exists($decrypted->key2, 'nestedKey2'));
         self::assertEquals('value3', $decrypted->key2->nestedKey2->{'#finalKey'});
+        self::assertEquals('{{ variable }}', $decrypted->{'#key4'});
 
         self::assertEquals(json_encode($decrypted), json_encode(json_decode($json)));
     }
@@ -1057,6 +1064,247 @@ class ObjectEncryptorTest extends AbstractTestCase
         );
         self::assertEquals(
             'secret7',
+            $encryptor->decryptForBranchTypeConfiguration(
+                $encryptedBranchTypeConfiguration,
+                'my-component',
+                'my-project',
+                'my-configuration',
+                ObjectEncryptor::BRANCH_TYPE_DEFAULT,
+            )
+        );
+    }
+
+    /**
+     * @dataProvider cloudEncryptorProvider
+     */
+    public function testIgnoreVariables(ObjectEncryptor $encryptor): void
+    {
+        $encryptedGeneric = $encryptor->encryptGeneric('{{ my_variable }}');
+        self::assertEquals('{{ my_variable }}', $encryptedGeneric);
+        self::assertEquals('{{ my_variable }}', $encryptor->decryptGeneric($encryptedGeneric));
+
+        $encryptedComponent = $encryptor->encryptForComponent('{{ my_variable-2 }}', 'my-component');
+        self::assertEquals('{{ my_variable-2 }}', $encryptedComponent);
+        self::assertEquals('{{ my_variable }}', $encryptor->decryptForComponent($encryptedGeneric, 'my-component'));
+        self::assertEquals('{{ my_variable-2 }}', $encryptor->decryptForComponent($encryptedComponent, 'my-component'));
+
+        $encryptedProject = $encryptor->encryptForProject('{{ my_variable-3 }}', 'my-component', 'my-project');
+        self::assertEquals('{{ my_variable-3 }}', $encryptedProject);
+        self::assertEquals(
+            '{{ my_variable }}',
+            $encryptor->decryptForProject($encryptedGeneric, 'my-component', 'my-project')
+        );
+        self::assertEquals(
+            '{{ my_variable-2 }}',
+            $encryptor->decryptForProject($encryptedComponent, 'my-component', 'my-project')
+        );
+        self::assertEquals(
+            '{{ my_variable-3 }}',
+            $encryptor->decryptForProject($encryptedProject, 'my-component', 'my-project')
+        );
+
+        $encryptedConfiguration = $encryptor->encryptForConfiguration(
+            '{{ my_variable-4 }}',
+            'my-component',
+            'my-project',
+            'my-configuration'
+        );
+        self::assertEquals('{{ my_variable-4 }}', $encryptedConfiguration);
+        self::assertEquals(
+            '{{ my_variable }}',
+            $encryptor->decryptForConfiguration(
+                $encryptedGeneric,
+                'my-component',
+                'my-project',
+                'my-configuration'
+            )
+        );
+        self::assertEquals(
+            '{{ my_variable-2 }}',
+            $encryptor->decryptForConfiguration(
+                $encryptedComponent,
+                'my-component',
+                'my-project',
+                'my-configuration'
+            )
+        );
+        self::assertEquals(
+            '{{ my_variable-3 }}',
+            $encryptor->decryptForConfiguration(
+                $encryptedProject,
+                'my-component',
+                'my-project',
+                'my-configuration'
+            )
+        );
+        self::assertEquals(
+            '{{ my_variable-4 }}',
+            $encryptor->decryptForConfiguration(
+                $encryptedConfiguration,
+                'my-component',
+                'my-project',
+                'my-configuration'
+            )
+        );
+
+        $encryptedProjectWide = $encryptor->encryptForProjectWide('{{ my_variable-2 }}', 'my-project');
+        self::assertEquals('{{ my_variable-2 }}', $encryptedProjectWide);
+        self::assertEquals(
+            '{{ my_variable }}',
+            $encryptor->decryptForProjectWide($encryptedGeneric, 'my-project')
+        );
+        self::assertEquals(
+            '{{ my_variable-2 }}',
+            $encryptor->decryptForProjectWide($encryptedProjectWide, 'my-project')
+        );
+
+        $encryptedBranchType = $encryptor->encryptForBranchType(
+            '{{ my_variable-5 }}',
+            'my-component',
+            'my-project',
+            ObjectEncryptor::BRANCH_TYPE_DEFAULT,
+        );
+        self::assertEquals('{{ my_variable-5 }}', $encryptedBranchType);
+        self::assertEquals(
+            '{{ my_variable }}',
+            $encryptor->decryptForBranchType(
+                $encryptedGeneric,
+                'my-component',
+                'my-project',
+                ObjectEncryptor::BRANCH_TYPE_DEFAULT,
+            )
+        );
+        self::assertEquals(
+            '{{ my_variable-2 }}',
+            $encryptor->decryptForBranchType(
+                $encryptedComponent,
+                'my-component',
+                'my-project',
+                ObjectEncryptor::BRANCH_TYPE_DEFAULT,
+            )
+        );
+        self::assertEquals(
+            '{{ my_variable-3 }}',
+            $encryptor->decryptForBranchType(
+                $encryptedProject,
+                'my-component',
+                'my-project',
+                ObjectEncryptor::BRANCH_TYPE_DEFAULT,
+            )
+        );
+        self::assertEquals(
+            '{{ my_variable-5 }}',
+            $encryptor->decryptForBranchType(
+                $encryptedBranchType,
+                'my-component',
+                'my-project',
+                ObjectEncryptor::BRANCH_TYPE_DEFAULT,
+            )
+        );
+
+        $encryptedProjectWideBranchType = $encryptor->encryptForProjectWideBranchType(
+            '{{ my_variable-6 }}',
+            'my-project',
+            ObjectEncryptor::BRANCH_TYPE_DEFAULT
+        );
+        self::assertEquals('{{ my_variable-6 }}', $encryptedProjectWideBranchType);
+        self::assertEquals(
+            '{{ my_variable }}',
+            $encryptor->decryptForProjectWideBranchType(
+                $encryptedGeneric,
+                'my-project',
+                ObjectEncryptor::BRANCH_TYPE_DEFAULT,
+            )
+        );
+        self::assertEquals(
+            '{{ my_variable-6 }}',
+            $encryptor->decryptForProjectWideBranchType(
+                $encryptedProjectWideBranchType,
+                'my-project',
+                ObjectEncryptor::BRANCH_TYPE_DEFAULT,
+            )
+        );
+
+        $encryptedBranchTypeConfiguration = $encryptor->encryptForBranchTypeConfiguration(
+            '{{ my_variable-7 }}',
+            'my-component',
+            'my-project',
+            'my-configuration',
+            ObjectEncryptor::BRANCH_TYPE_DEFAULT,
+        );
+        self::assertEquals('{{ my_variable-7 }}', $encryptedBranchTypeConfiguration);
+        self::assertEquals(
+            '{{ my_variable }}',
+            $encryptor->decryptForBranchTypeConfiguration(
+                $encryptedGeneric,
+                'my-component',
+                'my-project',
+                'my-configuration',
+                ObjectEncryptor::BRANCH_TYPE_DEFAULT,
+            )
+        );
+        self::assertEquals(
+            '{{ my_variable-2 }}',
+            $encryptor->decryptForBranchTypeConfiguration(
+                $encryptedComponent,
+                'my-component',
+                'my-project',
+                'my-configuration',
+                ObjectEncryptor::BRANCH_TYPE_DEFAULT,
+            )
+        );
+        self::assertEquals(
+            '{{ my_variable-3 }}',
+            $encryptor->decryptForBranchTypeConfiguration(
+                $encryptedProject,
+                'my-component',
+                'my-project',
+                'my-configuration',
+                ObjectEncryptor::BRANCH_TYPE_DEFAULT,
+            )
+        );
+        self::assertEquals(
+            '{{ my_variable-4 }}',
+            $encryptor->decryptForBranchTypeConfiguration(
+                $encryptedConfiguration,
+                'my-component',
+                'my-project',
+                'my-configuration',
+                ObjectEncryptor::BRANCH_TYPE_DEFAULT,
+            )
+        );
+        self::assertEquals(
+            '{{ my_variable-5 }}',
+            $encryptor->decryptForBranchTypeConfiguration(
+                $encryptedBranchType,
+                'my-component',
+                'my-project',
+                'my-configuration',
+                ObjectEncryptor::BRANCH_TYPE_DEFAULT,
+            )
+        );
+        self::assertEquals(
+            '{{ my_variable-2 }}',
+            $encryptor->decryptForBranchTypeConfiguration(
+                $encryptedProjectWide,
+                'my-component',
+                'my-project',
+                'my-configuration',
+                ObjectEncryptor::BRANCH_TYPE_DEFAULT,
+            )
+        );
+        self::assertEquals(
+            '{{ my_variable-6 }}',
+            $encryptor->decryptForBranchTypeConfiguration(
+                $encryptedProjectWideBranchType,
+                'my-component',
+                'my-project',
+                'my-configuration',
+                ObjectEncryptor::BRANCH_TYPE_DEFAULT,
+            )
+        );
+        self::assertEquals(
+            '{{ my_variable-7 }}',
             $encryptor->decryptForBranchTypeConfiguration(
                 $encryptedBranchTypeConfiguration,
                 'my-component',
