@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\ObjectEncryptor;
 
+use Aws\Kms\KmsClient;
 use Keboola\ObjectEncryptor\Exception\ApplicationException;
 use Keboola\ObjectEncryptor\Exception\UserException;
 use Keboola\ObjectEncryptor\Wrapper\BranchTypeConfigurationAKVWrapper;
@@ -19,6 +20,7 @@ use Keboola\ObjectEncryptor\Wrapper\ConfigurationKMSWrapper;
 use Keboola\ObjectEncryptor\Wrapper\CryptoWrapperInterface;
 use Keboola\ObjectEncryptor\Wrapper\GenericAKVWrapper;
 use Keboola\ObjectEncryptor\Wrapper\GenericKMSWrapper;
+use Keboola\ObjectEncryptor\Wrapper\KmsClientFactory;
 use Keboola\ObjectEncryptor\Wrapper\ProjectAKVWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ProjectKMSWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ProjectWideAKVWrapper;
@@ -32,6 +34,7 @@ class ObjectEncryptor
     public const BRANCH_TYPE_DEV = 'dev';
 
     private EncryptorOptions $encryptorOptions;
+    private ?KmsClient $kmsClient = null;
 
     public function __construct(EncryptorOptions $encryptorOptions)
     {
@@ -504,39 +507,43 @@ class ObjectEncryptor
         ?string $configurationId,
         ?string $branchType,
     ): array {
+        if ($this->kmsClient === null) {
+            $this->kmsClient = (new KmsClientFactory())->createClient($this->encryptorOptions);
+        }
+
         $wrappers = [];
-        $wrapper = new GenericKMSWrapper($this->encryptorOptions);
+        $wrapper = new GenericKMSWrapper($this->kmsClient, $this->encryptorOptions);
         $wrappers[] = $wrapper;
 
         if ($this->encryptorOptions->getStackId()) {
             if ($projectId) {
-                $wrapper = new ProjectWideKMSWrapper($this->encryptorOptions);
+                $wrapper = new ProjectWideKMSWrapper($this->kmsClient, $this->encryptorOptions);
                 $wrapper->setProjectId($projectId);
                 $wrappers[] = $wrapper;
                 if ($branchType) {
-                    $wrapper = new BranchTypeProjectWideKMSWrapper($this->encryptorOptions);
+                    $wrapper = new BranchTypeProjectWideKMSWrapper($this->kmsClient, $this->encryptorOptions);
                     $wrapper->setProjectId($projectId);
                     $wrapper->setBranchType($branchType);
                     $wrappers[] = $wrapper;
                 }
             }
             if ($componentId) {
-                $wrapper = new ComponentKMSWrapper($this->encryptorOptions);
+                $wrapper = new ComponentKMSWrapper($this->kmsClient, $this->encryptorOptions);
                 $wrapper->setComponentId($componentId);
                 $wrappers[] = $wrapper;
                 if ($projectId) {
-                    $wrapper = new ProjectKMSWrapper($this->encryptorOptions);
+                    $wrapper = new ProjectKMSWrapper($this->kmsClient, $this->encryptorOptions);
                     $wrapper->setComponentId($componentId);
                     $wrapper->setProjectId($projectId);
                     $wrappers[] = $wrapper;
                     if ($configurationId) {
-                        $wrapper = new ConfigurationKMSWrapper($this->encryptorOptions);
+                        $wrapper = new ConfigurationKMSWrapper($this->kmsClient, $this->encryptorOptions);
                         $wrapper->setComponentId($componentId);
                         $wrapper->setProjectId($projectId);
                         $wrapper->setConfigurationId($configurationId);
                         $wrappers[] = $wrapper;
                         if ($branchType) {
-                            $wrapper = new BranchTypeConfigurationKMSWrapper($this->encryptorOptions);
+                            $wrapper = new BranchTypeConfigurationKMSWrapper($this->kmsClient, $this->encryptorOptions);
                             $wrapper->setComponentId($componentId);
                             $wrapper->setProjectId($projectId);
                             $wrapper->setConfigurationId($configurationId);
@@ -545,7 +552,7 @@ class ObjectEncryptor
                         }
                     }
                     if ($branchType) {
-                        $wrapper = new BranchTypeProjectKMSWrapper($this->encryptorOptions);
+                        $wrapper = new BranchTypeProjectKMSWrapper($this->kmsClient, $this->encryptorOptions);
                         $wrapper->setComponentId($componentId);
                         $wrapper->setProjectId($projectId);
                         $wrapper->setBranchType($branchType);

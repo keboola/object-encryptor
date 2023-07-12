@@ -9,6 +9,7 @@ use Keboola\ObjectEncryptor\Exception\ApplicationException;
 use Keboola\ObjectEncryptor\Exception\UserException;
 use Keboola\ObjectEncryptor\Wrapper\ComponentAKVWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ComponentKMSWrapper;
+use Keboola\ObjectEncryptor\Wrapper\KmsClientFactory;
 
 class ComponentWrapperTest extends AbstractTestCase
 {
@@ -27,12 +28,16 @@ class ComponentWrapperTest extends AbstractTestCase
      */
     public function wrapperProvider(): array
     {
-        $componentWrapperKMS = new ComponentKMSWrapper(new EncryptorOptions(
+        $kmsOptions = new EncryptorOptions(
             stackId: 'some-stack',
             kmsKeyId: self::getkmsKeyId(),
             kmsRegion: self::getkmsRegion(),
             backoffMaxTries: 1,
-        ));
+        );
+        $componentWrapperKMS = new ComponentKMSWrapper(
+            (new KmsClientFactory())->createClient($kmsOptions),
+            $kmsOptions,
+        );
 
         $componentWrapperAKV = new ComponentAKVWrapper(new EncryptorOptions(
             stackId: 'some-stack',
@@ -65,12 +70,17 @@ class ComponentWrapperTest extends AbstractTestCase
 
     public function testEncryptDifferentStackKMS(): void
     {
-        $wrapper = new ComponentKMSWrapper(new EncryptorOptions(
+        $options = new EncryptorOptions(
             stackId: 'some-stack',
             kmsKeyId: self::getKmsKeyId(),
             kmsRegion: self::getKmsRegion(),
             backoffMaxTries: 1,
-        ));
+        );
+
+        $wrapper = new ComponentKMSWrapper(
+            (new KmsClientFactory())->createClient($options),
+            $options,
+        );
         $wrapper->setComponentId('dummy-component');
         $secret = 'mySecretValue';
 
@@ -78,12 +88,16 @@ class ComponentWrapperTest extends AbstractTestCase
         self::assertNotEquals($secret, $encrypted);
         self::assertEquals($secret, $wrapper->decrypt($encrypted));
 
-        $wrapper = new ComponentKMSWrapper(new EncryptorOptions(
+        $options = new EncryptorOptions(
             stackId: 'some-other-stack',
             kmsKeyId: self::getKmsKeyId(),
             kmsRegion: self::getKmsRegion(),
             backoffMaxTries: 1,
-        ));
+        );
+        $wrapper = new ComponentKMSWrapper(
+            (new KmsClientFactory())->createClient($options),
+            $options,
+        );
         $wrapper->setComponentId('dummy-component');
         self::expectException(UserException::class);
         self::expectExceptionMessage('Deciphering failed.');
@@ -135,13 +149,18 @@ class ComponentWrapperTest extends AbstractTestCase
 
     public function testInvalidSetupKMS(): void
     {
-        self::expectException(ApplicationException::class);
-        self::expectExceptionMessage('Cipher key settings are missing.');
-        new ComponentKMSWrapper(new EncryptorOptions(
+        $options = new EncryptorOptions(
             stackId: 'some-stack',
             kmsKeyId: 'some-key',
             kmsRegion: null,
-        ));
+        );
+
+        self::expectException(ApplicationException::class);
+        self::expectExceptionMessage('Cipher key settings are missing.');
+        new ComponentKMSWrapper(
+            (new KmsClientFactory())->createClient($options),
+            $options,
+        );
     }
 
     public function testInvalidSetupAKV(): void

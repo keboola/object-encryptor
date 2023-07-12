@@ -7,6 +7,7 @@ namespace Keboola\ObjectEncryptor\Tests;
 use Keboola\ObjectEncryptor\EncryptorOptions;
 use Keboola\ObjectEncryptor\Exception\ApplicationException;
 use Keboola\ObjectEncryptor\Exception\UserException;
+use Keboola\ObjectEncryptor\Wrapper\KmsClientFactory;
 use Keboola\ObjectEncryptor\Wrapper\ProjectAKVWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ProjectKMSWrapper;
 
@@ -27,12 +28,17 @@ class ProjectWrapperTest extends AbstractTestCase
      */
     public function wrapperProvider(): array
     {
-        $projectWrapperKMS = new ProjectKMSWrapper(new EncryptorOptions(
+        $options = new EncryptorOptions(
             stackId: 'some-stack',
             kmsKeyId: self::getKmsKeyId(),
             kmsRegion: self::getKmsRegion(),
             backoffMaxTries: 1,
-        ));
+        );
+
+        $projectWrapperKMS = new ProjectKMSWrapper(
+            (new KmsClientFactory())->createClient($options),
+            $options,
+        );
 
         $projectWrapperAKV = new ProjectAKVWrapper(new EncryptorOptions(
             stackId: 'some-stack',
@@ -105,12 +111,17 @@ class ProjectWrapperTest extends AbstractTestCase
 
     public function testInvalidSetupKMS(): void
     {
-        self::expectException(ApplicationException::class);
-        self::expectExceptionMessage('Cipher key settings are missing.');
-        new ProjectKMSWrapper(new EncryptorOptions(
+        $options = new EncryptorOptions(
             stackId: 'some-stack',
             akvUrl: 'some-url',
-        ));
+        );
+
+        self::expectException(ApplicationException::class);
+        self::expectExceptionMessage('Cipher key settings are missing.');
+        new ProjectKMSWrapper(
+            (new KmsClientFactory())->createClient($options),
+            $options,
+        );
     }
 
     public function testInvalidSetupAKV(): void

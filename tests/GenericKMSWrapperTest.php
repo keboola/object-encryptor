@@ -12,10 +12,12 @@ use Keboola\ObjectEncryptor\EncryptorOptions;
 use Keboola\ObjectEncryptor\Exception\ApplicationException;
 use Keboola\ObjectEncryptor\Exception\UserException;
 use Keboola\ObjectEncryptor\Wrapper\GenericKMSWrapper;
+use Keboola\ObjectEncryptor\Wrapper\KmsClientFactory;
 
 class GenericKMSWrapperTest extends AbstractTestCase
 {
     use DataProviderTrait;
+    use TestEnvVarsTrait;
 
     public function setUp(): void
     {
@@ -24,14 +26,23 @@ class GenericKMSWrapperTest extends AbstractTestCase
         putenv('AWS_SECRET_ACCESS_KEY='. getenv('TEST_AWS_SECRET_ACCESS_KEY'));
     }
 
-    private function getWrapper(): GenericKMSWrapper
+    /**
+     * @param non-empty-string|null $role
+     */
+    private function getWrapper(?string $role = null): GenericKMSWrapper
     {
-        return new GenericKMSWrapper(new EncryptorOptions(
+        $options = new EncryptorOptions(
             stackId: 'some-stack',
             kmsKeyId: self::getKmsKeyId(),
             kmsRegion: self::getKmsRegion(),
+            kmsRole: $role,
             backoffMaxTries: 1,
-        ));
+        );
+
+        return new GenericKMSWrapper(
+            (new KmsClientFactory())->createClient($options),
+            $options,
+        );
     }
 
     public function testEncrypt(): void
@@ -54,12 +65,17 @@ class GenericKMSWrapperTest extends AbstractTestCase
         self::assertNotEquals($secret, $encrypted);
         self::assertEquals($secret, $wrapper->decrypt($encrypted));
 
-        $wrapper = new GenericKMSWrapper(new EncryptorOptions(
+        $options = new EncryptorOptions(
             stackId: 'some-stack',
             // This is ok, because KMS key is found automatically during decryption
             kmsKeyId: 'non-existent',
             kmsRegion: self::getKmsRegion(),
-        ));
+        );
+
+        $wrapper = new GenericKMSWrapper(
+            (new KmsClientFactory())->createClient($options),
+            $options,
+        );
         self::assertEquals($secret, $wrapper->decrypt($encrypted));
     }
 
@@ -95,21 +111,19 @@ class GenericKMSWrapperTest extends AbstractTestCase
                 }
             });
 
-        $mockWrapper = $this->getMockBuilder(GenericKMSWrapper::class)
-            ->setConstructorArgs([new EncryptorOptions(
-                stackId: 'some-stack',
-                kmsKeyId: self::getKmsKeyId(),
-                kmsRegion: self::getKmsRegion(),
-                backoffMaxTries: 3,
-            )])
-            ->onlyMethods(['getClient'])
-            ->getMock();
-        $mockWrapper->method('getClient')->willReturn($mockKmsClient);
+        $options = new EncryptorOptions(
+            stackId: 'some-stack',
+            kmsKeyId: self::getKmsKeyId(),
+            kmsRegion: self::getKmsRegion(),
+            backoffMaxTries: 3,
+        );
+
+        $mockWrapper = new GenericKMSWrapper(
+            $mockKmsClient,
+            $options,
+        );
 
         $secret = 'secret';
-        /** @var GenericKMSWrapper $mockWrapper */
-        $mockWrapper->setKMSKeyId(self::getKmsKeyId());
-        $mockWrapper->setKMSRegion(self::getKmsRegion());
         $encrypted = $mockWrapper->encrypt($secret);
         self::assertNotEquals($secret, $encrypted);
         self::assertEquals($secret, $mockWrapper->decrypt($encrypted));
@@ -129,21 +143,17 @@ class GenericKMSWrapperTest extends AbstractTestCase
                 new ConnectException('mock failed to connect', new Request('GET', 'some-uri'))
             );
 
-        $mockWrapper = $this->getMockBuilder(GenericKMSWrapper::class)
-            ->setConstructorArgs([new EncryptorOptions(
+        $mockWrapper = new GenericKMSWrapper(
+            $mockKmsClient,
+            new EncryptorOptions(
                 stackId: 'some-stack',
                 kmsKeyId: self::getKmsKeyId(),
                 kmsRegion: self::getKmsRegion(),
                 backoffMaxTries: 3,
-            )])
-            ->onlyMethods(['getClient'])
-            ->getMock();
-        $mockWrapper->method('getClient')->willReturn($mockKmsClient);
+            ),
+        );
 
         $secret = 'secret';
-        /** @var GenericKMSWrapper $mockWrapper */
-        $mockWrapper->setKMSKeyId(self::getKmsKeyId());
-        $mockWrapper->setKMSRegion(self::getKmsRegion());
         $this->expectException(ApplicationException::class);
         $this->expectExceptionMessage('Ciphering failed: Failed to obtain encryption key.');
         $mockWrapper->encrypt($secret);
@@ -169,22 +179,19 @@ class GenericKMSWrapperTest extends AbstractTestCase
                 }
             });
 
-        $mockWrapper = $this->getMockBuilder(GenericKMSWrapper::class)
-            ->setConstructorArgs([new EncryptorOptions(
+        $mockWrapper = new GenericKMSWrapper(
+            $mockKmsClient,
+            new EncryptorOptions(
                 stackId: 'some-stack',
                 kmsKeyId: self::getKmsKeyId(),
                 kmsRegion: self::getKmsRegion(),
                 backoffMaxTries: 3,
-            )])
-            ->onlyMethods(['getClient'])
-            ->getMock();
-        $mockWrapper->method('getClient')->willReturn($mockKmsClient);
-
+            ),
+        );
         $secret = 'secret';
         $wrapper = $this->getWrapper();
         $encrypted = $wrapper->encrypt($secret);
         self::assertNotEquals($secret, $encrypted);
-        /** @var GenericKMSWrapper $mockWrapper */
         self::assertEquals($secret, $mockWrapper->decrypt($encrypted));
     }
 
@@ -202,22 +209,21 @@ class GenericKMSWrapperTest extends AbstractTestCase
                 new ConnectException('mock failed to connect', new Request('GET', 'some-uri'))
             );
 
-        $mockWrapper = $this->getMockBuilder(GenericKMSWrapper::class)
-            ->setConstructorArgs([new EncryptorOptions(
+        $mockWrapper = new GenericKMSWrapper(
+            $mockKmsClient,
+            new EncryptorOptions(
                 stackId: 'some-stack',
                 kmsKeyId: self::getKmsKeyId(),
                 kmsRegion: self::getKmsRegion(),
                 backoffMaxTries: 3,
-            )])
-            ->onlyMethods(['getClient'])
-            ->getMock();
-        $mockWrapper->method('getClient')->willReturn($mockKmsClient);
+            ),
+        );
 
         $secret = 'secret';
         $wrapper = $this->getWrapper();
         $encrypted = $wrapper->encrypt($secret);
         self::assertNotEquals($secret, $encrypted);
-        /** @var GenericKMSWrapper $mockWrapper */
+
         $this->expectException(ApplicationException::class);
         $this->expectExceptionMessage('Deciphering failed.');
         $mockWrapper->decrypt($encrypted);
@@ -241,9 +247,8 @@ class GenericKMSWrapperTest extends AbstractTestCase
     public function testEncryptRole(): void
     {
         $secret = 'mySecretValue';
-        $wrapper = $this->getWrapper();
+        $wrapper = $this->getWrapper(self::getRequiredEnv('TEST_AWS_ROLE_ID'));
         $wrapper->setMetadataValue('key', 'value');
-        $wrapper->setKMSRole((string) getenv('TEST_AWS_ROLE_ID'));
         $encrypted = $wrapper->encrypt($secret);
         self::assertNotEquals($secret, $encrypted);
         self::assertEquals($secret, $wrapper->decrypt($encrypted));
@@ -331,12 +336,17 @@ class GenericKMSWrapperTest extends AbstractTestCase
 
     public function testInvalidSetupDecryptMissingAll(): void
     {
-        $this->expectException(ApplicationException::class);
-        $this->expectExceptionMessage('Cipher key settings are missing.');
-        new GenericKMSWrapper(new EncryptorOptions(
+        $options = new EncryptorOptions(
             stackId: 'some-stack',
             akvUrl: 'some-url',
-        ));
+        );
+
+        $this->expectException(ApplicationException::class);
+        $this->expectExceptionMessage('Cipher key settings are missing.');
+        new GenericKMSWrapper(
+            (new KmsClientFactory())->createClient($options),
+            $options,
+        );
     }
 
     public function testInvalidCredentials(): void
@@ -352,26 +362,36 @@ class GenericKMSWrapperTest extends AbstractTestCase
 
     public function testInvalidRole(): void
     {
-        $wrapper = new GenericKMSWrapper(new EncryptorOptions(
+        $options = new EncryptorOptions(
             stackId: 'some-stack',
             kmsKeyId: self::getKmsKeyId(),
             kmsRegion: self::getKmsRegion(),
             kmsRole: 'invalidEncryptionRoleName',
             backoffMaxTries: 1,
-        ));
+        );
+
+        $wrapper = new GenericKMSWrapper(
+            (new KmsClientFactory())->createClient($options),
+            $options,
+        );
         $this->expectException(ApplicationException::class);
-        $this->expectExceptionMessage('Ciphering failed: Error executing "AssumeRole" ');
+        $this->expectExceptionMessage('Ciphering failed: Failed to obtain encryption key.');
         $wrapper->encrypt('mySecretValue');
     }
 
     public function testInvalidNonExistentRegion(): void
     {
-        $wrapper = new GenericKMSWrapper(new EncryptorOptions(
+        $options = new EncryptorOptions(
             stackId: 'some-stack',
             kmsKeyId: self::getKmsKeyId(),
             kmsRegion: 'non-existent',
             backoffMaxTries: 1
-        ));
+        );
+
+        $wrapper = new GenericKMSWrapper(
+            (new KmsClientFactory())->createClient($options),
+            $options,
+        );
         $this->expectException(ApplicationException::class);
         $this->expectExceptionMessage('Ciphering failed: Failed to obtain encryption key.');
         $wrapper->encrypt('mySecretValue');
