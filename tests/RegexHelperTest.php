@@ -37,12 +37,40 @@ class RegexHelperTest extends TestCase
             'variableValue' => '{{ en-dash }}',
         ];
 
+        yield 'with prefix' => [
+            'variableValue' => '{{ vault.en-dash }}',
+        ];
+
         yield 'no whitespaces' => [
             'variableValue' => '{{nowhitespace}}',
         ];
 
+        yield 'multiple spaces' => [
+            'variableValue' => '{{    whitespace   }}',
+        ];
+
+        yield 'tabs as spaces' => [
+            'variableValue' => "{{\twhitespace\t}}",
+        ];
+
         yield 'everything' => [
             'variableValue' => '{{ Ev3_RY-th1n8 }}',
+        ];
+
+        yield 'just numbers' => [
+            'variableValue' => '{{ 123 }}',
+        ];
+
+        yield 'starts with underscore' => [
+            'variableValue' => '{{ _underscore }}',
+        ];
+
+        yield 'just underscore' => [
+            'variableValue' => '{{ _ }}',
+        ];
+
+        yield 'just dash' => [
+            'variableValue' => '{{ - }}',
         ];
     }
 
@@ -94,24 +122,8 @@ class RegexHelperTest extends TestCase
             'variableValue' => '{{ value }} something',
         ];
 
-        yield 'just numbers' => [
-            'variableValue' => '{{ 123 }}',
-        ];
-
         yield 'whitespace in the middle' => [
             'variableValue' => '{{ white space }}',
-        ];
-
-        yield 'starts with underscore' => [
-            'variableValue' => '{{ _underscore }}',
-        ];
-
-        yield 'just underscore' => [
-            'variableValue' => '{{ _ }}',
-        ];
-
-        yield 'just dash' => [
-            'variableValue' => '{{ - }}',
         ];
 
         yield 'just empty' => [
