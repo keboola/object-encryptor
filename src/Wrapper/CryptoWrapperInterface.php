@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Keboola\ObjectEncryptor\Wrapper;
 
-use Keboola\ObjectEncryptor\EncryptorOptions;
-
 interface CryptoWrapperInterface
 {
     /**
@@ -17,6 +15,4 @@ interface CryptoWrapperInterface
     public function encrypt(string $data): string;
 
     public function decrypt(string $encryptedData): string;
-
-    public function __construct(EncryptorOptions $encryptorOptions);
 }

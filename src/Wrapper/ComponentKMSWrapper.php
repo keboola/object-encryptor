@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\ObjectEncryptor\Wrapper;
 
+use Aws\Kms\KmsClient;
 use Keboola\ObjectEncryptor\EncryptorOptions;
 use Keboola\ObjectEncryptor\Exception\ApplicationException;
 
@@ -20,9 +21,9 @@ class ComponentKMSWrapper extends GenericKMSWrapper
         $this->setMetadataValue(self::KEY_COMPONENT, $componentId);
     }
 
-    public function __construct(EncryptorOptions $encryptorOptions)
+    public function __construct(KmsClient $kmsClient, EncryptorOptions $encryptorOptions)
     {
-        parent::__construct($encryptorOptions);
+        parent::__construct($kmsClient, $encryptorOptions);
         $this->setMetadataValue(self::KEY_STACK, $encryptorOptions->getStackId());
     }
 
