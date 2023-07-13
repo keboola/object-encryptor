@@ -10,7 +10,12 @@ class RegexHelper
 {
     public static function matchesVariable(string $value): bool
     {
-        $regex = '/^{{\s?[a-zA-Z][a-zA-Z0-9_\-]*\s?}}$/';
+        // based on https://github.com/keboola/platform-libraries/blob/main/libs/configuration-variables-resolver/src/VariablesRenderer/RegexRenderer.php#L32
+        // (?<!{) - do not match more than two opening braces
+        // {{\s* - match opening braces and optional whitespaces
+        // [a-zA-Z0-9_\-.]+ - match variable name (including prefix if supplied)
+        // \s*}} - match optional whitespaces and closing braces
+        $regex = '/^(?<!{){{\s*[a-zA-Z0-9_\-.]+\s*}}$/';
         $result = preg_match($regex, $value);
 
         if ($result === false) {
