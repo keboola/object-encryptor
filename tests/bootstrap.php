@@ -13,6 +13,7 @@ if (file_exists(dirname(__DIR__).'/.env.local')) {
 $requiredEnvs = [
     'TEST_TENANT_ID', 'TEST_CLIENT_ID', 'TEST_CLIENT_SECRET', 'TEST_KEY_VAULT_URL', 'TEST_AWS_REGION',
     'TEST_AWS_ACCESS_KEY_ID', 'TEST_AWS_SECRET_ACCESS_KEY', 'TEST_AWS_KMS_KEY_ID',
+    //'TEST_GOOGLE_CLOUD_PROJECT', 'TEST_GOOGLE_APPLICATION_CREDENTIALS', 'TEST_GCP_KMS_KEY_ID',
 ];
 
 foreach ($requiredEnvs as $env) {

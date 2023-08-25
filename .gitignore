@@ -8,3 +8,4 @@
 /build/logs/
 /.phpunit.result.cache
 /infection.log
+/gcp-private-key.json

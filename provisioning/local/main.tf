@@ -15,9 +15,9 @@ terraform {
       version = "~> 2.18"
     }
 
-    kubernetes = {
-      source  = "hashicorp/kubernetes"
-      version = "~> 2.9"
+    google = {
+      source  = "hashicorp/google"
+      version = "~> 4.74.0"
     }
   }
 
@@ -30,5 +30,9 @@ terraform {
 }
 
 variable "name_prefix" {
+  type = string
+}
+
+variable "gcp_project" {
   type = string
 }
