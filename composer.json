@@ -21,10 +21,11 @@
     },
     "require": {
         "php": ">=8.1",
-        "ext-zlib": "*",
         "ext-json": "*",
+        "ext-zlib": "*",
         "aws/aws-sdk-php": "^3.209",
         "defuse/php-encryption": "^2.3",
+        "google/cloud-kms": "^1.20",
         "keboola/azure-key-vault-client": "^3.0",
         "keboola/common-exceptions": "^1.2",
         "vkartaviy/retry": "^0.2"
