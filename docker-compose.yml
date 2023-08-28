@@ -15,7 +15,7 @@ services:
       - TEST_AWS_SECRET_ACCESS_KEY
       - TEST_AWS_KMS_KEY_ID
       - TEST_AWS_ROLE_ID
-      - TEST_GOOGLE_APPLICATION_CREDENTIAL
+      - TEST_GOOGLE_APPLICATION_CREDENTIALS
       - TEST_GCP_KMS_KEY_ID
     command: ["composer", "ci"]
 
