@@ -1,6 +1,6 @@
 .idea
 .env*
-gcp-private-key.json
+var
 README.md
 composer.lock
 vendor

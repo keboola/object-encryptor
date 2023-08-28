@@ -71,10 +71,11 @@ Prerequisites:
 ```bash
 export NAME_PREFIX= # your name/nickname to make your resource unique & recognizable
 export AWS_PROFILE= # your AWS profile name e.g. Keboola-Dev-Platform-Services-AWSAdministratorAccess
+export GCP_PROJECT= # your GCP project name e.g. keboola-dev-platform-services
 
 cat <<EOF > ./provisioning/local/terraform.tfvars
 name_prefix = "${NAME_PREFIX}"
-gcp_project = "kbc-dev-platform-services"
+gcp_project = "${GCP_PROJECT}"
 EOF
 
 terraform -chdir=./provisioning/local init -backend-config="key=object-encryptor/${NAME_PREFIX}.tfstate"
