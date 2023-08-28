@@ -15,9 +15,9 @@ terraform {
       version = "~> 2.18"
     }
 
-    kubernetes = {
-      source  = "hashicorp/kubernetes"
-      version = "~> 2.9"
+    google = {
+      source  = "hashicorp/google"
+      version = "~> 4.74.0"
     }
   }
 
