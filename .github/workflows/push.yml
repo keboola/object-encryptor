@@ -10,16 +10,24 @@ env:
   TEST_AWS_SECRET_ACCESS_KEY: ${{ secrets.TEST_AWS_SECRET_ACCESS_KEY }}
   TEST_AWS_KMS_KEY_ID: c474f77b-65db-4778-975b-6f167e27d385
   TEST_AWS_ROLE_ID: arn:aws:iam::480319613404:role/ci-object-encryptor-role
+  TEST_GCP_KMS_KEY_ID: projects/kbc-ci-platform-services/locations/global/keyRings/ci-object-encryptor/cryptoKeys/ci-object-encryptor
 jobs:
   Build:
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
         uses: actions/checkout@v3
+      - name: Google Login
+        uses: 'google-github-actions/auth@v1'
+        with:
+          credentials_json: ${{ secrets.TEST_GCP_SERVICE_ACCOUNT_KEY }}
+          create_credentials_file: true
+
       - name: Build image
-        run: |
+        run: |          
           docker login --username "$DOCKERHUB_USER" --password "$DOCKERHUB_TOKEN"
           docker-compose build
       - name: Run tests
         run: |
+          export TEST_GOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_APPLICATION_CREDENTIALS
           docker-compose run ci
