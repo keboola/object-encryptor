@@ -1,5 +1,7 @@
 name: GitHub Actions
 on: [ push ]
+concurrency: ci-${{ github.ref }}
+
 env:
   TEST_TENANT_ID: 9b85ee6f-4fb0-4a46-8cb7-4dcc6b262a89
   TEST_CLIENT_ID: 3a4162fa-43d4-4de7-a8c1-be3bc7765a8c
@@ -25,7 +27,7 @@ jobs:
           create_credentials_file: true
 
       - name: Build image
-        run: |          
+        run: |
           docker login --username "$DOCKERHUB_USER" --password "$DOCKERHUB_TOKEN"
           docker-compose build
       - name: Run tests
