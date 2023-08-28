@@ -21,6 +21,7 @@ jobs:
         uses: 'google-github-actions/auth@v1'
         with:
           credentials_json: ${{ secrets.TEST_GCP_SERVICE_ACCOUNT_KEY }}
+          export_environment_variables: true
           create_credentials_file: true
 
       - name: Build image
@@ -29,5 +30,9 @@ jobs:
           docker-compose build
       - name: Run tests
         run: |
+          # GCP login generates `GOOGLE_APPLICATION_CREDENTIALS` environment variable, but for tests we need 
+          # `TEST_GOOGLE_APPLICATION_CREDENTIALS` which is assigned to the `GOOGLE_APPLICATION_CREDENTIALS` when needed.  
+          # https://github.com/google-github-actions/auth#other-inputs
           export TEST_GOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_APPLICATION_CREDENTIALS
+          
           docker-compose run ci
