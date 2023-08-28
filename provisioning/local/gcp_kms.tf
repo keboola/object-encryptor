@@ -11,11 +11,6 @@ resource "google_kms_crypto_key" "object_encryptor_key" {
   lifecycle {
     prevent_destroy = false
   }
-
-  labels = {
-    "stack" = "${var.name_prefix}-object-encryptor"
-    "role"  = "object-encryptor"
-  }
 }
 
 output "gcp_kms_key_id" {

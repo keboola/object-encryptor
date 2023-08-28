@@ -4,7 +4,7 @@ resource "google_service_account" "object_encryptor_service_account" {
 }
 
 resource "google_project_iam_binding" "object_encryptor_iam" {
-  project = var.gcp_project
+  project = local.gcp_project
   role    = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
 
   members = [

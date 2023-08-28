@@ -1,7 +1,7 @@
-provider "google" {
-  project = var.gcp_project
+locals {
+  gcp_project = "keboola-dev-platform-services"
 }
 
-output "gcp_project_id" {
-  value = var.gcp_project
+provider "google" {
+  project = local.gcp_project
 }
