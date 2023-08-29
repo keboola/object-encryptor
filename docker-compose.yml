@@ -5,18 +5,18 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    environment:
-      - TEST_TENANT_ID
-      - TEST_CLIENT_ID
-      - TEST_CLIENT_SECRET
-      - TEST_KEY_VAULT_URL
-      - TEST_AWS_REGION
-      - TEST_AWS_ACCESS_KEY_ID
-      - TEST_AWS_SECRET_ACCESS_KEY
-      - TEST_AWS_KMS_KEY_ID
-      - TEST_AWS_ROLE_ID
-      - TEST_GOOGLE_APPLICATION_CREDENTIALS
-      - TEST_GCP_KMS_KEY_ID
+    environment: &env
+      TEST_TENANT_ID:
+      TEST_CLIENT_ID:
+      TEST_CLIENT_SECRET:
+      TEST_KEY_VAULT_URL:
+      TEST_AWS_REGION:
+      TEST_AWS_ACCESS_KEY_ID:
+      TEST_AWS_SECRET_ACCESS_KEY:
+      TEST_AWS_KMS_KEY_ID:
+      TEST_AWS_ROLE_ID:
+      TEST_GOOGLE_APPLICATION_CREDENTIALS:
+      TEST_GCP_KMS_KEY_ID:
     command: ["composer", "ci"]
 
   dev:
@@ -30,5 +30,9 @@ services:
       context: .
       dockerfile: Dockerfile
     command: ["composer", "ci"]
+    environment:
+      <<: *env
+      TEST_GOOGLE_APPLICATION_CREDENTIALS: /code/var/gcp-private-key.json
     volumes:
       - ./build/logs/:/code/build/logs/
+      - $GOOGLE_APPLICATION_CREDENTIALS:/code/var/gcp-private-key.json

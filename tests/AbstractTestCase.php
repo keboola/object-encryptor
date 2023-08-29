@@ -47,4 +47,14 @@ class AbstractTestCase extends TestCase
         // @phpstan-ignore-next-line
         return $kmsRoleId;
     }
+
+    /**
+     * @return non-empty-string
+     */
+    protected static function getGkmsKeyId(): string
+    {
+        $gkmsKeyId = (string) getenv('TEST_GCP_KMS_KEY_ID');
+        self::assertNotEmpty($gkmsKeyId);
+        return $gkmsKeyId;
+    }
 }

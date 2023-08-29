@@ -22,6 +22,7 @@ class ObjectEncryptorTest extends AbstractTestCase
         putenv('AZURE_TENANT_ID=' . getenv('TEST_TENANT_ID'));
         putenv('AZURE_CLIENT_ID=' . getenv('TEST_CLIENT_ID'));
         putenv('AZURE_CLIENT_SECRET=' . getenv('TEST_CLIENT_SECRET'));
+        putenv('GOOGLE_APPLICATION_CREDENTIALS=' . getenv('TEST_GOOGLE_APPLICATION_CREDENTIALS'));
     }
 
     private function getEncryptor(): ObjectEncryptor
@@ -61,6 +62,18 @@ class ObjectEncryptorTest extends AbstractTestCase
         self::expectExceptionMessage('Encryption failed: Ciphering failed: Failed to obtain encryption key.');
         $encryptor->encryptForComponent('secret', 'some-component');
         // for azure, this test takes minutes to execute, so it is not included
+    }
+
+    public function testEncryptorStackGcpEncryptor(): void
+    {
+        $encryptor = ObjectEncryptorFactory::getGcpEncryptor(
+            'my-stack',
+            self::getGkmsKeyId()
+        );
+        $encrypted = $encryptor->encryptGeneric('secret');
+        self::assertStringStartsWith('KBC::SecureGKMS::', $encrypted);
+        $decrypted = $encryptor->decryptGeneric($encrypted);
+        self::assertEquals('secret', $decrypted);
     }
 
     public function unsupportedEncryptionInputProvider(): array
