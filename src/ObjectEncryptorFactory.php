@@ -34,6 +34,17 @@ class ObjectEncryptorFactory
         return self::getEncryptor($encryptOptions);
     }
 
+    /**
+     * @param non-empty-string $stackId
+     * @param non-empty-string $gkmsKeyId
+     * @return ObjectEncryptor
+     */
+    public static function getGcpEncryptor(string $stackId, string $gkmsKeyId): ObjectEncryptor
+    {
+        $encryptOptions = new EncryptorOptions(stackId: $stackId, gkmsKeyId: $gkmsKeyId);
+        return self::getEncryptor($encryptOptions);
+    }
+
     public static function getEncryptor(EncryptorOptions $encryptorOptions): ObjectEncryptor
     {
         return new ObjectEncryptor($encryptorOptions);

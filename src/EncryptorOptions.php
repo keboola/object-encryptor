@@ -16,6 +16,9 @@ class EncryptorOptions
     private ?string $kmsKeyRegion;
     /** @var non-empty-string|null */
     private ?string $akvUrl;
+    /** @var non-empty-string|null */
+    private ?string $gkmsKeyId;
+
     /** @var non-empty-string */
     private string $stackId;
     private ?string $kmsRole;
@@ -27,6 +30,7 @@ class EncryptorOptions
      * @param non-empty-string|null $kmsRegion
      * @param non-empty-string|null $kmsRole
      * @param non-empty-string|null $akvUrl
+     * @param non-empty-string|null $gkmsKeyId
      * @param int|null $backoffMaxTries
      */
     public function __construct(
@@ -35,6 +39,7 @@ class EncryptorOptions
         ?string $kmsRegion = null,
         ?string $kmsRole = null,
         ?string $akvUrl = null,
+        ?string $gkmsKeyId = null,
         ?int $backoffMaxTries = null
     ) {
         $this->stackId = $stackId;
@@ -42,6 +47,7 @@ class EncryptorOptions
         $this->kmsKeyRegion = $kmsRegion;
         $this->kmsRole = $kmsRole;
         $this->akvUrl = $akvUrl;
+        $this->gkmsKeyId = $gkmsKeyId;
         $this->backoffMaxTries = $backoffMaxTries ?? self::DEFAULT_BACKOFF_MAX_TRIES;
         $this->validateState();
     }
@@ -76,6 +82,14 @@ class EncryptorOptions
     }
 
     /**
+     * @return non-empty-string|null
+     */
+    public function getGkmsKeyId(): ?string
+    {
+        return $this->gkmsKeyId;
+    }
+
+    /**
      * @return non-empty-string
      */
     public function getStackId(): string
@@ -93,8 +107,8 @@ class EncryptorOptions
      */
     private function validateState(): void
     {
-        if (empty($this->kmsKeyId) && empty($this->kmsKeyRegion) && empty($this->akvUrl)) {
-            throw new ApplicationException('Neither KMS, nor KeyVault configured.');
+        if (empty($this->kmsKeyId) && empty($this->kmsKeyRegion) && empty($this->akvUrl) && empty($this->gkmsKeyId)) {
+            throw new ApplicationException('Neither AWS KMS, nor KeyVault, nor Google KMS is configured.');
         }
     }
 }
