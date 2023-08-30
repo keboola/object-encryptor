@@ -1,5 +1,5 @@
 locals {
-  gcp_project = "keboola-dev-platform-services"
+  gcp_project = "kbc-dev-platform-services"
 }
 
 provider "google" {
