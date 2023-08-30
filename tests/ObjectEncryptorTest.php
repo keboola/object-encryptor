@@ -32,7 +32,8 @@ class ObjectEncryptorTest extends AbstractTestCase
             self::getKmsKeyId(),
             self::getKmsRegion(),
             null,
-            self::getAkvUrl()
+            self::getAkvUrl(),
+            self::getGkmsKeyId(),
         );
         $factory = new ObjectEncryptorFactory();
         return $factory->getEncryptor($options);
@@ -72,20 +73,10 @@ class ObjectEncryptorTest extends AbstractTestCase
             self::getGkmsKeyId()
         );
         self::expectException(ApplicationException::class);
-        self::expectExceptionMessage('Cipher key settings are invalid.');
-        $encryptor->encryptGeneric('secret');
-    }
-
-    public function testEncryptorStackGcpEncryptor(): void
-    {
-        $encryptor = ObjectEncryptorFactory::getGcpEncryptor(
-            'my-stack',
-            self::getGkmsKeyId()
+        self::expectExceptionMessage(
+            'Cipher key settings are invalid: Could not construct ApplicationDefaultCredentials'
         );
-        $encrypted = $encryptor->encryptGeneric('secret');
-        self::assertStringStartsWith('KBC::SecureGKMS::', $encrypted);
-        $decrypted = $encryptor->decryptGeneric($encrypted);
-        self::assertEquals('secret', $decrypted);
+        $encryptor->encryptGeneric('secret');
     }
 
     public function unsupportedEncryptionInputProvider(): array
@@ -218,22 +209,30 @@ class ObjectEncryptorTest extends AbstractTestCase
     {
         $encryptor = $this->getEncryptor();
         $data = [
-            '#GenericKMSWrapper' => 'KBC::Secure::aaaaaaaaaaaaaaaaaaaaaaaaaa',
             '#GenericAKVWrapper' => 'KBC::SecureKV::aaaaaaaaaaaaaaaaaaaaaaaaaa',
-            '#ComponentKMSWrapper' => 'KBC::ComponentSecure::aaaaaaaaaaaaaaaaaaaaaaaaaa',
+            '#GenericGKMSWrapper' => 'KBC::SecureGKMS::aaaaaaaaaaaaaaaaaaaaaaaaaa',
+            '#GenericKMSWrapper' => 'KBC::Secure::aaaaaaaaaaaaaaaaaaaaaaaaaa',
             '#ComponentAKVWrapper' => 'KBC::ComponentSecureKV::aaaaaaaaaaaaaaaaaaaaaaaaaa',
-            '#ProjectKMSWrapper' =>  'KBC::ProjectSecure::aaaaaaaaaaaaaaaaaaaaaaaaaa',
+            '#ComponentGKMSWrapper' => 'KBC::ComponentSecureGKMS::aaaaaaaaaaaaaaaaaaaaaaaaaa',
+            '#ComponentKMSWrapper' => 'KBC::ComponentSecure::aaaaaaaaaaaaaaaaaaaaaaaaaa',
             '#ProjectAKVWrapper' =>  'KBC::ProjectSecureKV::aaaaaaaaaaaaaaaaaaaaaaaaaa',
-            '#ConfigurationKMSWrapper' => 'KBC::ConfigSecure::aaaaaaaaaaaaaaaaaaaaaaaaaa',
+            '#ProjectGKMSWrapper' =>  'KBC::ProjectSecureGKMS::aaaaaaaaaaaaaaaaaaaaaaaaaa',
+            '#ProjectKMSWrapper' =>  'KBC::ProjectSecure::aaaaaaaaaaaaaaaaaaaaaaaaaa',
             '#ConfigurationAKVWrapper' => 'KBC::ConfigSecureKV::aaaaaaaaaaaaaaaaaaaaaaaaaa',
-            '#ProjectWideKMSWrapper' => 'KBC::ConfigSecure::aaaaaaaaaaaaaaaaaaaaaaaaaa',
+            '#ConfigurationGKMSWrapper' => 'KBC::ConfigSecureGKMS::aaaaaaaaaaaaaaaaaaaaaaaaaa',
+            '#ConfigurationKMSWrapper' => 'KBC::ConfigSecure::aaaaaaaaaaaaaaaaaaaaaaaaaa',
             '#ProjectWideAKVWrapper' => 'KBC::ConfigSecureKV::aaaaaaaaaaaaaaaaaaaaaaaaaa',
-            '#BranchTypeProjectKMSWrapper' => 'KBC::BranchTypeSecure::aaaaaaaaaaaaaaaaaaaaaaaaaa',
+            '#ProjectWideGKMSWrapper' => 'KBC::ConfigSecureGKMS::aaaaaaaaaaaaaaaaaaaaaaaaaa',
+            '#ProjectWideKMSWrapper' => 'KBC::ConfigSecure::aaaaaaaaaaaaaaaaaaaaaaaaaa',
             '#BranchTypeProjectAKVWrapper' => 'KBC::BranchTypeSecureKV::aaaaaaaaaaaaaaaaaaaaaaaaaa',
-            '#BranchTypeProjectWideKMSWrapper' => 'KBC::BranchTypeSecure::aaaaaaaaaaaaaaaaaaaaaaaaaa',
+            '#BranchTypeProjectGKMSWrapper' => 'KBC::BranchTypeSecureGKMS::aaaaaaaaaaaaaaaaaaaaaaaaaa',
+            '#BranchTypeProjectKMSWrapper' => 'KBC::BranchTypeSecure::aaaaaaaaaaaaaaaaaaaaaaaaaa',
             '#BranchTypeProjectWideAKVWrapper' => 'KBC::BranchTypeSecureKV::aaaaaaaaaaaaaaaaaaaaaaaaaa',
-            '#BranchTypeConfigurationKMSWrapper' => 'KBC::BranchTypeConfigSecure::aaaaaaaaaaaaaaaaaaaaaaaaaa',
+            '#BranchTypeProjectWideGKMSWrapper' => 'KBC::BranchTypeSecureGKMS::aaaaaaaaaaaaaaaaaaaaaaaaaa',
+            '#BranchTypeProjectWideKMSWrapper' => 'KBC::BranchTypeSecure::aaaaaaaaaaaaaaaaaaaaaaaaaa',
             '#BranchTypeConfigurationAKVWrapper' => 'KBC::BranchTypeConfigSecureKV::aaaaaaaaaaaaaaaaaaaaaaaaaa',
+            '#BranchTypeConfigurationGKMSWrapper' => 'KBC::BranchTypeConfigSecureGKMS::aaaaaaaaaaaaaaaaaaaaaaaaaa',
+            '#BranchTypeConfigurationKMSWrapper' => 'KBC::BranchTypeConfigSecure::aaaaaaaaaaaaaaaaaaaaaaaaaa',
             '#Similar' => 'KBC::ConfigSecureKVaaaaaaaaaaaaaaaaaaaaaaaaaa',
             '#Legacy1' => 'KBC::Encrypted==aaaaaaaaaaaaaaaaaaaaaaaaaa',
             '#Legacy2' => 'KBC::ComponentEncrypted==aaaaaaaaaaaaaaaaaaaaaaaaaa',
@@ -274,7 +273,7 @@ class ObjectEncryptorTest extends AbstractTestCase
         self::assertArrayHasKey('key1', $result);
         self::assertArrayHasKey('#key2', $result);
         self::assertEquals('value1', $result['key1']);
-        self::assertStringStartsWith('KBC::ComponentSecureKV::', $result['#key2']);
+        self::assertStringStartsWith('KBC::ComponentSecure', $result['#key2']);
 
         $decrypted = $encryptor->decryptForComponent($result, 'my-component');
         self::assertIsArray($decrypted);
@@ -823,10 +822,10 @@ class ObjectEncryptorTest extends AbstractTestCase
 
     public function cloudEncryptorProvider(): Generator
     {
-        yield 'azure' => [
+        yield 'akv' => [
             'encryptor' => ObjectEncryptorFactory::getAzureEncryptor(
                 'my-stack',
-                self::getAkvUrl()
+                self::getAkvUrl(),
             ),
             'genericPrefix' => 'KBC::SecureKV::',
             'componentPrefix' => 'KBC::ComponentSecureKV::',
@@ -837,12 +836,26 @@ class ObjectEncryptorTest extends AbstractTestCase
             'projectWideBranchTypePrefix' => 'KBC::ProjectWideBranchTypeSecureKV::',
             'branchTypeConfigurationPrefix' => 'KBC::BranchTypeConfigSecureKV::',
         ];
-        yield 'aws' => [
+        yield 'gkms' => [
+            'encryptor' => ObjectEncryptorFactory::getGcpEncryptor(
+                'my-stack',
+                self::getGkmsKeyId(),
+            ),
+            'genericPrefix' => 'KBC::SecureGKMS::',
+            'componentPrefix' => 'KBC::ComponentSecureGKMS::',
+            'projectPrefix' => 'KBC::ProjectSecureGKMS::',
+            'configurationPrefix' => 'KBC::ConfigSecureGKMS::',
+            'projectWidePrefix' => 'KBC::ProjectWideSecureGKMS::',
+            'branchTypePrefix' => 'KBC::BranchTypeSecureGKMS::',
+            'projectWideBranchTypePrefix' => 'KBC::ProjectWideBranchTypeSecureGKMS::',
+            'branchTypeConfigurationPrefix' => 'KBC::BranchTypeConfigSecureGKMS::',
+        ];
+        yield 'kms' => [
             'encryptor' => ObjectEncryptorFactory::getAwsEncryptor(
                 'my-stack',
                 self::getKmsKeyId(),
                 self::getKmsRegion(),
-                null
+                null,
             ),
             'genericPrefix' => 'KBC::Secure::',
             'componentPrefix' => 'KBC::ComponentSecure::',

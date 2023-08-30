@@ -8,7 +8,9 @@ use Keboola\ObjectEncryptor\EncryptorOptions;
 use Keboola\ObjectEncryptor\Exception\ApplicationException;
 use Keboola\ObjectEncryptor\Exception\UserException;
 use Keboola\ObjectEncryptor\Wrapper\ConfigurationAKVWrapper;
+use Keboola\ObjectEncryptor\Wrapper\ConfigurationGKMSWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ConfigurationKMSWrapper;
+use Keboola\ObjectEncryptor\Wrapper\GkmsClientFactory;
 use Keboola\ObjectEncryptor\Wrapper\KmsClientFactory;
 
 class ConfigurationWrapperTest extends AbstractTestCase
@@ -24,38 +26,52 @@ class ConfigurationWrapperTest extends AbstractTestCase
     }
 
     /**
-     * @return ConfigurationKMSWrapper[][]|ConfigurationAKVWrapper[][]
+     * @return ConfigurationAKVWrapper[][]|ConfigurationGKMSWrapper[][]|ConfigurationKMSWrapper[][]
      */
     public function wrapperProvider(): array
     {
+        putenv('GOOGLE_APPLICATION_CREDENTIALS=' . getenv('TEST_GOOGLE_APPLICATION_CREDENTIALS'));
+
         $kmsOptions = new EncryptorOptions(
             stackId: 'some-stack',
             kmsKeyId: self::getKmsKeyId(),
             kmsRegion: self::getKmsRegion(),
             backoffMaxTries: 1,
         );
-        $configurationWrapperKMS = new ConfigurationKMSWrapper(
-            (new KmsClientFactory())->createClient($kmsOptions),
-            $kmsOptions,
+        $gkmsOptions = new EncryptorOptions(
+            stackId: 'some-stack',
+            gkmsKeyId: self::getGkmsKeyId(),
+            backoffMaxTries: 1,
         );
 
         $configurationWrapperAKV = new ConfigurationAKVWrapper(new EncryptorOptions(
             stackId: 'some-stack',
             akvUrl: self::getAkvUrl(),
         ));
+        $configurationWrapperGKMS = new ConfigurationGKMSWrapper(
+            (new GkmsClientFactory())->createClient($gkmsOptions),
+            $gkmsOptions,
+        );
+        $configurationWrapperKMS = new ConfigurationKMSWrapper(
+            (new KmsClientFactory())->createClient($kmsOptions),
+            $kmsOptions,
+        );
 
         return [
-            'KMS' => [
-                $configurationWrapperKMS,
-            ],
             'AKV' => [
                 $configurationWrapperAKV,
+            ],
+            'GKMS' => [
+                $configurationWrapperGKMS,
+            ],
+            'KMS' => [
+                $configurationWrapperKMS,
             ],
         ];
     }
 
     /**
-     * @param ConfigurationAKVWrapper|ConfigurationKMSWrapper $wrapper
+     * @param ConfigurationAKVWrapper|ConfigurationGKMSWrapper|ConfigurationKMSWrapper $wrapper
      * @dataProvider wrapperProvider
      */
     public function testEncrypt($wrapper): void
@@ -71,7 +87,7 @@ class ConfigurationWrapperTest extends AbstractTestCase
     }
 
     /**
-     * @param ConfigurationAKVWrapper|ConfigurationKMSWrapper $wrapper
+     * @param ConfigurationAKVWrapper|ConfigurationGKMSWrapper|ConfigurationKMSWrapper $wrapper
      * @dataProvider wrapperProvider
      */
     public function testEncryptDifferentConfiguration($wrapper): void
@@ -93,7 +109,7 @@ class ConfigurationWrapperTest extends AbstractTestCase
     }
 
     /**
-     * @param ConfigurationAKVWrapper|ConfigurationKMSWrapper $wrapper
+     * @param ConfigurationAKVWrapper|ConfigurationGKMSWrapper|ConfigurationKMSWrapper $wrapper
      * @dataProvider wrapperProvider
      */
     public function testEncryptDifferentProject($wrapper): void
@@ -114,6 +130,32 @@ class ConfigurationWrapperTest extends AbstractTestCase
         $wrapper->decrypt($encrypted);
     }
 
+    public function testInvalidSetupAKV(): void
+    {
+        self::expectException(ApplicationException::class);
+        self::expectExceptionMessage('Cipher key settings are invalid.');
+        new ConfigurationAKVWrapper(new EncryptorOptions(
+            stackId: 'some-stack',
+            kmsKeyId: 'some-key-id',
+            kmsRegion: 'some-region',
+        ));
+    }
+
+    public function testInvalidSetupGKMS(): void
+    {
+        $options = new EncryptorOptions(
+            stackId: 'some-stack',
+            akvUrl: 'some-url',
+        );
+
+        self::expectException(ApplicationException::class);
+        self::expectExceptionMessage('Cipher key settings are invalid.');
+        new ConfigurationGKMSWrapper(
+            (new GkmsClientFactory())->createClient($options),
+            $options,
+        );
+    }
+
     public function testInvalidSetupKMS(): void
     {
         $options = new EncryptorOptions(
@@ -129,19 +171,8 @@ class ConfigurationWrapperTest extends AbstractTestCase
         );
     }
 
-    public function testInvalidSetupAKV(): void
-    {
-        self::expectException(ApplicationException::class);
-        self::expectExceptionMessage('Cipher key settings are invalid.');
-        new ConfigurationAKVWrapper(new EncryptorOptions(
-            stackId: 'some-stack',
-            kmsKeyId: 'some-key-id',
-            kmsRegion: 'some-region',
-        ));
-    }
-
     /**
-     * @param ConfigurationAKVWrapper|ConfigurationKMSWrapper $wrapper
+     * @param ConfigurationAKVWrapper|ConfigurationGKMSWrapper|ConfigurationKMSWrapper $wrapper
      * @dataProvider wrapperProvider
      */
     public function testInvalidSetupEncryptComponentId($wrapper): void
@@ -152,7 +183,7 @@ class ConfigurationWrapperTest extends AbstractTestCase
     }
 
     /**
-     * @param ConfigurationAKVWrapper|ConfigurationKMSWrapper $wrapper
+     * @param ConfigurationAKVWrapper|ConfigurationGKMSWrapper|ConfigurationKMSWrapper $wrapper
      * @dataProvider wrapperProvider
      */
     public function testInvalidSetupEncryptProjectId($wrapper): void
@@ -164,7 +195,7 @@ class ConfigurationWrapperTest extends AbstractTestCase
     }
 
     /**
-     * @param ConfigurationAKVWrapper|ConfigurationKMSWrapper $wrapper
+     * @param ConfigurationAKVWrapper|ConfigurationGKMSWrapper|ConfigurationKMSWrapper $wrapper
      * @dataProvider wrapperProvider
      */
     public function testInvalidSetupEncryptConfigurationId($wrapper): void
@@ -177,7 +208,7 @@ class ConfigurationWrapperTest extends AbstractTestCase
     }
 
     /**
-     * @param ConfigurationAKVWrapper|ConfigurationKMSWrapper $wrapper
+     * @param ConfigurationAKVWrapper|ConfigurationGKMSWrapper|ConfigurationKMSWrapper $wrapper
      * @dataProvider wrapperProvider
      */
     public function testInvalidSetupDecryptComponentId($wrapper): void
@@ -188,7 +219,7 @@ class ConfigurationWrapperTest extends AbstractTestCase
     }
 
     /**
-     * @param ConfigurationAKVWrapper|ConfigurationKMSWrapper $wrapper
+     * @param ConfigurationAKVWrapper|ConfigurationGKMSWrapper|ConfigurationKMSWrapper $wrapper
      * @dataProvider wrapperProvider
      */
     public function testInvalidSetupDecryptProjectId($wrapper): void
@@ -200,7 +231,7 @@ class ConfigurationWrapperTest extends AbstractTestCase
     }
 
     /**
-     * @param ConfigurationAKVWrapper|ConfigurationKMSWrapper $wrapper
+     * @param ConfigurationAKVWrapper|ConfigurationGKMSWrapper|ConfigurationKMSWrapper $wrapper
      * @dataProvider wrapperProvider
      */
     public function testInvalidSetupDecryptConfigurationId($wrapper): void

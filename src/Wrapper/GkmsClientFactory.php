@@ -24,7 +24,7 @@ class GkmsClientFactory
                 ]
             );
         } catch (Throwable $e) {
-            throw new ApplicationException('Cipher key settings are invalid.', 0, $e);
+            throw new ApplicationException('Cipher key settings are invalid: ' . $e->getMessage(), 0, $e);
         }
     }
 }

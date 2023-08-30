@@ -46,16 +46,6 @@ class GenericAKVWrapper implements CryptoWrapperInterface
         }
     }
 
-    public function setMetadataValue(string $key, string $value): void
-    {
-        $this->metadata[$key] = $value;
-    }
-
-    protected function getMetadataValue(string $key): ?string
-    {
-        return $this->metadata[$key] ?? null;
-    }
-
     public function getClient(): Client
     {
         if ($this->client === null) {
@@ -73,6 +63,16 @@ class GenericAKVWrapper implements CryptoWrapperInterface
         $retryPolicy = new SimpleRetryPolicy(3);
         $backOffPolicy = new ExponentialBackOffPolicy(1000);
         return new RetryProxy($retryPolicy, $backOffPolicy);
+    }
+
+    public function setMetadataValue(string $key, string $value): void
+    {
+        $this->metadata[$key] = $value;
+    }
+
+    protected function getMetadataValue(string $key): ?string
+    {
+        return $this->metadata[$key] ?? null;
     }
 
     /**

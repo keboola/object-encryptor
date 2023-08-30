@@ -9,7 +9,7 @@ use Keboola\ObjectEncryptor\Exception\ApplicationException;
 /**
  * @internal Use ObjectEncryptor
  */
-class BranchTypeProjectAKVWrapper extends ProjectAKVWrapper
+class BranchTypeProjectWideGKMSWrapper extends ProjectWideGKMSWrapper
 {
     use BranchTypeWrapperTrait;
 
@@ -23,6 +23,6 @@ class BranchTypeProjectAKVWrapper extends ProjectAKVWrapper
 
     public static function getPrefix(): string
     {
-        return 'KBC::BranchTypeSecureKV::';
+        return 'KBC::ProjectWideBranchTypeSecureGKMS::';
     }
 }

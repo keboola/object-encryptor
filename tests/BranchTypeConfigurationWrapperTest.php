@@ -9,11 +9,13 @@ use Keboola\ObjectEncryptor\Exception\ApplicationException;
 use Keboola\ObjectEncryptor\Exception\UserException;
 use Keboola\ObjectEncryptor\ObjectEncryptor;
 use Keboola\ObjectEncryptor\Wrapper\BranchTypeConfigurationAKVWrapper;
+use Keboola\ObjectEncryptor\Wrapper\BranchTypeConfigurationGKMSWrapper;
 use Keboola\ObjectEncryptor\Wrapper\BranchTypeConfigurationKMSWrapper;
 use Keboola\ObjectEncryptor\Wrapper\BranchTypeProjectAKVWrapper;
 use Keboola\ObjectEncryptor\Wrapper\BranchTypeProjectKMSWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ConfigurationAKVWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ConfigurationKMSWrapper;
+use Keboola\ObjectEncryptor\Wrapper\GkmsClientFactory;
 use Keboola\ObjectEncryptor\Wrapper\KmsClientFactory;
 
 class BranchTypeConfigurationWrapperTest extends AbstractTestCase
@@ -29,38 +31,55 @@ class BranchTypeConfigurationWrapperTest extends AbstractTestCase
     }
 
     /**
-     * @return BranchTypeConfigurationAKVWrapper[][]|BranchTypeConfigurationKMSWrapper[][]
+     * @return BranchTypeConfigurationAKVWrapper[][]|BranchTypeConfigurationKMSWrapper[][]|BranchTypeConfigurationGKMSWrapper[][]
      */
     public function wrapperProvider(): array
     {
+        putenv('GOOGLE_APPLICATION_CREDENTIALS=' . getenv('TEST_GOOGLE_APPLICATION_CREDENTIALS'));
+
         $kmsOptions = new EncryptorOptions(
             stackId: 'some-stack',
             kmsKeyId: self::getKmsKeyId(),
             kmsRegion: self::getKmsRegion(),
             backoffMaxTries: 1,
         );
-        $branchTypeWrapperKMS = new BranchTypeConfigurationKMSWrapper(
+        $gkmsOptions = new EncryptorOptions(
+            stackId: 'some-stack',
+            gkmsKeyId: self::getGkmsKeyId(),
+            backoffMaxTries: 1,
+        );
+
+        $branchTypeConfigurationWrapperKMS = new BranchTypeConfigurationKMSWrapper(
             (new KmsClientFactory())->createClient($kmsOptions),
             $kmsOptions,
         );
 
-        $branchTypeWrapperAKV = new BranchTypeConfigurationAKVWrapper(new EncryptorOptions(
+        $branchTypeConfigurationWrapperAKV = new BranchTypeConfigurationAKVWrapper(new EncryptorOptions(
             stackId: 'some-stack',
             akvUrl: self::getAkvUrl(),
         ));
 
+        $branchTypeConfigurationWrapperGKMS = new BranchTypeConfigurationGKMSWrapper(
+            (new GkmsClientFactory())->createClient($gkmsOptions),
+            $gkmsOptions,
+        );
+
         return [
-            'KMS' => [
-                $branchTypeWrapperKMS,
-            ],
             'AKV' => [
-                $branchTypeWrapperAKV,
+                $branchTypeConfigurationWrapperAKV,
+            ],
+            'GKMS' => [
+                $branchTypeConfigurationWrapperGKMS,
+            ],
+            'KMS' => [
+                $branchTypeConfigurationWrapperKMS,
             ],
         ];
     }
 
     /**
-     * @param BranchTypeConfigurationAKVWrapper|BranchTypeConfigurationKMSWrapper $wrapper
+     * // phpcs:ignore Generic.Files.LineLength
+     * @param BranchTypeConfigurationAKVWrapper|BranchTypeConfigurationGKMSWrapper|BranchTypeConfigurationKMSWrapper $wrapper
      * @dataProvider wrapperProvider
      */
     public function testEncrypt($wrapper): void
@@ -77,7 +96,8 @@ class BranchTypeConfigurationWrapperTest extends AbstractTestCase
     }
 
     /**
-     * @param BranchTypeConfigurationAKVWrapper|BranchTypeConfigurationKMSWrapper $wrapper
+     * // phpcs:ignore Generic.Files.LineLength
+     * @param BranchTypeConfigurationAKVWrapper|BranchTypeConfigurationGKMSWrapper|BranchTypeConfigurationKMSWrapper $wrapper
      * @dataProvider wrapperProvider
      */
     public function testEncryptDifferentBranchType($wrapper): void
@@ -102,7 +122,8 @@ class BranchTypeConfigurationWrapperTest extends AbstractTestCase
     }
 
     /**
-     * @param BranchTypeConfigurationAKVWrapper|BranchTypeConfigurationKMSWrapper $wrapper
+     * // phpcs:ignore Generic.Files.LineLength
+     * @param BranchTypeConfigurationAKVWrapper|BranchTypeConfigurationGKMSWrapper|BranchTypeConfigurationKMSWrapper $wrapper
      * @dataProvider wrapperProvider
      */
     public function testEncryptDifferentConfiguration($wrapper): void
@@ -127,7 +148,8 @@ class BranchTypeConfigurationWrapperTest extends AbstractTestCase
     }
 
     /**
-     * @param BranchTypeConfigurationAKVWrapper|BranchTypeConfigurationKMSWrapper $wrapper
+     * // phpcs:ignore Generic.Files.LineLength
+     * @param BranchTypeConfigurationAKVWrapper|BranchTypeConfigurationGKMSWrapper|BranchTypeConfigurationKMSWrapper $wrapper
      * @dataProvider wrapperProvider
      */
     public function testEncryptDifferentProject($wrapper): void
@@ -159,7 +181,7 @@ class BranchTypeConfigurationWrapperTest extends AbstractTestCase
 
         self::expectException(ApplicationException::class);
         self::expectExceptionMessage('Cipher key settings are missing.');
-        new ConfigurationKMSWrapper(
+        new BranchTypeConfigurationKMSWrapper(
             (new KmsClientFactory())->createClient($options),
             $options,
         );
@@ -169,15 +191,31 @@ class BranchTypeConfigurationWrapperTest extends AbstractTestCase
     {
         self::expectException(ApplicationException::class);
         self::expectExceptionMessage('Cipher key settings are invalid.');
-        new ConfigurationAKVWrapper(new EncryptorOptions(
+        new BranchTypeConfigurationAKVWrapper(new EncryptorOptions(
             stackId: 'some-stack',
             kmsKeyId: 'some-key-id',
             kmsRegion: 'some-region',
         ));
     }
 
+    public function testInvalidSetupGKMS(): void
+    {
+        $options = new EncryptorOptions(
+            stackId: 'some-stack',
+            akvUrl: 'some-url',
+        );
+
+        self::expectException(ApplicationException::class);
+        self::expectExceptionMessage('Cipher key settings are invalid.');
+        new BranchTypeConfigurationGKMSWrapper(
+            (new GkmsClientFactory())->createClient($options),
+            $options,
+        );
+    }
+
     /**
-     * @param BranchTypeConfigurationAKVWrapper|BranchTypeConfigurationKMSWrapper $wrapper
+     * // phpcs:ignore Generic.Files.LineLength
+     * @param BranchTypeConfigurationAKVWrapper|BranchTypeConfigurationGKMSWrapper|BranchTypeConfigurationKMSWrapper $wrapper
      * @dataProvider wrapperProvider
      */
     public function testInvalidSetupEncryptComponentId($wrapper): void
@@ -188,7 +226,8 @@ class BranchTypeConfigurationWrapperTest extends AbstractTestCase
     }
 
     /**
-     * @param BranchTypeConfigurationAKVWrapper|BranchTypeConfigurationKMSWrapper $wrapper
+     * // phpcs:ignore Generic.Files.LineLength
+     * @param BranchTypeConfigurationAKVWrapper|BranchTypeConfigurationGKMSWrapper|BranchTypeConfigurationKMSWrapper $wrapper
      * @dataProvider wrapperProvider
      */
     public function testInvalidSetupEncryptProjectId($wrapper): void
@@ -200,7 +239,8 @@ class BranchTypeConfigurationWrapperTest extends AbstractTestCase
     }
 
     /**
-     * @param BranchTypeConfigurationAKVWrapper|BranchTypeConfigurationKMSWrapper $wrapper
+     * // phpcs:ignore Generic.Files.LineLength
+     * @param BranchTypeConfigurationAKVWrapper|BranchTypeConfigurationGKMSWrapper|BranchTypeConfigurationKMSWrapper $wrapper
      * @dataProvider wrapperProvider
      */
     public function testInvalidSetupEncryptConfigurationId($wrapper): void
@@ -214,7 +254,8 @@ class BranchTypeConfigurationWrapperTest extends AbstractTestCase
     }
 
     /**
-     * @param BranchTypeConfigurationAKVWrapper|BranchTypeConfigurationKMSWrapper $wrapper
+     * // phpcs:ignore Generic.Files.LineLength
+     * @param BranchTypeConfigurationAKVWrapper|BranchTypeConfigurationGKMSWrapper|BranchTypeConfigurationKMSWrapper $wrapper
      * @dataProvider wrapperProvider
      */
     public function testInvalidSetupEncryptBranchType($wrapper): void
@@ -228,7 +269,8 @@ class BranchTypeConfigurationWrapperTest extends AbstractTestCase
     }
 
     /**
-     * @param BranchTypeConfigurationAKVWrapper|BranchTypeConfigurationKMSWrapper $wrapper
+     * // phpcs:ignore Generic.Files.LineLength
+     * @param BranchTypeConfigurationAKVWrapper|BranchTypeConfigurationGKMSWrapper|BranchTypeConfigurationKMSWrapper $wrapper
      * @dataProvider wrapperProvider
      */
     public function testInvalidSetupDecryptComponentId($wrapper): void
@@ -239,7 +281,8 @@ class BranchTypeConfigurationWrapperTest extends AbstractTestCase
     }
 
     /**
-     * @param BranchTypeConfigurationAKVWrapper|BranchTypeConfigurationKMSWrapper $wrapper
+     * // phpcs:ignore Generic.Files.LineLength
+     * @param BranchTypeConfigurationAKVWrapper|BranchTypeConfigurationGKMSWrapper|BranchTypeConfigurationKMSWrapper $wrapper
      * @dataProvider wrapperProvider
      */
     public function testInvalidSetupDecryptProjectId($wrapper): void
@@ -251,7 +294,8 @@ class BranchTypeConfigurationWrapperTest extends AbstractTestCase
     }
 
     /**
-     * @param BranchTypeConfigurationAKVWrapper|BranchTypeConfigurationKMSWrapper $wrapper
+     * // phpcs:ignore Generic.Files.LineLength
+     * @param BranchTypeConfigurationAKVWrapper|BranchTypeConfigurationGKMSWrapper|BranchTypeConfigurationKMSWrapper $wrapper
      * @dataProvider wrapperProvider
      */
     public function testInvalidSetupDecryptConfigurationId($wrapper): void
@@ -264,7 +308,8 @@ class BranchTypeConfigurationWrapperTest extends AbstractTestCase
     }
 
     /**
-     * @param BranchTypeConfigurationAKVWrapper|BranchTypeConfigurationKMSWrapper $wrapper
+     * // phpcs:ignore Generic.Files.LineLength
+     * @param BranchTypeConfigurationAKVWrapper|BranchTypeConfigurationGKMSWrapper|BranchTypeConfigurationKMSWrapper $wrapper
      * @dataProvider wrapperProvider
      */
     public function testInvalidSetupDecryptBranchType($wrapper): void

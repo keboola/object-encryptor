@@ -11,12 +11,7 @@ use Keboola\ObjectEncryptor\Exception\ApplicationException;
  */
 class BranchTypeProjectKMSWrapper extends ProjectKMSWrapper
 {
-    private const KEY_BRANCH_TYPE = 'branchType';
-
-    public function setBranchType(string $branchType): void
-    {
-        $this->setMetadataValue(self::KEY_BRANCH_TYPE, $branchType);
-    }
+    use BranchTypeWrapperTrait;
 
     protected function validateState(): void
     {
