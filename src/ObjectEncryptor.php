@@ -52,14 +52,16 @@ class ObjectEncryptor
      */
     public function encryptGeneric($data)
     {
+        if ($this->encryptorOptions->getAkvUrl()) {
+            $className = GenericAKVWrapper::class;
+        } elseif ($this->encryptorOptions->getGkmsKeyId()) {
+            $className = GenericGKMSWrapper::class;
+        } else {
+            $className = GenericKMSWrapper::class;
+        }
+
         $wrappers = $this->getWrappers(null, null, null, null);
-        return $this->encrypt(
-            $data,
-            $wrappers,
-            $this->encryptorOptions->getAkvUrl() ? GenericAKVWrapper::class :
-                ($this->encryptorOptions->getGkmsKeyId() ? GenericGKMSWrapper::class :
-                    GenericKMSWrapper::class)
-        );
+        return $this->encrypt($data, $wrappers, $className);
     }
 
     /**
