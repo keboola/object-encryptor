@@ -10,6 +10,7 @@ use Aws\Result;
 use Defuse\Crypto\Crypto;
 use Defuse\Crypto\Encoding;
 use Defuse\Crypto\Key;
+use Google\ApiCore\ApiException;
 use Google\Cloud\Kms\V1\KeyManagementServiceClient;
 use Keboola\ObjectEncryptor\EncryptorOptions;
 use Keboola\ObjectEncryptor\Exception\ApplicationException;
@@ -83,6 +84,7 @@ class GenericGKMSWrapper implements CryptoWrapperInterface
         try {
             $key = Key::createNewRandomKey();
             $encryptedKey = $this->retryProxy->call(function () use ($key) {
+                ksort($this->metadata);
                 $response = $this->client->encrypt(
                     $this->gkmsKeyId,
                     $key->saveToAsciiSafeString(),
@@ -103,14 +105,13 @@ class GenericGKMSWrapper implements CryptoWrapperInterface
     {
         $this->validateState();
         $encrypted = $this->decode($encryptedData);
-        if (!is_array($encrypted) || count($encrypted) !== 2 ||
-            empty($encrypted[self::PAYLOAD_INDEX]) || empty($encrypted[self::KEY_INDEX])
-        ) {
+        if (count($encrypted) !== 2 || empty($encrypted[self::PAYLOAD_INDEX]) || empty($encrypted[self::KEY_INDEX])) {
             throw new UserException('Deciphering failed.');
         }
 
         try {
             $decryptedKey = $this->retryProxy->call(function () use ($encrypted) {
+                ksort($this->metadata);
                 $response = $this->client->decrypt(
                     $this->gkmsKeyId,
                     $encrypted[self::KEY_INDEX],
@@ -119,6 +120,8 @@ class GenericGKMSWrapper implements CryptoWrapperInterface
                 return $response->getPlaintext();
             });
             assert(is_string($decryptedKey));
+        } catch (ApiException $e) {
+            throw new UserException('Deciphering failed.', $e->getCode(), $e);
         } catch (Throwable $e) {
             throw new ApplicationException('Deciphering failed.', $e->getCode(), $e);
         }

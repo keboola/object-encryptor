@@ -48,7 +48,7 @@ class ObjectEncryptorTest extends AbstractTestCase
         self::assertEquals($originalText, $encryptor->decryptForComponent($encrypted, 'my-component'));
     }
 
-    public function testEncryptorStackNoAwsCredentials(): void
+    public function testEncryptorStackAwsNoAwsCredentials(): void
     {
         putenv('AWS_ACCESS_KEY_ID=fail');
         putenv('AWS_SECRET_ACCESS_KEY=fail');
@@ -62,6 +62,18 @@ class ObjectEncryptorTest extends AbstractTestCase
         self::expectExceptionMessage('Encryption failed: Ciphering failed: Failed to obtain encryption key.');
         $encryptor->encryptForComponent('secret', 'some-component');
         // for azure, this test takes minutes to execute, so it is not included
+    }
+
+    public function testEncryptorStackGcpNoGcpCredentials(): void
+    {
+        putenv('GOOGLE_APPLICATION_CREDENTIALS=fail');
+        $encryptor = ObjectEncryptorFactory::getGcpEncryptor(
+            'my-stack',
+            self::getGkmsKeyId()
+        );
+        self::expectException(ApplicationException::class);
+        self::expectExceptionMessage('Cipher key settings are invalid.');
+        $encryptor->encryptGeneric('secret');
     }
 
     public function testEncryptorStackGcpEncryptor(): void
