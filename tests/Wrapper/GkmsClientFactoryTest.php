@@ -14,10 +14,6 @@ class GkmsClientFactoryTest extends AbstractTestCase
     public function setUp(): void
     {
         parent::setUp();
-        putenv('GOOGLE_APPLICATION_CREDENTIALS=' . getenv('TEST_GOOGLE_APPLICATION_CREDENTIALS'));
-        $c = file_get_contents((string) getenv('GOOGLE_APPLICATION_CREDENTIALS'));
-        var_dump($c);
-        var_dump(getenv('GOOGLE_APPLICATION_CREDENTIALS'));
     }
 
     public function testCreatedClientWorks(): void
