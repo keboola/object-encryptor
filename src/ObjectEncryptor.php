@@ -9,14 +9,19 @@ use Google\Cloud\Kms\V1\KeyManagementServiceClient;
 use Keboola\ObjectEncryptor\Exception\ApplicationException;
 use Keboola\ObjectEncryptor\Exception\UserException;
 use Keboola\ObjectEncryptor\Wrapper\BranchTypeConfigurationAKVWrapper;
+use Keboola\ObjectEncryptor\Wrapper\BranchTypeConfigurationGKMSWrapper;
 use Keboola\ObjectEncryptor\Wrapper\BranchTypeConfigurationKMSWrapper;
 use Keboola\ObjectEncryptor\Wrapper\BranchTypeProjectAKVWrapper;
+use Keboola\ObjectEncryptor\Wrapper\BranchTypeProjectGKMSWrapper;
 use Keboola\ObjectEncryptor\Wrapper\BranchTypeProjectKMSWrapper;
 use Keboola\ObjectEncryptor\Wrapper\BranchTypeProjectWideAKVWrapper;
+use Keboola\ObjectEncryptor\Wrapper\BranchTypeProjectWideGKMSWrapper;
 use Keboola\ObjectEncryptor\Wrapper\BranchTypeProjectWideKMSWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ComponentAKVWrapper;
+use Keboola\ObjectEncryptor\Wrapper\ComponentGKMSWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ComponentKMSWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ConfigurationAKVWrapper;
+use Keboola\ObjectEncryptor\Wrapper\ConfigurationGKMSWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ConfigurationKMSWrapper;
 use Keboola\ObjectEncryptor\Wrapper\CryptoWrapperInterface;
 use Keboola\ObjectEncryptor\Wrapper\GenericAKVWrapper;
@@ -25,8 +30,10 @@ use Keboola\ObjectEncryptor\Wrapper\GenericKMSWrapper;
 use Keboola\ObjectEncryptor\Wrapper\GkmsClientFactory;
 use Keboola\ObjectEncryptor\Wrapper\KmsClientFactory;
 use Keboola\ObjectEncryptor\Wrapper\ProjectAKVWrapper;
+use Keboola\ObjectEncryptor\Wrapper\ProjectGKMSWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ProjectKMSWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ProjectWideAKVWrapper;
+use Keboola\ObjectEncryptor\Wrapper\ProjectWideGKMSWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ProjectWideKMSWrapper;
 use stdClass;
 use Throwable;
@@ -71,12 +78,16 @@ class ObjectEncryptor
      */
     public function encryptForComponent($data, string $componentId)
     {
+        if ($this->encryptorOptions->getAkvUrl()) {
+            $className = ComponentAKVWrapper::class;
+        } elseif ($this->encryptorOptions->getGkmsKeyId()) {
+            $className = ComponentGKMSWrapper::class;
+        } else {
+            $className = ComponentKMSWrapper::class;
+        }
+
         $wrappers = $this->getWrappers($componentId, null, null, null);
-        return $this->encrypt(
-            $data,
-            $wrappers,
-            $this->encryptorOptions->getAkvUrl() ? ComponentAKVWrapper::class : ComponentKMSWrapper::class
-        );
+        return $this->encrypt($data, $wrappers, $className);
     }
 
     /**
@@ -86,12 +97,16 @@ class ObjectEncryptor
      */
     public function encryptForProject($data, string $componentId, string $projectId)
     {
+        if ($this->encryptorOptions->getAkvUrl()) {
+            $className = ProjectAKVWrapper::class;
+        } elseif ($this->encryptorOptions->getGkmsKeyId()) {
+            $className = ProjectGKMSWrapper::class;
+        } else {
+            $className = ProjectKMSWrapper::class;
+        }
+
         $wrappers = $this->getWrappers($componentId, $projectId, null, null);
-        return $this->encrypt(
-            $data,
-            $wrappers,
-            $this->encryptorOptions->getAkvUrl() ? ProjectAKVWrapper::class : ProjectKMSWrapper::class
-        );
+        return $this->encrypt($data, $wrappers, $className);
     }
 
     /**
@@ -101,12 +116,16 @@ class ObjectEncryptor
      */
     public function encryptForConfiguration($data, string $componentId, string $projectId, string $configurationId)
     {
+        if ($this->encryptorOptions->getAkvUrl()) {
+            $className = ConfigurationAKVWrapper::class;
+        } elseif ($this->encryptorOptions->getGkmsKeyId()) {
+            $className = ConfigurationGKMSWrapper::class;
+        } else {
+            $className = ConfigurationKMSWrapper::class;
+        }
+
         $wrappers = $this->getWrappers($componentId, $projectId, $configurationId, null);
-        return $this->encrypt(
-            $data,
-            $wrappers,
-            $this->encryptorOptions->getAkvUrl() ? ConfigurationAKVWrapper::class : ConfigurationKMSWrapper::class
-        );
+        return $this->encrypt($data, $wrappers, $className);
     }
 
     /**
@@ -116,12 +135,16 @@ class ObjectEncryptor
      */
     public function encryptForProjectWide($data, string $projectId)
     {
+        if ($this->encryptorOptions->getAkvUrl()) {
+            $className = ProjectWideAKVWrapper::class;
+        } elseif ($this->encryptorOptions->getGkmsKeyId()) {
+            $className = ProjectWideGKMSWrapper::class;
+        } else {
+            $className = ProjectWideKMSWrapper::class;
+        }
+
         $wrappers = $this->getWrappers(null, $projectId, null, null);
-        return $this->encrypt(
-            $data,
-            $wrappers,
-            $this->encryptorOptions->getAkvUrl() ? ProjectWideAKVWrapper::class : ProjectWideKMSWrapper::class
-        );
+        return $this->encrypt($data, $wrappers, $className);
     }
 
     /**
@@ -132,13 +155,16 @@ class ObjectEncryptor
      */
     public function encryptForBranchType($data, string $componentId, string $projectId, string $branchType)
     {
+        if ($this->encryptorOptions->getAkvUrl()) {
+            $className = BranchTypeProjectAKVWrapper::class;
+        } elseif ($this->encryptorOptions->getGkmsKeyId()) {
+            $className = BranchTypeProjectGKMSWrapper::class;
+        } else {
+            $className = BranchTypeProjectKMSWrapper::class;
+        }
+
         $wrappers = $this->getWrappers($componentId, $projectId, null, $branchType);
-        return $this->encrypt(
-            $data,
-            $wrappers,
-            $this->encryptorOptions->getAkvUrl() ?
-                BranchTypeProjectAKVWrapper::class : BranchTypeProjectKMSWrapper::class
-        );
+        return $this->encrypt($data, $wrappers, $className);
     }
 
     /**
@@ -154,13 +180,16 @@ class ObjectEncryptor
         string $configurationId,
         string $branchType,
     ) {
+        if ($this->encryptorOptions->getAkvUrl()) {
+            $className = BranchTypeConfigurationAKVWrapper::class;
+        } elseif ($this->encryptorOptions->getGkmsKeyId()) {
+            $className = BranchTypeConfigurationGKMSWrapper::class;
+        } else {
+            $className = BranchTypeConfigurationKMSWrapper::class;
+        }
+
         $wrappers = $this->getWrappers($componentId, $projectId, $configurationId, $branchType);
-        return $this->encrypt(
-            $data,
-            $wrappers,
-            $this->encryptorOptions->getAkvUrl() ?
-                BranchTypeConfigurationAKVWrapper::class : BranchTypeConfigurationKMSWrapper::class
-        );
+        return $this->encrypt($data, $wrappers, $className);
     }
 
     /**
@@ -171,14 +200,16 @@ class ObjectEncryptor
      */
     public function encryptForProjectWideBranchType($data, string $projectId, string $branchType)
     {
+        if ($this->encryptorOptions->getAkvUrl()) {
+            $className = BranchTypeProjectWideAKVWrapper::class;
+        } elseif ($this->encryptorOptions->getGkmsKeyId()) {
+            $className = BranchTypeProjectWideGKMSWrapper::class;
+        } else {
+            $className = BranchTypeProjectWideKMSWrapper::class;
+        }
+
         $wrappers = $this->getWrappers(null, $projectId, null, $branchType);
-        return $this->encrypt(
-            $data,
-            $wrappers,
-            $this->encryptorOptions->getAkvUrl() ?
-                BranchTypeProjectWideAKVWrapper::class :
-                BranchTypeProjectWideKMSWrapper::class
-        );
+        return $this->encrypt($data, $wrappers, $className);
     }
 
     /**
@@ -372,7 +403,7 @@ class ObjectEncryptor
     private function encryptItem($key, $value, array $wrappers, CryptoWrapperInterface $wrapper)
     {
         if (is_scalar($value) || is_null($value)) {
-            if (substr((string) $key, 0, 1) === '#') {
+            if (str_starts_with((string) $key, '#')) {
                 return $this->encryptValue((string) $value, $wrappers, $wrapper);
             } else {
                 return $value;
@@ -391,22 +422,29 @@ class ObjectEncryptor
     private function getKnownWrapperPrefixes(): array
     {
         return [
-            GenericKMSWrapper::getPrefix(),
             GenericAKVWrapper::getPrefix(),
             GenericGKMSWrapper::getPrefix(),
-            ComponentKMSWrapper::getPrefix(),
+            GenericKMSWrapper::getPrefix(),
             ComponentAKVWrapper::getPrefix(),
-            ProjectKMSWrapper::getPrefix(),
+            ComponentGKMSWrapper::getPrefix(),
+            ComponentKMSWrapper::getPrefix(),
             ProjectAKVWrapper::getPrefix(),
-            ConfigurationKMSWrapper::getPrefix(),
+            ProjectGKMSWrapper::getPrefix(),
+            ProjectKMSWrapper::getPrefix(),
             ConfigurationAKVWrapper::getPrefix(),
+            ConfigurationGKMSWrapper::getPrefix(),
+            ConfigurationKMSWrapper::getPrefix(),
             ProjectWideAKVWrapper::getPrefix(),
+            ProjectWideGKMSWrapper::getPrefix(),
             ProjectWideKMSWrapper::getPrefix(),
             BranchTypeProjectAKVWrapper::getPrefix(),
+            BranchTypeProjectGKMSWrapper::getPrefix(),
             BranchTypeProjectKMSWrapper::getPrefix(),
             BranchTypeProjectWideAKVWrapper::getPrefix(),
+            BranchTypeProjectWideGKMSWrapper::getPrefix(),
             BranchTypeProjectWideKMSWrapper::getPrefix(),
             BranchTypeConfigurationAKVWrapper::getPrefix(),
+            BranchTypeConfigurationGKMSWrapper::getPrefix(),
             BranchTypeConfigurationKMSWrapper::getPrefix(),
             // legacy wrappers that are no longer implemented, but still exist in the real world
             'KBC::Encrypted==',
@@ -651,36 +689,38 @@ class ObjectEncryptor
         $wrapper = new GenericGKMSWrapper($this->gkmsClient, $this->encryptorOptions);
         $wrappers[] = $wrapper;
 
-        /*
         if ($this->encryptorOptions->getStackId()) {
             if ($projectId) {
-                $wrapper = new ProjectWideKMSWrapper($this->kmsClient, $this->encryptorOptions);
+                $wrapper = new ProjectWideGKMSWrapper($this->gkmsClient, $this->encryptorOptions);
                 $wrapper->setProjectId($projectId);
                 $wrappers[] = $wrapper;
                 if ($branchType) {
-                    $wrapper = new BranchTypeProjectWideKMSWrapper($this->kmsClient, $this->encryptorOptions);
+                    $wrapper = new BranchTypeProjectWideGKMSWrapper($this->gkmsClient, $this->encryptorOptions);
                     $wrapper->setProjectId($projectId);
                     $wrapper->setBranchType($branchType);
                     $wrappers[] = $wrapper;
                 }
             }
             if ($componentId) {
-                $wrapper = new ComponentKMSWrapper($this->kmsClient, $this->encryptorOptions);
+                $wrapper = new ComponentGKMSWrapper($this->gkmsClient, $this->encryptorOptions);
                 $wrapper->setComponentId($componentId);
                 $wrappers[] = $wrapper;
                 if ($projectId) {
-                    $wrapper = new ProjectKMSWrapper($this->kmsClient, $this->encryptorOptions);
+                    $wrapper = new ProjectGKMSWrapper($this->gkmsClient, $this->encryptorOptions);
                     $wrapper->setComponentId($componentId);
                     $wrapper->setProjectId($projectId);
                     $wrappers[] = $wrapper;
                     if ($configurationId) {
-                        $wrapper = new ConfigurationKMSWrapper($this->kmsClient, $this->encryptorOptions);
+                        $wrapper = new ConfigurationGKMSWrapper($this->gkmsClient, $this->encryptorOptions);
                         $wrapper->setComponentId($componentId);
                         $wrapper->setProjectId($projectId);
                         $wrapper->setConfigurationId($configurationId);
                         $wrappers[] = $wrapper;
                         if ($branchType) {
-                            $wrapper = new BranchTypeConfigurationKMSWrapper($this->kmsClient, $this->encryptorOptions);
+                            $wrapper = new BranchTypeConfigurationGKMSWrapper(
+                                $this->gkmsClient,
+                                $this->encryptorOptions
+                            );
                             $wrapper->setComponentId($componentId);
                             $wrapper->setProjectId($projectId);
                             $wrapper->setConfigurationId($configurationId);
@@ -689,7 +729,7 @@ class ObjectEncryptor
                         }
                     }
                     if ($branchType) {
-                        $wrapper = new BranchTypeProjectKMSWrapper($this->kmsClient, $this->encryptorOptions);
+                        $wrapper = new BranchTypeProjectGKMSWrapper($this->gkmsClient, $this->encryptorOptions);
                         $wrapper->setComponentId($componentId);
                         $wrapper->setProjectId($projectId);
                         $wrapper->setBranchType($branchType);
@@ -698,7 +738,7 @@ class ObjectEncryptor
                 }
             }
         }
-        */
+
         return $wrappers;
     }
 

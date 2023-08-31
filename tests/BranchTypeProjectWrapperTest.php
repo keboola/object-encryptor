@@ -9,7 +9,9 @@ use Keboola\ObjectEncryptor\Exception\ApplicationException;
 use Keboola\ObjectEncryptor\Exception\UserException;
 use Keboola\ObjectEncryptor\ObjectEncryptor;
 use Keboola\ObjectEncryptor\Wrapper\BranchTypeProjectAKVWrapper;
+use Keboola\ObjectEncryptor\Wrapper\BranchTypeProjectGKMSWrapper;
 use Keboola\ObjectEncryptor\Wrapper\BranchTypeProjectKMSWrapper;
+use Keboola\ObjectEncryptor\Wrapper\GkmsClientFactory;
 use Keboola\ObjectEncryptor\Wrapper\KmsClientFactory;
 
 class BranchTypeProjectWrapperTest extends AbstractTestCase
@@ -25,38 +27,54 @@ class BranchTypeProjectWrapperTest extends AbstractTestCase
     }
 
     /**
-     * @return BranchTypeProjectAKVWrapper[][]|BranchTypeProjectKMSWrapper[][]
+     * @return BranchTypeProjectAKVWrapper[][]|BranchTypeProjectGKMSWrapper[][]|BranchTypeProjectKMSWrapper[][]
      */
     public function wrapperProvider(): array
     {
+        putenv('GOOGLE_APPLICATION_CREDENTIALS=' . getenv('TEST_GOOGLE_APPLICATION_CREDENTIALS'));
+
         $kmsOptions = new EncryptorOptions(
             stackId: 'some-stack',
             kmsKeyId: self::getKmsKeyId(),
             kmsRegion: self::getKmsRegion(),
             backoffMaxTries: 1,
         );
-        $branchTypeWrapperKMS = new BranchTypeProjectKMSWrapper(
-            (new KmsClientFactory())->createClient($kmsOptions),
-            $kmsOptions,
+        $gkmsOptions = new EncryptorOptions(
+            stackId: 'some-stack',
+            gkmsKeyId: self::getGkmsKeyId(),
+            backoffMaxTries: 1,
         );
 
-        $branchTypeWrapperAKV = new BranchTypeProjectAKVWrapper(new EncryptorOptions(
+        $branchTypeProjectWrapperAKV = new BranchTypeProjectAKVWrapper(new EncryptorOptions(
             stackId: 'some-stack',
             akvUrl: self::getAkvUrl(),
         ));
 
+        $branchTypeProjectWrapperGKMS = new BranchTypeProjectGKMSWrapper(
+            (new GkmsClientFactory())->createClient($kmsOptions),
+            $gkmsOptions,
+        );
+
+        $branchTypeProjectWrapperKMS = new BranchTypeProjectKMSWrapper(
+            (new KmsClientFactory())->createClient($kmsOptions),
+            $kmsOptions,
+        );
+
         return [
-            'KMS' => [
-                $branchTypeWrapperKMS,
-            ],
             'AKV' => [
-                $branchTypeWrapperAKV,
+                $branchTypeProjectWrapperAKV,
+            ],
+            'GKMS' => [
+                $branchTypeProjectWrapperGKMS,
+            ],
+            'KMS' => [
+                $branchTypeProjectWrapperKMS,
             ],
         ];
     }
 
     /**
-     * @param BranchTypeProjectAKVWrapper|BranchTypeProjectKMSWrapper $wrapper
+     * @param BranchTypeProjectAKVWrapper|BranchTypeProjectGKMSWrapper|BranchTypeProjectKMSWrapper $wrapper
      * @dataProvider wrapperProvider
      */
     public function testEncrypt($wrapper): void

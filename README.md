@@ -36,22 +36,30 @@ Alternatively, you can use `getAwsEncryptor` and `getAzureEncryptor` and `getGcp
 ### Wrappers
 Depending on the provided keys and parameters, the following wrappers will be available:
 
-- `GenericKMSWrapper` - AWS wrapper for `KBC::Secure::` ciphers, requires `kmsKeyId` and `kmsRegion`. Also, the runner must have AWS credentials available (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`)
-- `ComponentKMSWrapper` - AWS wrapper for `KBC::ComponentSecure::` ciphers, requires `kmsKeyId`, `kmsRegion`, `stackId` and `componentId`
-- `ProjectKMSWrapper` - AWS wrapper for `KBC::ProjectSecure::` ciphers, requires `kmsKeyId`, `kmsRegion`, `stackId`, `componentId` and `projectId`.
-- `ConfigurationKMSWrapper` - AWS wrapper for `KBC::ConfigSecure::` ciphers, requires `kmsKeyId`, `kmsRegion`, `stackId`, `componentId`, `projectId` and `configurationId`.
-- `ProjectWideKMSWrapper` - KMS wrapper `KBC::ProjectWideSecure::` ciphers, requires `kmsKeyId`, `kmsRegion`, `stackId`, and `projectId`.
-- `BranchTypeProjectKMSWrapper` - KMS wrapper `KBC::BranchTypeSecure::` ciphers, requires `kmsKeyId`, `kmsRegion`, `stackId`, `componentId`, projectId` and `branchType`.
-- `BranchTypeConfigurationKMSWrapper` - KMS wrapper `KBC::BranchTypeConfigSecure::` ciphers, requires `kmsKeyId`, `kmsRegion`, `stackId`, `componentId`, `projectId`, `configurationId` and `branchType`.
-- `BranchTypeProjectWideKMSWrapper` - KMS wrapper `KBC::ProjectWideBranchTypeSecure::` ciphers, requires `kmsKeyId`, `kmsRegion`, `stackId`, `projectId` and `branchType`.
-- `GenericAKVWrapper` - Azure wrapper for `KBC::SecureKV::` ciphers, requires `akvUrl`. Also, the runner must have AWS credentials available (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`)
-- `ComponentAKVWrapper` - Azure wrapper for `KBC::ComponentSecureKV::` ciphers, requires `akvUrl`, `stackId` and `componentId`
-- `ProjectAKVWrapper` - Azure wrapper for `KBC::ProjectSecureKV::` ciphers, requires `akvUrl`, `stackId`, `componentId` and `projectId`.
-- `ConfigurationAKVWrapper` - Azure wrapper for `KBC::ConfigSecureKV::` ciphers, requires `akvUrl`, `stackId`, `componentId`, `projectId` and `configurationId`.
-- `ProjectWideAKvWrapper` - Azure wrapper `KBC::ProjectWideSecureKV::` ciphers, requires `akvUrl`, `stackId`, and `projectId`.
-- `BranchTypeProjectAKVWrapper` - Azure wrapper `KBC::BranchTypeSecureKV::` ciphers, requires `akvUrl`, `stackId`, `componentId`, projectId` and `branchType`.
-- `BranchTypeConfigurationAKVWrapper` - Azure wrapper `KBC::BranchTypeConfigSecureKV::` ciphers, requires `akvUrl`, `stackId`, `componentId`, `projectId`, `configurationId` and `branchType`.
-- `BranchTypeProjectWideAKVWrapper` - Azure wrapper `KBC::ProjectWideBranchTypeSecureKV::` ciphers, requires `akvUrl`, `stackId`, `projectId` and `branchType`.
+- `GenericKMSWrapper` - AWS KMS wrapper for `KBC::Secure::` ciphers, requires `kmsKeyId` and `kmsRegion`. Also, the runner must have AWS credentials available (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`)
+- `ComponentKMSWrapper` - AWS KMS wrapper for `KBC::ComponentSecure::` ciphers, requires `kmsKeyId`, `kmsRegion`, `stackId` and `componentId`
+- `ProjectKMSWrapper` - AWS KMS wrapper for `KBC::ProjectSecure::` ciphers, requires `kmsKeyId`, `kmsRegion`, `stackId`, `componentId` and `projectId`.
+- `ConfigurationKMSWrapper` - AWS KMS wrapper for `KBC::ConfigSecure::` ciphers, requires `kmsKeyId`, `kmsRegion`, `stackId`, `componentId`, `projectId` and `configurationId`.
+- `ProjectWideKMSWrapper` - AWS KMS wrapper `KBC::ProjectWideSecure::` ciphers, requires `kmsKeyId`, `kmsRegion`, `stackId`, and `projectId`.
+- `BranchTypeProjectKMSWrapper` - AWS KMS wrapper `KBC::BranchTypeSecure::` ciphers, requires `kmsKeyId`, `kmsRegion`, `stackId`, `componentId`, projectId` and `branchType`.
+- `BranchTypeConfigurationKMSWrapper` - AWS KMS wrapper `KBC::BranchTypeConfigSecure::` ciphers, requires `kmsKeyId`, `kmsRegion`, `stackId`, `componentId`, `projectId`, `configurationId` and `branchType`.
+- `BranchTypeProjectWideKMSWrapper` - AWS KMS wrapper `KBC::ProjectWideBranchTypeSecure::` ciphers, requires `kmsKeyId`, `kmsRegion`, `stackId`, `projectId` and `branchType`.
+- `GenericAKVWrapper` - Azure Key Vault wrapper for `KBC::SecureKV::` ciphers, requires `akvUrl`. Also, the runner must have AWS credentials available (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`)
+- `ComponentAKVWrapper` - Azure Key Vault wrapper for `KBC::ComponentSecureKV::` ciphers, requires `akvUrl`, `stackId` and `componentId`
+- `ProjectAKVWrapper` - Azure Key Vault wrapper for `KBC::ProjectSecureKV::` ciphers, requires `akvUrl`, `stackId`, `componentId` and `projectId`.
+- `ConfigurationAKVWrapper` - Azure Key Vault wrapper for `KBC::ConfigSecureKV::` ciphers, requires `akvUrl`, `stackId`, `componentId`, `projectId` and `configurationId`.
+- `ProjectWideAKVWrapper` - Azure Key Vault wrapper `KBC::ProjectWideSecureKV::` ciphers, requires `akvUrl`, `stackId`, and `projectId`.
+- `BranchTypeProjectAKVWrapper` - Azure Key Vault wrapper `KBC::BranchTypeSecureKV::` ciphers, requires `akvUrl`, `stackId`, `componentId`, projectId` and `branchType`.
+- `BranchTypeConfigurationAKVWrapper` - Azure Key Vault wrapper `KBC::BranchTypeConfigSecureKV::` ciphers, requires `akvUrl`, `stackId`, `componentId`, `projectId`, `configurationId` and `branchType`.
+- `BranchTypeProjectWideAKVWrapper` - Azure Key Vault wrapper `KBC::ProjectWideBranchTypeSecureKV::` ciphers, requires `akvUrl`, `stackId`, `projectId` and `branchType`.
+- `GenericGKMSWrapper` - Google KMS wrapper for `KBC::SecureGKMS::` ciphers, requires `gkmsKeyId`. Also, the runner must have AWS credentials available (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`)
+- `ComponentGKMSWrapper` - Google KMS wrapper for `KBC::ComponentSecureGKMS::` ciphers, requires `gkmsKeyId`, `stackId` and `componentId`
+- `ProjectGKMSWrapper` - Google KMS wrapper for `KBC::ProjectSecureGKMS::` ciphers, requires `gkmsKeyId`, `stackId`, `componentId` and `projectId`.
+- `ConfigurationGKMSWrapper` - Google KMS wrapper for `KBC::ConfigSecureGKMS::` ciphers, requires `gkmsKeyId`, `stackId`, `componentId`, `projectId` and `configurationId`.
+- `ProjectWideGKMSWrapper` - Google KMS wrapper `KBC::ProjectWideSecureGKMS::` ciphers, requires `gkmsKeyId`, `stackId`, and `projectId`.
+- `BranchTypeProjectGKMSWrapper` - Google KMS wrapper `KBC::BranchTypeSecureGKMS::` ciphers, requires `gkmsKeyId`, `stackId`, `componentId`, projectId` and `branchType`.
+- `BranchTypeConfigurationGKMSWrapper` - Google KMS wrapper `KBC::BranchTypeConfigSecureGKMS::` ciphers, requires `gkmsKeyId`, `stackId`, `componentId`, `projectId`, `configurationId` and `branchType`.
+- `BranchTypeProjectWideGKMSWrapper` - Google KMS wrapper `KBC::ProjectWideBranchTypeSecureGKMS::` ciphers, requires `gkmsKeyId`, `stackId`, `projectId` and `branchType`.
 
 During encryption, the wrapper has to be specified (each `encryptXXX` method uses one). During decryption, 
 the wrapper is chosen automatically by the cipher prefix. This means that `decryptForConfiguration` method is also

@@ -7,10 +7,12 @@ namespace Keboola\ObjectEncryptor\Tests;
 use Keboola\ObjectEncryptor\EncryptorOptions;
 use Keboola\ObjectEncryptor\Exception\ApplicationException;
 use Keboola\ObjectEncryptor\Exception\UserException;
+use Keboola\ObjectEncryptor\Wrapper\GkmsClientFactory;
 use Keboola\ObjectEncryptor\Wrapper\KmsClientFactory;
 use Keboola\ObjectEncryptor\Wrapper\ProjectAKVWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ProjectKMSWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ProjectWideAKVWrapper;
+use Keboola\ObjectEncryptor\Wrapper\ProjectWideGKMSWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ProjectWideKMSWrapper;
 
 class ProjectWideWrapperTest extends AbstractTestCase
@@ -26,40 +28,53 @@ class ProjectWideWrapperTest extends AbstractTestCase
     }
 
     /**
-     * @return ProjectWideAKVWrapper[][]|ProjectWideKMSWrapper[][]
+     * @return ProjectWideAKVWrapper[][]|ProjectWideGKMSWrapper[][]|ProjectWideKMSWrapper[][]
      */
     public function wrapperProvider(): array
     {
+        putenv('GOOGLE_APPLICATION_CREDENTIALS=' . getenv('TEST_GOOGLE_APPLICATION_CREDENTIALS'));
+
         $kmsOptions = new EncryptorOptions(
             stackId: 'some-stack',
             kmsKeyId: self::getKmsKeyId(),
             kmsRegion: self::getKmsRegion(),
             backoffMaxTries: 1,
         );
-
-        $projectWrapperKMS = new ProjectWideKMSWrapper(
-            (new KmsClientFactory())->createClient($kmsOptions),
-            $kmsOptions,
+        $gkmsOptions = new EncryptorOptions(
+            stackId: 'some-stack',
+            gkmsKeyId: self::getGkmsKeyId(),
+            backoffMaxTries: 1,
         );
 
         $projectWrapperAKV = new ProjectWideAKVWrapper(new EncryptorOptions(
             stackId: 'some-stack',
             akvUrl: self::getAkvUrl(),
         ));
+        $projectWrapperKMS = new ProjectWideGKMSWrapper(
+            (new GkmsClientFactory())->createClient($gkmsOptions),
+            $gkmsOptions,
+        );
+        $projectWrapperGKMS = new ProjectWideKMSWrapper(
+            (new KmsClientFactory())->createClient($kmsOptions),
+            $kmsOptions,
+        );
 
         return [
-            'KMS' => [
-                $projectWrapperKMS,
-            ],
             'AKV' => [
                 $projectWrapperAKV,
+            ],
+            'GKMS' => [
+                $projectWrapperGKMS,
+            ],
+            'KMS' => [
+                $projectWrapperKMS,
             ],
         ];
     }
 
     /**
      * @dataProvider wrapperProvider
-     * @param ProjectWideKMSWrapper|ProjectWideAKVWrapper $wrapper
+     * @param ProjectWideAKVWrapper|ProjectWideGKMSWrapper|ProjectWideKMSWrapper $wrapper
      */
     public function testEncrypt($wrapper): void
     {
@@ -72,7 +87,7 @@ class ProjectWideWrapperTest extends AbstractTestCase
 
     /**
      * @dataProvider wrapperProvider
-     * @param ProjectWideKMSWrapper|ProjectWideAKVWrapper $wrapper
+     * @param ProjectWideAKVWrapper|ProjectWideGKMSWrapper|ProjectWideKMSWrapper $wrapper
      */
     public function testEncryptDifferentProject($wrapper): void
     {
@@ -88,6 +103,33 @@ class ProjectWideWrapperTest extends AbstractTestCase
         $wrapper->decrypt($encrypted);
     }
 
+    public function testInvalidSetupAKV(): void
+    {
+        self::expectException(ApplicationException::class);
+        self::expectExceptionMessage('Cipher key settings are invalid.');
+        new ProjectWideAKVWrapper(new EncryptorOptions(
+            stackId: 'some-stack',
+            kmsKeyId: 'some-key',
+            kmsRegion: 'some-region',
+        ));
+    }
+
+    public function testInvalidSetupGKMS(): void
+    {
+        $options = new EncryptorOptions(
+            stackId: 'some-stack',
+            akvUrl: 'some-url'
+        );
+
+        self::expectException(ApplicationException::class);
+        self::expectExceptionMessage('Cipher key settings are invalid.');
+        new ProjectWideGKMSWrapper(
+            (new GkmsClientFactory())->createClient($options),
+            $options,
+        );
+    }
+
+
     public function testInvalidSetupKMS(): void
     {
         $options = new EncryptorOptions(
@@ -97,26 +139,15 @@ class ProjectWideWrapperTest extends AbstractTestCase
 
         self::expectException(ApplicationException::class);
         self::expectExceptionMessage('Cipher key settings are missing.');
-        new ProjectKMSWrapper(
+        new ProjectWideKMSWrapper(
             (new KmsClientFactory())->createClient($options),
             $options,
         );
     }
 
-    public function testInvalidSetupAKV(): void
-    {
-        self::expectException(ApplicationException::class);
-        self::expectExceptionMessage('Cipher key settings are invalid.');
-        new ProjectAKVWrapper(new EncryptorOptions(
-            stackId: 'some-stack',
-            kmsKeyId: 'some-key',
-            kmsRegion: 'some-region',
-        ));
-    }
-
     /**
      * @dataProvider wrapperProvider
-     * @param ProjectWideKMSWrapper|ProjectWideAKVWrapper $wrapper
+     * @param ProjectWideAKVWrapper|ProjectWideGKMSWrapper|ProjectWideKMSWrapper $wrapper
      */
     public function testInvalidSetupEncryptProjectId($wrapper): void
     {
@@ -127,7 +158,7 @@ class ProjectWideWrapperTest extends AbstractTestCase
 
     /**
      * @dataProvider wrapperProvider
-     * @param ProjectWideKMSWrapper|ProjectWideAKVWrapper $wrapper
+     * @param ProjectWideAKVWrapper|ProjectWideGKMSWrapper|ProjectWideKMSWrapper $wrapper
      */
     public function testInvalidSetupDecryptProjectId($wrapper): void
     {
