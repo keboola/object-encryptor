@@ -64,7 +64,6 @@ fi
 echo -e "Configuring \033[1;33m${ENV_FILE}\033[0m for \033[1;33m${ENV_NAME}\033[0m"
 
 SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SCRIPT_PATH="D:/OneDrive/Work/object-encryptor/provisioning/local"
 PROJECT_ROOT="${SCRIPT_PATH}/../.."
 cd "${PROJECT_ROOT}"
 
