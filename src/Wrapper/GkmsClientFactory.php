@@ -25,9 +25,10 @@ class GkmsClientFactory
             (as some other GCP clients do), therefore we disable retries completely and rely on application level
             retries in GenericGKMWrapper. */
         try {
-            // GKM client checks for authorization when created, authorization is cached in memory
+            // Create the handler with passed http client with timeout settings
             $handler = HttpHandlerFactory::build($this->createHttpClient());
 
+            // GKM client checks for authorization when created, authorization is cached in memory
             return new KeyManagementServiceClient(
                 [
                     'disableRetries' => true,
