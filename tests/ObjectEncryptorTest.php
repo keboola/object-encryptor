@@ -1352,4 +1352,41 @@ class ObjectEncryptorTest extends AbstractTestCase
             ),
         );
     }
+
+    /**
+     * @dataProvider cloudEncryptorProvider
+     */
+    public function testDecryptEmptyStrings(ObjectEncryptor $encryptor): void
+    {
+        self::assertEquals('', $encryptor->decryptGeneric(''));
+        self::assertEquals('', $encryptor->decryptForComponent('', 'my-component'));
+        self::assertEquals(
+            '',
+            $encryptor->decryptForProjectWideBranchType('', 'my-project', 'default'),
+        );
+
+        $json = '{
+            "#emptyToken1": "",
+            "key1": {
+                "#emptyToken2": "",
+                "key2": {
+                    "#emptyToken2": ""
+                }
+            }
+        }';
+
+        $result = $encryptor->decryptForConfiguration(
+            json_decode($json),
+            'my-component',
+            'my-project',
+            'my-configuration',
+        );
+        self::assertEquals('', $result->{'#emptyToken1'});
+        self::assertEquals('', $result->key1->{'#emptyToken2'});
+        self::assertEquals('', $result->key1->key2->{'#emptyToken2'});
+
+        $this->expectException(UserException::class);
+        $this->expectExceptionMessage('Value " " is not an encrypted value.');
+        self::assertEquals('', $encryptor->decryptGeneric(' '));
+    }
 }
