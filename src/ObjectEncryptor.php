@@ -376,7 +376,7 @@ class ObjectEncryptor
 
     private function decryptValue(string $value, array $wrappers): string
     {
-        if (RegexHelper::matchesVariable($value)) {
+        if ($value === '' || RegexHelper::matchesVariable($value)) {
             return $value;
         }
 
