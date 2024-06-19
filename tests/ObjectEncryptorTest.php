@@ -57,7 +57,7 @@ class ObjectEncryptorTest extends AbstractTestCase
             'my-stack',
             self::getKmsKeyId(),
             self::getKmsRegion(),
-            null
+            null,
         );
         self::expectException(ApplicationException::class);
         self::expectExceptionMessage('Encryption failed: Ciphering failed: Failed to obtain encryption key.');
@@ -70,11 +70,11 @@ class ObjectEncryptorTest extends AbstractTestCase
         putenv('GOOGLE_APPLICATION_CREDENTIALS=fail');
         $encryptor = ObjectEncryptorFactory::getGcpEncryptor(
             'my-stack',
-            self::getGkmsKeyId()
+            self::getGkmsKeyId(),
         );
         self::expectException(ApplicationException::class);
         self::expectExceptionMessage(
-            'Cipher key settings are invalid: Could not construct ApplicationDefaultCredentials'
+            'Cipher key settings are invalid: Could not construct ApplicationDefaultCredentials',
         );
         $encryptor->encryptGeneric('secret');
     }
@@ -248,11 +248,11 @@ class ObjectEncryptorTest extends AbstractTestCase
         // decrypt the two encrypted values, everything else should remain identical
         self::assertSame(
             'KBC::ConfigSecureKVaaaaaaaaaaaaaaaaaaaaaaaaaa',
-            $encryptor->decryptForComponent($encryptedValue['#Similar'], 'my-component')
+            $encryptor->decryptForComponent($encryptedValue['#Similar'], 'my-component'),
         );
         self::assertSame(
             'KBC::Encryptedaaaaaaaaaaaaaaaaaaaaaaaaaa',
-            $encryptor->decryptForComponent($encryptedValue['#LegacySimilar'], 'my-component')
+            $encryptor->decryptForComponent($encryptedValue['#LegacySimilar'], 'my-component'),
         );
         unset($data['#LegacySimilar']);
         unset($data['#Similar']);
@@ -753,7 +753,7 @@ class ObjectEncryptorTest extends AbstractTestCase
         self::assertEquals(stdClass::class, get_class($encrypted));
         self::assertEquals(
             stdClass::class,
-            get_class($encryptor->decryptForComponent($encrypted, 'my-component'))
+            get_class($encryptor->decryptForComponent($encrypted, 'my-component')),
         );
     }
 
@@ -895,22 +895,22 @@ class ObjectEncryptorTest extends AbstractTestCase
         self::assertStringStartsWith($projectPrefix, $encryptedProject);
         self::assertEquals(
             'secret1',
-            $encryptor->decryptForProject($encryptedGeneric, 'my-component', 'my-project')
+            $encryptor->decryptForProject($encryptedGeneric, 'my-component', 'my-project'),
         );
         self::assertEquals(
             'secret2',
-            $encryptor->decryptForProject($encryptedComponent, 'my-component', 'my-project')
+            $encryptor->decryptForProject($encryptedComponent, 'my-component', 'my-project'),
         );
         self::assertEquals(
             'secret3',
-            $encryptor->decryptForProject($encryptedProject, 'my-component', 'my-project')
+            $encryptor->decryptForProject($encryptedProject, 'my-component', 'my-project'),
         );
 
         $encryptedConfiguration = $encryptor->encryptForConfiguration(
             'secret4',
             'my-component',
             'my-project',
-            'my-configuration'
+            'my-configuration',
         );
         self::assertStringStartsWith($configurationPrefix, $encryptedConfiguration);
         self::assertEquals(
@@ -919,8 +919,8 @@ class ObjectEncryptorTest extends AbstractTestCase
                 $encryptedGeneric,
                 'my-component',
                 'my-project',
-                'my-configuration'
-            )
+                'my-configuration',
+            ),
         );
         self::assertEquals(
             'secret2',
@@ -928,8 +928,8 @@ class ObjectEncryptorTest extends AbstractTestCase
                 $encryptedComponent,
                 'my-component',
                 'my-project',
-                'my-configuration'
-            )
+                'my-configuration',
+            ),
         );
         self::assertEquals(
             'secret3',
@@ -937,8 +937,8 @@ class ObjectEncryptorTest extends AbstractTestCase
                 $encryptedProject,
                 'my-component',
                 'my-project',
-                'my-configuration'
-            )
+                'my-configuration',
+            ),
         );
         self::assertEquals(
             'secret4',
@@ -946,8 +946,8 @@ class ObjectEncryptorTest extends AbstractTestCase
                 $encryptedConfiguration,
                 'my-component',
                 'my-project',
-                'my-configuration'
-            )
+                'my-configuration',
+            ),
         );
 
         $encryptedProjectWide = $encryptor->encryptForProjectWide('secret2', 'my-project');
@@ -969,7 +969,7 @@ class ObjectEncryptorTest extends AbstractTestCase
                 'my-component',
                 'my-project',
                 ObjectEncryptor::BRANCH_TYPE_DEFAULT,
-            )
+            ),
         );
         self::assertEquals(
             'secret2',
@@ -978,7 +978,7 @@ class ObjectEncryptorTest extends AbstractTestCase
                 'my-component',
                 'my-project',
                 ObjectEncryptor::BRANCH_TYPE_DEFAULT,
-            )
+            ),
         );
         self::assertEquals(
             'secret3',
@@ -987,7 +987,7 @@ class ObjectEncryptorTest extends AbstractTestCase
                 'my-component',
                 'my-project',
                 ObjectEncryptor::BRANCH_TYPE_DEFAULT,
-            )
+            ),
         );
         self::assertEquals(
             'secret5',
@@ -996,13 +996,13 @@ class ObjectEncryptorTest extends AbstractTestCase
                 'my-component',
                 'my-project',
                 ObjectEncryptor::BRANCH_TYPE_DEFAULT,
-            )
+            ),
         );
 
         $encryptedProjectWideBranchType = $encryptor->encryptForProjectWideBranchType(
             'secret6',
             'my-project',
-            ObjectEncryptor::BRANCH_TYPE_DEFAULT
+            ObjectEncryptor::BRANCH_TYPE_DEFAULT,
         );
         self::assertStringStartsWith($projectWideBranchTypePrefix, $encryptedProjectWideBranchType);
         self::assertEquals(
@@ -1011,7 +1011,7 @@ class ObjectEncryptorTest extends AbstractTestCase
                 $encryptedGeneric,
                 'my-project',
                 ObjectEncryptor::BRANCH_TYPE_DEFAULT,
-            )
+            ),
         );
         self::assertEquals(
             'secret6',
@@ -1019,7 +1019,7 @@ class ObjectEncryptorTest extends AbstractTestCase
                 $encryptedProjectWideBranchType,
                 'my-project',
                 ObjectEncryptor::BRANCH_TYPE_DEFAULT,
-            )
+            ),
         );
 
         $encryptedBranchTypeConfiguration = $encryptor->encryptForBranchTypeConfiguration(
@@ -1038,7 +1038,7 @@ class ObjectEncryptorTest extends AbstractTestCase
                 'my-project',
                 'my-configuration',
                 ObjectEncryptor::BRANCH_TYPE_DEFAULT,
-            )
+            ),
         );
         self::assertEquals(
             'secret2',
@@ -1048,7 +1048,7 @@ class ObjectEncryptorTest extends AbstractTestCase
                 'my-project',
                 'my-configuration',
                 ObjectEncryptor::BRANCH_TYPE_DEFAULT,
-            )
+            ),
         );
         self::assertEquals(
             'secret3',
@@ -1058,7 +1058,7 @@ class ObjectEncryptorTest extends AbstractTestCase
                 'my-project',
                 'my-configuration',
                 ObjectEncryptor::BRANCH_TYPE_DEFAULT,
-            )
+            ),
         );
         self::assertEquals(
             'secret4',
@@ -1068,7 +1068,7 @@ class ObjectEncryptorTest extends AbstractTestCase
                 'my-project',
                 'my-configuration',
                 ObjectEncryptor::BRANCH_TYPE_DEFAULT,
-            )
+            ),
         );
         self::assertEquals(
             'secret5',
@@ -1078,7 +1078,7 @@ class ObjectEncryptorTest extends AbstractTestCase
                 'my-project',
                 'my-configuration',
                 ObjectEncryptor::BRANCH_TYPE_DEFAULT,
-            )
+            ),
         );
         self::assertEquals(
             'secret2',
@@ -1088,7 +1088,7 @@ class ObjectEncryptorTest extends AbstractTestCase
                 'my-project',
                 'my-configuration',
                 ObjectEncryptor::BRANCH_TYPE_DEFAULT,
-            )
+            ),
         );
         self::assertEquals(
             'secret6',
@@ -1098,7 +1098,7 @@ class ObjectEncryptorTest extends AbstractTestCase
                 'my-project',
                 'my-configuration',
                 ObjectEncryptor::BRANCH_TYPE_DEFAULT,
-            )
+            ),
         );
         self::assertEquals(
             'secret7',
@@ -1108,7 +1108,7 @@ class ObjectEncryptorTest extends AbstractTestCase
                 'my-project',
                 'my-configuration',
                 ObjectEncryptor::BRANCH_TYPE_DEFAULT,
-            )
+            ),
         );
     }
 
@@ -1130,22 +1130,22 @@ class ObjectEncryptorTest extends AbstractTestCase
         self::assertEquals('{{ my_variable-3 }}', $encryptedProject);
         self::assertEquals(
             '{{ my_variable }}',
-            $encryptor->decryptForProject($encryptedGeneric, 'my-component', 'my-project')
+            $encryptor->decryptForProject($encryptedGeneric, 'my-component', 'my-project'),
         );
         self::assertEquals(
             '{{ my_variable-2 }}',
-            $encryptor->decryptForProject($encryptedComponent, 'my-component', 'my-project')
+            $encryptor->decryptForProject($encryptedComponent, 'my-component', 'my-project'),
         );
         self::assertEquals(
             '{{ my_variable-3 }}',
-            $encryptor->decryptForProject($encryptedProject, 'my-component', 'my-project')
+            $encryptor->decryptForProject($encryptedProject, 'my-component', 'my-project'),
         );
 
         $encryptedConfiguration = $encryptor->encryptForConfiguration(
             '{{ my_variable-4 }}',
             'my-component',
             'my-project',
-            'my-configuration'
+            'my-configuration',
         );
         self::assertEquals('{{ my_variable-4 }}', $encryptedConfiguration);
         self::assertEquals(
@@ -1154,8 +1154,8 @@ class ObjectEncryptorTest extends AbstractTestCase
                 $encryptedGeneric,
                 'my-component',
                 'my-project',
-                'my-configuration'
-            )
+                'my-configuration',
+            ),
         );
         self::assertEquals(
             '{{ my_variable-2 }}',
@@ -1163,8 +1163,8 @@ class ObjectEncryptorTest extends AbstractTestCase
                 $encryptedComponent,
                 'my-component',
                 'my-project',
-                'my-configuration'
-            )
+                'my-configuration',
+            ),
         );
         self::assertEquals(
             '{{ my_variable-3 }}',
@@ -1172,8 +1172,8 @@ class ObjectEncryptorTest extends AbstractTestCase
                 $encryptedProject,
                 'my-component',
                 'my-project',
-                'my-configuration'
-            )
+                'my-configuration',
+            ),
         );
         self::assertEquals(
             '{{ my_variable-4 }}',
@@ -1181,19 +1181,19 @@ class ObjectEncryptorTest extends AbstractTestCase
                 $encryptedConfiguration,
                 'my-component',
                 'my-project',
-                'my-configuration'
-            )
+                'my-configuration',
+            ),
         );
 
         $encryptedProjectWide = $encryptor->encryptForProjectWide('{{ my_variable-2 }}', 'my-project');
         self::assertEquals('{{ my_variable-2 }}', $encryptedProjectWide);
         self::assertEquals(
             '{{ my_variable }}',
-            $encryptor->decryptForProjectWide($encryptedGeneric, 'my-project')
+            $encryptor->decryptForProjectWide($encryptedGeneric, 'my-project'),
         );
         self::assertEquals(
             '{{ my_variable-2 }}',
-            $encryptor->decryptForProjectWide($encryptedProjectWide, 'my-project')
+            $encryptor->decryptForProjectWide($encryptedProjectWide, 'my-project'),
         );
 
         $encryptedBranchType = $encryptor->encryptForBranchType(
@@ -1210,7 +1210,7 @@ class ObjectEncryptorTest extends AbstractTestCase
                 'my-component',
                 'my-project',
                 ObjectEncryptor::BRANCH_TYPE_DEFAULT,
-            )
+            ),
         );
         self::assertEquals(
             '{{ my_variable-2 }}',
@@ -1219,7 +1219,7 @@ class ObjectEncryptorTest extends AbstractTestCase
                 'my-component',
                 'my-project',
                 ObjectEncryptor::BRANCH_TYPE_DEFAULT,
-            )
+            ),
         );
         self::assertEquals(
             '{{ my_variable-3 }}',
@@ -1228,7 +1228,7 @@ class ObjectEncryptorTest extends AbstractTestCase
                 'my-component',
                 'my-project',
                 ObjectEncryptor::BRANCH_TYPE_DEFAULT,
-            )
+            ),
         );
         self::assertEquals(
             '{{ my_variable-5 }}',
@@ -1237,13 +1237,13 @@ class ObjectEncryptorTest extends AbstractTestCase
                 'my-component',
                 'my-project',
                 ObjectEncryptor::BRANCH_TYPE_DEFAULT,
-            )
+            ),
         );
 
         $encryptedProjectWideBranchType = $encryptor->encryptForProjectWideBranchType(
             '{{ my_variable-6 }}',
             'my-project',
-            ObjectEncryptor::BRANCH_TYPE_DEFAULT
+            ObjectEncryptor::BRANCH_TYPE_DEFAULT,
         );
         self::assertEquals('{{ my_variable-6 }}', $encryptedProjectWideBranchType);
         self::assertEquals(
@@ -1252,7 +1252,7 @@ class ObjectEncryptorTest extends AbstractTestCase
                 $encryptedGeneric,
                 'my-project',
                 ObjectEncryptor::BRANCH_TYPE_DEFAULT,
-            )
+            ),
         );
         self::assertEquals(
             '{{ my_variable-6 }}',
@@ -1260,7 +1260,7 @@ class ObjectEncryptorTest extends AbstractTestCase
                 $encryptedProjectWideBranchType,
                 'my-project',
                 ObjectEncryptor::BRANCH_TYPE_DEFAULT,
-            )
+            ),
         );
 
         $encryptedBranchTypeConfiguration = $encryptor->encryptForBranchTypeConfiguration(
@@ -1279,7 +1279,7 @@ class ObjectEncryptorTest extends AbstractTestCase
                 'my-project',
                 'my-configuration',
                 ObjectEncryptor::BRANCH_TYPE_DEFAULT,
-            )
+            ),
         );
         self::assertEquals(
             '{{ my_variable-2 }}',
@@ -1289,7 +1289,7 @@ class ObjectEncryptorTest extends AbstractTestCase
                 'my-project',
                 'my-configuration',
                 ObjectEncryptor::BRANCH_TYPE_DEFAULT,
-            )
+            ),
         );
         self::assertEquals(
             '{{ my_variable-3 }}',
@@ -1299,7 +1299,7 @@ class ObjectEncryptorTest extends AbstractTestCase
                 'my-project',
                 'my-configuration',
                 ObjectEncryptor::BRANCH_TYPE_DEFAULT,
-            )
+            ),
         );
         self::assertEquals(
             '{{ my_variable-4 }}',
@@ -1309,7 +1309,7 @@ class ObjectEncryptorTest extends AbstractTestCase
                 'my-project',
                 'my-configuration',
                 ObjectEncryptor::BRANCH_TYPE_DEFAULT,
-            )
+            ),
         );
         self::assertEquals(
             '{{ my_variable-5 }}',
@@ -1319,7 +1319,7 @@ class ObjectEncryptorTest extends AbstractTestCase
                 'my-project',
                 'my-configuration',
                 ObjectEncryptor::BRANCH_TYPE_DEFAULT,
-            )
+            ),
         );
         self::assertEquals(
             '{{ my_variable-2 }}',
@@ -1329,7 +1329,7 @@ class ObjectEncryptorTest extends AbstractTestCase
                 'my-project',
                 'my-configuration',
                 ObjectEncryptor::BRANCH_TYPE_DEFAULT,
-            )
+            ),
         );
         self::assertEquals(
             '{{ my_variable-6 }}',
@@ -1339,7 +1339,7 @@ class ObjectEncryptorTest extends AbstractTestCase
                 'my-project',
                 'my-configuration',
                 ObjectEncryptor::BRANCH_TYPE_DEFAULT,
-            )
+            ),
         );
         self::assertEquals(
             '{{ my_variable-7 }}',
@@ -1349,7 +1349,7 @@ class ObjectEncryptorTest extends AbstractTestCase
                 'my-project',
                 'my-configuration',
                 ObjectEncryptor::BRANCH_TYPE_DEFAULT,
-            )
+            ),
         );
     }
 }

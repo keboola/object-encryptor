@@ -19,7 +19,7 @@ class EncryptorOptionsTest extends TestCase
             kmsRole: 'role',
             akvUrl: 'akv-url',
             gkmsKeyId: 'gkms-key-id',
-            backoffMaxTries: 1
+            backoffMaxTries: 1,
         );
         self::assertSame('my-stack', $options->getStackId());
         self::assertSame('my-kms-id', $options->getKmsKeyId());

@@ -145,7 +145,7 @@ class GenericKMSWrapper implements CryptoWrapperInterface
             assert(is_string($decryptedKey));
             $safeKey = Encoding::saveBytesToChecksummedAsciiSafeString(
                 Key::KEY_CURRENT_VERSION,
-                $decryptedKey
+                $decryptedKey,
             );
             $key = Key::loadFromAsciiSafeString($safeKey);
             return Crypto::decrypt($encrypted[0], $key, true);
