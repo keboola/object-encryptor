@@ -35,4 +35,4 @@ services:
       TEST_GOOGLE_APPLICATION_CREDENTIALS: /code/var/gcp-private-key.json
     volumes:
       - ./build/logs/:/code/build/logs/
-      - $GOOGLE_APPLICATION_CREDENTIALS:/code/var/gcp-private-key.json
+      - ./var/gcp-private-key.json:/code/var/gcp-private-key.json
