@@ -32,7 +32,7 @@
     },
     "require-dev": {
         "infection/infection": "^0.26",
-        "keboola/coding-standard": "^14.0",
+        "keboola/coding-standard": "^15.0",
         "phpstan/phpstan": "^1.8",
         "phpstan/phpstan-phpunit": "^1.0",
         "phpunit/phpunit": "^9.5",
