@@ -52,7 +52,7 @@ class GenericAKVWrapper implements CryptoWrapperInterface
             $this->client = new Client(
                 new GuzzleClientFactory(new NullLogger()),
                 new AuthenticatorFactory(),
-                $this->keyVaultURL
+                $this->keyVaultURL,
             );
         }
         return $this->client;
@@ -116,7 +116,7 @@ class GenericAKVWrapper implements CryptoWrapperInterface
             $secret = $this->getRetryProxy()->call(function () use ($context) {
                 return $this->getClient()->setSecret(
                     new SetSecretRequest($context, new SecretAttributes()),
-                    uniqid('gen-encryptor')
+                    uniqid('gen-encryptor'),
                 );
             });
             /** @var SecretBundle $secret */
@@ -152,7 +152,7 @@ class GenericAKVWrapper implements CryptoWrapperInterface
             $decryptedContext = $this->getRetryProxy()->call(function () use ($encrypted) {
                 return $this->getClient()->getSecret(
                     $encrypted[self::SECRET_NAME],
-                    $encrypted[self::SECRET_VERSION]
+                    $encrypted[self::SECRET_VERSION],
                 )->getValue();
             });
             assert(is_string($decryptedContext));

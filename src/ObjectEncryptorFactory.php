@@ -17,7 +17,7 @@ class ObjectEncryptorFactory
         string $stackId,
         string $kmsKeyId,
         string $kmsRegion,
-        ?string $kmsRole
+        ?string $kmsRole,
     ): ObjectEncryptor {
         $encryptOptions = new EncryptorOptions($stackId, $kmsKeyId, $kmsRegion, $kmsRole, null);
         return self::getEncryptor($encryptOptions);

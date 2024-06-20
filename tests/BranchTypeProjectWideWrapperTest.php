@@ -123,7 +123,7 @@ class BranchTypeProjectWideWrapperTest extends AbstractTestCase
     {
         $options = new EncryptorOptions(
             stackId: 'some-stack',
-            akvUrl: 'some-url'
+            akvUrl: 'some-url',
         );
 
         self::expectException(ApplicationException::class);
@@ -138,7 +138,7 @@ class BranchTypeProjectWideWrapperTest extends AbstractTestCase
     {
         $options = new EncryptorOptions(
             stackId: 'some-stack',
-            akvUrl: 'some-url'
+            akvUrl: 'some-url',
         );
 
         self::expectException(ApplicationException::class);

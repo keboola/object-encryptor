@@ -37,7 +37,7 @@ class GkmsClientFactory
                             'httpHandler' => [$handler, 'async'],
                         ],
                     ],
-                ]
+                ],
             );
         } catch (Throwable $e) {
             throw new ApplicationException('Cipher key settings are invalid: ' . $e->getMessage(), 0, $e);

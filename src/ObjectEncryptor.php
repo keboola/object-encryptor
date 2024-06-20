@@ -376,7 +376,7 @@ class ObjectEncryptor
 
     private function decryptValue(string $value, array $wrappers): string
     {
-        if (RegexHelper::matchesVariable($value)) {
+        if ($value === '' || RegexHelper::matchesVariable($value)) {
             return $value;
         }
 
@@ -414,7 +414,7 @@ class ObjectEncryptor
             return $this->encryptObject($value, $wrappers, $wrapper);
         } else {
             throw new ApplicationException(
-                'Invalid item $key - only stdClass, array and scalar can be encrypted.'
+                'Invalid item $key - only stdClass, array and scalar can be encrypted.',
             );
         }
     }
@@ -522,7 +522,7 @@ class ObjectEncryptor
             return $this->decryptObject($value, $wrappers);
         } else {
             throw new ApplicationException(
-                "Invalid item $key - only stdClass, array and scalar can be decrypted."
+                "Invalid item $key - only stdClass, array and scalar can be decrypted.",
             );
         }
     }
@@ -719,7 +719,7 @@ class ObjectEncryptor
                         if ($branchType) {
                             $wrapper = new BranchTypeConfigurationGKMSWrapper(
                                 $this->gkmsClient,
-                                $this->encryptorOptions
+                                $this->encryptorOptions,
                             );
                             $wrapper->setComponentId($componentId);
                             $wrapper->setProjectId($projectId);
@@ -755,21 +755,21 @@ class ObjectEncryptor
         if ($this->encryptorOptions->getAkvUrl()) {
             $wrappers = array_merge(
                 $wrappers,
-                $this->getAKVWrappers($componentId, $projectId, $configurationId, $branchType)
+                $this->getAKVWrappers($componentId, $projectId, $configurationId, $branchType),
             );
         }
 
         if ($this->encryptorOptions->getGkmsKeyId()) {
             $wrappers = array_merge(
                 $wrappers,
-                $this->getGMKSWrappers($componentId, $projectId, $configurationId, $branchType)
+                $this->getGMKSWrappers($componentId, $projectId, $configurationId, $branchType),
             );
         }
 
         if ($this->encryptorOptions->getKmsKeyRegion() && $this->encryptorOptions->getKmsKeyId()) {
             $wrappers = array_merge(
                 $wrappers,
-                $this->getKMSWrappers($componentId, $projectId, $configurationId, $branchType)
+                $this->getKMSWrappers($componentId, $projectId, $configurationId, $branchType),
             );
         }
         return $wrappers;

@@ -29,7 +29,7 @@ class GenericAKVWrapperTest extends AbstractTestCase
         foreach ($envs as $env) {
             if (!getenv($env)) {
                 throw new RuntimeException(
-                    sprintf('At least one of %s environment variables is empty.', implode(', ', $envs))
+                    sprintf('At least one of %s environment variables is empty.', implode(', ', $envs)),
                 );
             }
         }
@@ -44,7 +44,7 @@ class GenericAKVWrapperTest extends AbstractTestCase
         $client = new Client(
             new GuzzleClientFactory(new NullLogger()),
             new AuthenticatorFactory(),
-            self::getAkvUrl()
+            self::getAkvUrl(),
         );
         foreach ($client->getAllSecrets() as $secret) {
             $client->deleteSecret($secret->getName());
@@ -144,10 +144,10 @@ class GenericAKVWrapperTest extends AbstractTestCase
         $secretInternal = '';
         $mockClient->expects(self::exactly(3))->method('setSecret')
             ->willReturnCallback(function (
-                SetSecretRequest $setSecretRequest
+                SetSecretRequest $setSecretRequest,
             ) use (
                 &$callNoSet,
-                &$secretInternal
+                &$secretInternal,
             ) {
                 $callNoSet++;
                 $secretInternal = $setSecretRequest->getArray()['value'];
@@ -165,10 +165,10 @@ class GenericAKVWrapperTest extends AbstractTestCase
         $mockClient->expects(self::exactly(3))->method('getSecret')
             ->willReturnCallback(function (
                 $secretName,
-                $secretVersion
+                $secretVersion,
             ) use (
                 &$callNoGet,
-                &$secretInternal
+                &$secretInternal,
             ) {
                 $callNoGet++;
                 if ($callNoGet < 3) {
@@ -200,7 +200,7 @@ class GenericAKVWrapperTest extends AbstractTestCase
             ->getMock();
         $mockClient->method('setSecret')
             ->willThrowException(
-                new ConnectException('mock failed to connect', new Request('GET', 'some-uri'))
+                new ConnectException('mock failed to connect', new Request('GET', 'some-uri')),
             );
 
         $secret = 'secret';
@@ -222,13 +222,13 @@ class GenericAKVWrapperTest extends AbstractTestCase
             ->getMock();
         $mockClient->method('getSecret')
             ->willThrowException(
-                new ConnectException('mock failed to connect', new Request('GET', 'some-uri'))
+                new ConnectException('mock failed to connect', new Request('GET', 'some-uri')),
             );
 
         $secret = 'secret';
         $wrapper = new GenericAKVWrapper(new EncryptorOptions(
             stackId: 'some-stack',
-            akvUrl: self::getAkvUrl()
+            akvUrl: self::getAkvUrl(),
         ));
         $encrypted = $wrapper->encrypt($secret);
         self::assertNotEquals($secret, $encrypted);
@@ -288,9 +288,9 @@ class GenericAKVWrapperTest extends AbstractTestCase
         $mockClient->method('setSecret')
             ->willReturnCallback(function (
                 SetSecretRequest $setSecretRequest,
-                $secretName
+                $secretName,
             ) use (
-                &$secretInternal
+                &$secretInternal,
             ) {
                 $secretInternal = $setSecretRequest->getArray()['value'];
                 return new SecretBundle([
@@ -368,7 +368,7 @@ class GenericAKVWrapperTest extends AbstractTestCase
         putenv('AZURE_CLIENT_ID=invalid');
         $wrapper = new GenericAKVWrapper(new EncryptorOptions(
             stackId: 'some-stack',
-            akvUrl: self::getAkvUrl()
+            akvUrl: self::getAkvUrl(),
         ));
         self::expectException(ApplicationException::class);
         self::expectExceptionMessage('Ciphering failed: Failed to get authentication token');

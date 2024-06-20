@@ -140,7 +140,7 @@ class GenericKMSWrapperTest extends AbstractTestCase
             ->getMock();
         $mockKmsClient->method('execute')
             ->willThrowException(
-                new ConnectException('mock failed to connect', new Request('GET', 'some-uri'))
+                new ConnectException('mock failed to connect', new Request('GET', 'some-uri')),
             );
 
         $mockWrapper = new GenericKMSWrapper(
@@ -206,7 +206,7 @@ class GenericKMSWrapperTest extends AbstractTestCase
             ->getMock();
         $mockKmsClient->method('execute')
             ->willThrowException(
-                new ConnectException('mock failed to connect', new Request('GET', 'some-uri'))
+                new ConnectException('mock failed to connect', new Request('GET', 'some-uri')),
             );
 
         $mockWrapper = new GenericKMSWrapper(
@@ -385,7 +385,7 @@ class GenericKMSWrapperTest extends AbstractTestCase
             stackId: 'some-stack',
             kmsKeyId: self::getKmsKeyId(),
             kmsRegion: 'non-existent',
-            backoffMaxTries: 1
+            backoffMaxTries: 1,
         );
 
         $wrapper = new GenericKMSWrapper(

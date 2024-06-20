@@ -150,7 +150,7 @@ class GenericGKMWrapperTest extends AbstractTestCase
         $mockClient = $this->createMock(KeyManagementServiceClient::class);
         $mockClient->expects(self::exactly(1))->method('encrypt')
             ->willThrowException(
-                new ConnectException('mock failed to connect', new Request('GET', 'some-uri'))
+                new ConnectException('mock failed to connect', new Request('GET', 'some-uri')),
             );
 
         $options = new EncryptorOptions(
@@ -169,7 +169,7 @@ class GenericGKMWrapperTest extends AbstractTestCase
         $mockClient = $this->createMock(KeyManagementServiceClient::class);
         $mockClient->expects(self::exactly(1))->method('decrypt')
             ->willThrowException(
-                new ConnectException('mock failed to connect', new Request('GET', 'some-uri'))
+                new ConnectException('mock failed to connect', new Request('GET', 'some-uri')),
             );
 
         $options = new EncryptorOptions(
@@ -231,7 +231,7 @@ class GenericGKMWrapperTest extends AbstractTestCase
                 stackId: 'some-stack',
                 kmsKeyId: 'test-key',
                 kmsRegion: 'test-region',
-            )
+            ),
         );
     }
 
@@ -242,7 +242,7 @@ class GenericGKMWrapperTest extends AbstractTestCase
             new EncryptorOptions(
                 stackId: 'some-stack',
                 gkmsKeyId: 'test-key',
-            )
+            ),
         );
         self::expectException(ApplicationException::class);
         self::expectExceptionMessage('Ciphering failed: Could not map bindings for');
@@ -256,7 +256,7 @@ class GenericGKMWrapperTest extends AbstractTestCase
             new EncryptorOptions(
                 stackId: 'some-stack',
                 gkmsKeyId: 'test-key',
-            )
+            ),
         );
         self::expectException(ApplicationException::class);
         self::expectExceptionMessage('Deciphering failed.');
@@ -272,7 +272,7 @@ class GenericGKMWrapperTest extends AbstractTestCase
             new EncryptorOptions(
                 stackId: 'some-stack',
                 gkmsKeyId: self::getGkmsKeyId(),
-            )
+            ),
         );
         $encrypted = $wrapper->encrypt('test');
         self::assertNotEquals('test', $encrypted);

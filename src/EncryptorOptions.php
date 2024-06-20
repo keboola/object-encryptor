@@ -40,7 +40,7 @@ class EncryptorOptions
         ?string $kmsRole = null,
         ?string $akvUrl = null,
         ?string $gkmsKeyId = null,
-        ?int $backoffMaxTries = null
+        ?int $backoffMaxTries = null,
     ) {
         $this->stackId = $stackId;
         $this->kmsKeyId = $kmsKeyId;

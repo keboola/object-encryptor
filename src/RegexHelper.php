@@ -20,7 +20,7 @@ class RegexHelper
 
         if ($result === false) {
             throw new ApplicationException(
-                sprintf('Variable regex matching error "%s"', preg_last_error_msg())
+                sprintf('Variable regex matching error "%s"', preg_last_error_msg()),
             );
         }
 

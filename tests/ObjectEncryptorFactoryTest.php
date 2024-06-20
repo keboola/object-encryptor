@@ -25,7 +25,7 @@ class ObjectEncryptorFactoryTest extends AbstractTestCase
             'my-stack',
             self::getKmsKeyId(),
             self::getKmsRegion(),
-            null
+            null,
         );
         $encrypted = $encryptor->encryptForComponent('secret', 'my-component');
         self::assertIsString($encrypted);
@@ -38,7 +38,7 @@ class ObjectEncryptorFactoryTest extends AbstractTestCase
             'my-stack',
             self::getKmsKeyId(),
             self::getKmsRegion(),
-            self::getKmsRoleId()
+            self::getKmsRoleId(),
         );
         $encrypted = $encryptor->encryptForComponent('secret', 'my-component');
         self::assertIsString($encrypted);
@@ -49,7 +49,7 @@ class ObjectEncryptorFactoryTest extends AbstractTestCase
     {
         $encryptor = ObjectEncryptorFactory::getAzureEncryptor(
             'my-stack',
-            self::getAkvUrl()
+            self::getAkvUrl(),
         );
         $encrypted = $encryptor->encryptForComponent('secret', 'my-component');
         self::assertIsString($encrypted);
@@ -64,8 +64,8 @@ class ObjectEncryptorFactoryTest extends AbstractTestCase
                 self::getKmsKeyId(),
                 self::getKmsRegion(),
                 null,
-                self::getAkvUrl()
-            )
+                self::getAkvUrl(),
+            ),
         );
         $encrypted = $encryptor->encryptForComponent('secret', 'my-component');
         self::assertIsString($encrypted);
@@ -76,7 +76,7 @@ class ObjectEncryptorFactoryTest extends AbstractTestCase
             'my-stack',
             self::getKmsKeyId(),
             self::getKmsRegion(),
-            null
+            null,
         );
         $awsEncrypted = $awsEncryptor->encryptForComponent('secret', 'my-component');
         self::assertIsString($awsEncrypted);
@@ -84,7 +84,7 @@ class ObjectEncryptorFactoryTest extends AbstractTestCase
         self::assertStringStartsWith('KBC::ComponentSecure::', (string) $awsEncrypted);
         self::assertEquals(
             'secret',
-            $encryptor->decryptForComponent($awsEncrypted, 'my-component')
+            $encryptor->decryptForComponent($awsEncrypted, 'my-component'),
         );
     }
 }

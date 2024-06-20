@@ -88,7 +88,7 @@ class GenericGKMSWrapper implements CryptoWrapperInterface
                 $response = $this->client->encrypt(
                     $this->gkmsKeyId,
                     $key->saveToAsciiSafeString(),
-                    ['additionalAuthenticatedData' => $this->encode($this->metadata)]
+                    ['additionalAuthenticatedData' => $this->encode($this->metadata)],
                 );
                 return $response->getCiphertext();
             });
@@ -115,7 +115,7 @@ class GenericGKMSWrapper implements CryptoWrapperInterface
                 $response = $this->client->decrypt(
                     $this->gkmsKeyId,
                     $encrypted[self::KEY_INDEX],
-                    ['additionalAuthenticatedData' => $this->encode($this->metadata)]
+                    ['additionalAuthenticatedData' => $this->encode($this->metadata)],
                 );
                 return $response->getPlaintext();
             });
