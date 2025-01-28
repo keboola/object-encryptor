@@ -15,6 +15,8 @@ use Keboola\AzureKeyVaultClient\Responses\SecretBundle;
 use Keboola\ObjectEncryptor\EncryptorOptions;
 use Keboola\ObjectEncryptor\Exception\ApplicationException;
 use Keboola\ObjectEncryptor\Exception\UserException;
+use Keboola\ObjectEncryptor\Temporary\TransClient;
+use Keboola\ObjectEncryptor\Temporary\TransClientNotAvailableException;
 use Psr\Log\NullLogger;
 use Retry\BackOff\ExponentialBackOffPolicy;
 use Retry\Policy\SimpleRetryPolicy;
@@ -37,6 +39,9 @@ class GenericAKVWrapper implements CryptoWrapperInterface
     private string $keyVaultURL;
     private ?Client $client = null;
 
+    private TransClient|false|null $transClient = null;
+    private ?string $encryptorId = null;
+
     public function __construct(EncryptorOptions $encryptorOptions)
     {
         // there is no way to pass backOffMaxTries option to the Azure Key Vault client. Yet.
@@ -44,6 +49,8 @@ class GenericAKVWrapper implements CryptoWrapperInterface
         if (empty($this->keyVaultURL)) {
             throw new ApplicationException('Cipher key settings are invalid.');
         }
+
+        $this->encryptorId = $encryptorOptions->getEncryptorId();
     }
 
     public function getClient(): Client
@@ -56,6 +63,22 @@ class GenericAKVWrapper implements CryptoWrapperInterface
             );
         }
         return $this->client;
+    }
+
+    public function getTransClient(): ?TransClient
+    {
+        if ($this->transClient === null) {
+            try {
+                $this->transClient = new TransClient(
+                    new GuzzleClientFactory(new NullLogger()),
+                    $this->encryptorId,
+                );
+            } catch (TransClientNotAvailableException) {
+                $this->transClient = false;
+            }
+        }
+
+        return $this->transClient ?: null;
     }
 
     private function getRetryProxy(): RetryProxy
