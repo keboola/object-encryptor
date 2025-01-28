@@ -74,7 +74,7 @@ Prerequisites:
   * installed AWS CLI `aws` (and run `aws configure --profile YOUR_AWS_PROFILE_NAME`)
   * installed GCP CLI `gcloud` (and run `gcloud auth login` or `gcloud auth application-default login`)
 * installed `terraform` (https://www.terraform.io) and `jq` (https://stedolan.github.io/jq) to setup local env
-* installed `docker` and `docker-compose` to run & develop the app
+* installed `docker` to run & develop the app
 
 ```bash
 export NAME_PREFIX= # your name/nickname to make your resource unique & recognizable
@@ -88,7 +88,7 @@ terraform -chdir=./provisioning/local init -backend-config="key=object-encryptor
 terraform -chdir=./provisioning/local apply
 ./provisioning/local/update-env.sh aws # or azure or gcp
 
-docker-compose run --rm tests
+docker compose run --rm tests
 ```
 
 ## License
