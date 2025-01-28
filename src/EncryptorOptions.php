@@ -24,6 +24,9 @@ class EncryptorOptions
     private ?string $kmsRole;
     private int $backoffMaxTries;
 
+    /** @var non-empty-string|null */
+    private ?string $encryptorId;
+
     /**
      * @param non-empty-string $stackId
      * @param non-empty-string|null $kmsKeyId
@@ -32,6 +35,7 @@ class EncryptorOptions
      * @param non-empty-string|null $akvUrl
      * @param non-empty-string|null $gkmsKeyId
      * @param int|null $backoffMaxTries
+     * @param non-empty-string|null $encryptorId
      */
     public function __construct(
         string $stackId,
@@ -41,6 +45,7 @@ class EncryptorOptions
         ?string $akvUrl = null,
         ?string $gkmsKeyId = null,
         ?int $backoffMaxTries = null,
+        ?string $encryptorId = null,
     ) {
         $this->stackId = $stackId;
         $this->kmsKeyId = $kmsKeyId;
@@ -49,6 +54,7 @@ class EncryptorOptions
         $this->akvUrl = $akvUrl;
         $this->gkmsKeyId = $gkmsKeyId;
         $this->backoffMaxTries = $backoffMaxTries ?? self::DEFAULT_BACKOFF_MAX_TRIES;
+        $this->encryptorId = $encryptorId;
         $this->validateState();
     }
 
@@ -100,6 +106,14 @@ class EncryptorOptions
     public function getBackoffMaxTries(): int
     {
         return $this->backoffMaxTries;
+    }
+
+    /**
+     * @return non-empty-string|null
+     */
+    public function getEncryptorId(): ?string
+    {
+        return $this->encryptorId;
     }
 
     /**
