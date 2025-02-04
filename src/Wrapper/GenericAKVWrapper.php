@@ -150,10 +150,9 @@ class GenericAKVWrapper implements CryptoWrapperInterface
         }
         try {
             $decryptedContext = $this->getRetryProxy()->call(function () use ($encrypted) {
-                return $this->getClient()->getSecret(
-                    $encrypted[self::SECRET_NAME],
-                    $encrypted[self::SECRET_VERSION],
-                )->getValue();
+                return $this->getClient()
+                    ->getSecret($encrypted[self::SECRET_NAME])
+                    ->getValue();
             });
             assert(is_string($decryptedContext));
             $decryptedContext = $this->decode($decryptedContext);

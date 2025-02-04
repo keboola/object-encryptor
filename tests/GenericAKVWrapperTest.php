@@ -122,6 +122,27 @@ class GenericAKVWrapperTest extends AbstractTestCase
         self::assertEquals($secret, $wrapper->decrypt($encrypted));
     }
 
+    public function testIgnoreSecretVersionWhenRetrievingSecret(): void
+    {
+        $secret = 'mySecretValue';
+        $wrapper = $this->getWrapper();
+        $encrypted = $wrapper->encrypt($secret);
+
+        // decode the encrypted secret and manually change the version
+        $decoded = unserialize((string) gzuncompress(base64_decode($encrypted)));
+        $secretVersionIndex = 4; // = GenericAKVWrapper::SECRET_VERSION
+        /** @var array<int, string> $decoded */
+        $decoded[$secretVersionIndex] = bin2hex(random_bytes(16));
+
+        // encode back with the changed version
+        $encrypted = base64_encode((string) gzcompress(serialize($decoded)));
+
+        // decrypt should succeed regardless of changed version
+        $decrypted = $wrapper->decrypt($encrypted);
+
+        self::assertSame($secret, $decrypted);
+    }
+
     private function getMockWrapper(Client $mockClient): GenericAKVWrapper
     {
         $mockWrapper = $this->createPartialMock(GenericAKVWrapper::class, ['getClient']);
