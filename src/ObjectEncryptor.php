@@ -35,6 +35,7 @@ use Keboola\ObjectEncryptor\Wrapper\ProjectKMSWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ProjectWideAKVWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ProjectWideGKMSWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ProjectWideKMSWrapper;
+use Psr\Log\LoggerInterface;
 use stdClass;
 use Throwable;
 
@@ -47,7 +48,7 @@ class ObjectEncryptor
     private ?KmsClient $kmsClient = null;
     private ?KeyManagementServiceClient $gkmsClient = null;
 
-    public function __construct(EncryptorOptions $encryptorOptions)
+    public function __construct(EncryptorOptions $encryptorOptions, private readonly ?LoggerInterface $logger = null)
     {
         $this->encryptorOptions = $encryptorOptions;
     }
@@ -622,14 +623,17 @@ class ObjectEncryptor
     ): array {
         $wrappers = [];
         $wrapper = new GenericAKVWrapper($this->encryptorOptions);
+        $wrapper->logger = $this->logger;
         $wrappers[] = $wrapper;
         if ($this->encryptorOptions->getStackId()) {
             if ($projectId) {
                 $wrapper = new ProjectWideAKVWrapper($this->encryptorOptions);
+                $wrapper->logger = $this->logger;
                 $wrapper->setProjectId($projectId);
                 $wrappers[] = $wrapper;
                 if ($branchType) {
                     $wrapper = new BranchTypeProjectWideAKVWrapper($this->encryptorOptions);
+                    $wrapper->logger = $this->logger;
                     $wrapper->setProjectId($projectId);
                     $wrapper->setBranchType($branchType);
                     $wrappers[] = $wrapper;
@@ -637,21 +641,25 @@ class ObjectEncryptor
             }
             if ($componentId) {
                 $wrapper = new ComponentAKVWrapper($this->encryptorOptions);
+                $wrapper->logger = $this->logger;
                 $wrapper->setComponentId($componentId);
                 $wrappers[] = $wrapper;
                 if ($projectId) {
                     $wrapper = new ProjectAKVWrapper($this->encryptorOptions);
+                    $wrapper->logger = $this->logger;
                     $wrapper->setComponentId($componentId);
                     $wrapper->setProjectId($projectId);
                     $wrappers[] = $wrapper;
                     if ($configurationId) {
                         $wrapper = new ConfigurationAKVWrapper($this->encryptorOptions);
+                        $wrapper->logger = $this->logger;
                         $wrapper->setComponentId($componentId);
                         $wrapper->setProjectId($projectId);
                         $wrapper->setConfigurationId($configurationId);
                         $wrappers[] = $wrapper;
                         if ($branchType) {
                             $wrapper = new BranchTypeConfigurationAKVWrapper($this->encryptorOptions);
+                            $wrapper->logger = $this->logger;
                             $wrapper->setComponentId($componentId);
                             $wrapper->setProjectId($projectId);
                             $wrapper->setConfigurationId($configurationId);
@@ -661,6 +669,7 @@ class ObjectEncryptor
                     }
                     if ($branchType) {
                         $wrapper = new BranchTypeProjectAKVWrapper($this->encryptorOptions);
+                        $wrapper->logger = $this->logger;
                         $wrapper->setComponentId($componentId);
                         $wrapper->setProjectId($projectId);
                         $wrapper->setBranchType($branchType);

@@ -11,6 +11,9 @@ use Keboola\AzureKeyVaultClient\Exception\ClientException;
 use Keboola\AzureKeyVaultClient\Requests\SetSecretRequest;
 use Keboola\AzureKeyVaultClient\Responses\SecretBundle;
 use Keboola\ObjectEncryptor\EncryptorOptions;
+use Keboola\ObjectEncryptor\Exception\ApplicationException;
+use Keboola\ObjectEncryptor\ObjectEncryptor;
+use Keboola\ObjectEncryptor\ObjectEncryptorFactory;
 use Keboola\ObjectEncryptor\Temporary\TransClient;
 use Keboola\ObjectEncryptor\Wrapper\BranchTypeConfigurationAKVWrapper;
 use Keboola\ObjectEncryptor\Wrapper\BranchTypeProjectAKVWrapper;
@@ -22,6 +25,8 @@ use Keboola\ObjectEncryptor\Wrapper\ProjectAKVWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ProjectWideAKVWrapper;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\Test\TestLogger;
+use ReflectionClass;
 
 class AKVWrappersWithTransClientTest extends TestCase
 {
@@ -259,6 +264,8 @@ class AKVWrappersWithTransClientTest extends TestCase
                 'secret-name',
             );
 
+        $logger = new TestLogger();
+
         /** @var GenericAKVWrapper|MockObject $mockWrapper */
         $mockWrapper = $this->getMockBuilder($wrapperClass)
             ->setConstructorArgs([
@@ -269,6 +276,7 @@ class AKVWrappersWithTransClientTest extends TestCase
             ])
             ->onlyMethods(['getClient', 'getTransClient'])
             ->getMock();
+        $mockWrapper->logger = $logger;
         foreach ($metadata as $metaKey => $metaValue) {
             $mockWrapper->setMetadataValue($metaKey, $metaValue);
         }
@@ -288,6 +296,13 @@ class AKVWrappersWithTransClientTest extends TestCase
         $secret = $mockWrapper->decrypt($encryptedSecret);
 
         self::assertSame('something very secret', $secret);
+        self::assertTrue($logger->hasInfo([
+            'message' => 'Secret "{secretName}" migrated in {stackId} AKV.',
+            'context' => [
+                'secretName' => 'secret-name',
+                'stackId' => 'trans-stack',
+            ],
+        ]));
     }
 
     /**
@@ -343,22 +358,9 @@ class AKVWrappersWithTransClientTest extends TestCase
         self::assertSame('something very secret', $secret);
     }
 
-    public function testRetrieveFromPrimaryVaultWhenTransVaultRetrievalFails(): void
+    public function testTransVaultGetSecretFails(): void
     {
         $key = Key::createNewRandomKey();
-
-        $mockClient = $this->createMock(Client::class);
-        $mockClient->expects(self::once())
-            ->method('getSecret')
-            ->with('secret-name')
-            ->willReturn(new SecretBundle([
-                'id' => 'secret-id',
-                'value' => self::encode([
-                    0 => [],
-                    1 => $key->saveToAsciiSafeString(),
-                ]),
-                'attributes' => [],
-            ]));
 
         $mockTransClient = $this->createMock(TransClient::class);
         $mockTransClient->expects(self::exactly(3))
@@ -377,10 +379,71 @@ class AKVWrappersWithTransClientTest extends TestCase
             ])
             ->onlyMethods(['getClient', 'getTransClient'])
             ->getMock();
+        $mockWrapper->expects(self::never())->method('getClient');
+        $mockWrapper->expects(self::exactly(4))
+            ->method('getTransClient')
+            ->willReturn($mockTransClient);
+
+        $encryptedSecret = self::encode([
+            2 => Crypto::encrypt('something very secret', $key, true),
+            3 => 'secret-name',
+            4 => 'secret-version',
+        ]);
+
+        $this->expectException(ApplicationException::class);
+        $this->expectExceptionCode(500);
+        $this->expectExceptionMessage('Deciphering failed.');
+
+        $mockWrapper->decrypt($encryptedSecret);
+    }
+
+    public function testLogErrorWhenTransVaultSetSecretFails(): void
+    {
+        putenv('TRANS_ENCRYPTOR_STACK_ID=trans-stack');
+
+        $key = Key::createNewRandomKey();
+
+        $mockClient = $this->createMock(Client::class);
+        $mockClient->expects(self::once())
+            ->method('getSecret')
+            ->with('secret-name')
+            ->willReturn(new SecretBundle([
+                'id' => 'secret-id',
+                'value' => self::encode([
+                    0 => [],
+                    1 => $key->saveToAsciiSafeString(),
+                ]),
+                'attributes' => [],
+            ]));
+
+        $mockTransClient = $this->createMock(TransClient::class);
+        $mockTransClient->expects(self::once())
+            ->method('getSecret')
+            ->with('secret-name')
+            ->willThrowException(new ClientException('not found', 404));
+
+        $setSecretException = new ClientException('something failed', 500);
+        $mockTransClient->expects(self::exactly(3))
+            ->method('setSecret')
+            ->willThrowException($setSecretException);
+
+        $logger = new TestLogger();
+
+        /** @var GenericAKVWrapper|MockObject $mockWrapper */
+        $mockWrapper = $this->getMockBuilder(GenericAKVWrapper::class)
+            ->setConstructorArgs([
+                new EncryptorOptions(
+                    stackId: 'some-stack',
+                    akvUrl: 'some-url',
+                ),
+            ])
+            ->onlyMethods(['getClient', 'getTransClient'])
+            ->getMock();
+        $mockWrapper->logger = $logger;
         $mockWrapper->expects(self::once())
             ->method('getClient')
             ->willReturn($mockClient);
-        $mockWrapper->expects(self::exactly(4))
+        $mockWrapper->expects(self::exactly(5))
             ->method('getTransClient')
             ->willReturn($mockTransClient);
 
@@ -393,6 +456,41 @@ class AKVWrappersWithTransClientTest extends TestCase
         $secret = $mockWrapper->decrypt($encryptedSecret);
 
         self::assertSame('something very secret', $secret);
+        self::assertTrue($logger->hasError([
+            'message' => 'Migration of secret "{secretName}" in {stackId} AKV failed.',
+            'context' => [
+                'secretName' => 'secret-name',
+                'stackId' => 'trans-stack',
+                'exception' => $setSecretException,
+            ],
+        ]));
+    }
+
+    public function testObjectEncryptorFactoryInjectsLoggerInAKVWrappers(): void
+    {
+        $logger = new TestLogger();
+
+        $encryptor = ObjectEncryptorFactory::getEncryptor(
+            new EncryptorOptions(
+                stackId: 'some-stack',
+                akvUrl: 'some-url',
+            ),
+            $logger,
+        );
+
+        $reflection = new ReflectionClass(ObjectEncryptor::class);
+        $method = $reflection->getMethod('getWrappers');
+        $method->setAccessible(true);
+
+        /** @var array<GenericAKVWrapper> $wrappers */
+        $wrappers = $method->invokeArgs($encryptor, ['component-id', 'project-id', 'config-id', 'branch-type']);
+
+        self::assertIsArray($wrappers);
+        self::assertCount(8, $wrappers);
+
+        foreach ($wrappers as $wrapper) {
+            self::assertSame($logger, $wrapper->logger);
+        }
     }
 
     private static function encode(mixed $data): string
