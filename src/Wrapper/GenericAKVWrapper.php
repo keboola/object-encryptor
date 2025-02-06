@@ -38,6 +38,7 @@ class GenericAKVWrapper implements CryptoWrapperInterface
     private const PAYLOAD_INDEX = 2;
     private const SECRET_NAME = 3;
     private const SECRET_VERSION = 4;
+    private const TRANS_STACK_ID_ENV = 'TRANS_ENCRYPTOR_STACK_ID';
 
     private array $metadata = [];
     private string $keyVaultURL;
@@ -88,7 +89,7 @@ class GenericAKVWrapper implements CryptoWrapperInterface
 
     private static function getTransStackId(): ?string
     {
-        return (string) getenv('TRANS_ENCRYPTOR_STACK_ID') ?: null;
+        return (string) getenv(self::TRANS_STACK_ID_ENV) ?: null;
     }
 
     private function getRetryProxy(?RetryPolicyInterface $retryPolicy = null): RetryProxy
@@ -234,8 +235,12 @@ class GenericAKVWrapper implements CryptoWrapperInterface
             $doBackfill = false;
             throw new ApplicationException('Deciphering failed.', $e->getCode(), $e);
         } finally {
+            if (!self::getTransStackId()) {
+                $doBackfill = false;
+                $this->logger?->error(sprintf('Env %s not set.', self::TRANS_STACK_ID_ENV));
+            }
             if ($doBackfill) {
-                if (isset($this->metadata['stackId']) && self::getTransStackId()) {
+                if (isset($this->metadata['stackId'])) {
                     $decryptedContext[self::METADATA_INDEX]['stackId'] = self::getTransStackId();
                 }
                 try {
@@ -248,13 +253,13 @@ class GenericAKVWrapper implements CryptoWrapperInterface
                     });
                     $this->logger?->info('Secret "{secretName}" migrated in {stackId} AKV.', [
                         'secretName' => $encrypted[self::SECRET_NAME],
-                        'stackId' => self::getTransStackId() ?? 'trans',
+                        'stackId' => self::getTransStackId(),
                     ]);
                 } catch (Throwable $e) {
                     // intentionally suppress all errors to prevent decrypt() from failing
                     $this->logger?->error('Migration of secret "{secretName}" in {stackId} AKV failed.', [
                         'secretName' => $encrypted[self::SECRET_NAME],
-                        'stackId' => self::getTransStackId() ?? 'trans',
+                        'stackId' => self::getTransStackId(),
                         'exception' => $e,
                     ]);
                 }
