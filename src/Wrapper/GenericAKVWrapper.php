@@ -8,6 +8,7 @@ use Defuse\Crypto\Crypto;
 use Defuse\Crypto\Key;
 use Keboola\AzureKeyVaultClient\Authentication\AuthenticatorFactory;
 use Keboola\AzureKeyVaultClient\Client;
+use Keboola\AzureKeyVaultClient\Exception\ClientException;
 use Keboola\AzureKeyVaultClient\GuzzleClientFactory;
 use Keboola\AzureKeyVaultClient\Requests\SecretAttributes;
 use Keboola\AzureKeyVaultClient\Requests\SetSecretRequest;
@@ -15,10 +16,13 @@ use Keboola\AzureKeyVaultClient\Responses\SecretBundle;
 use Keboola\ObjectEncryptor\EncryptorOptions;
 use Keboola\ObjectEncryptor\Exception\ApplicationException;
 use Keboola\ObjectEncryptor\Exception\UserException;
+use Keboola\ObjectEncryptor\Temporary\CallbackRetryPolicy;
 use Keboola\ObjectEncryptor\Temporary\TransClient;
 use Keboola\ObjectEncryptor\Temporary\TransClientNotAvailableException;
+use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Retry\BackOff\ExponentialBackOffPolicy;
+use Retry\Policy\RetryPolicyInterface;
 use Retry\Policy\SimpleRetryPolicy;
 use Retry\RetryProxy;
 use Throwable;
@@ -34,6 +38,7 @@ class GenericAKVWrapper implements CryptoWrapperInterface
     private const PAYLOAD_INDEX = 2;
     private const SECRET_NAME = 3;
     private const SECRET_VERSION = 4;
+    private const TRANS_STACK_ID_ENV = 'TRANS_ENCRYPTOR_STACK_ID';
 
     private array $metadata = [];
     private string $keyVaultURL;
@@ -41,6 +46,7 @@ class GenericAKVWrapper implements CryptoWrapperInterface
 
     private TransClient|false|null $transClient = null;
     private ?string $encryptorId = null;
+    public ?LoggerInterface $logger = null;
 
     public function __construct(EncryptorOptions $encryptorOptions)
     {
@@ -81,9 +87,14 @@ class GenericAKVWrapper implements CryptoWrapperInterface
         return $this->transClient ?: null;
     }
 
-    private function getRetryProxy(): RetryProxy
+    private static function getTransStackId(): ?string
     {
-        $retryPolicy = new SimpleRetryPolicy(3);
+        return (string) getenv(self::TRANS_STACK_ID_ENV) ?: null;
+    }
+
+    private function getRetryProxy(?RetryPolicyInterface $retryPolicy = null): RetryProxy
+    {
+        $retryPolicy ??= new SimpleRetryPolicy(3);
         $backOffPolicy = new ExponentialBackOffPolicy(1000);
         return new RetryProxy($retryPolicy, $backOffPolicy);
     }
@@ -171,8 +182,36 @@ class GenericAKVWrapper implements CryptoWrapperInterface
         ) {
             throw new UserException('Deciphering failed.');
         }
+
+        $metadata = $this->metadata;
+        $doBackfill = false;
+
+        // try retrieve secret from trans AKV
+        if ($this->getTransClient() !== null) {
+            // do not retry if trans AKV response is 404
+            $retryDecider = fn($e) => !$e instanceof ClientException || $e->getCode() !== 404;
+            $retryPolicy = new CallbackRetryPolicy($retryDecider);
+            try {
+                $decryptedContext = $this->getRetryProxy($retryPolicy)->call(function () use ($encrypted) {
+                    return $this->getTransClient()
+                        ?->getSecret($encrypted[self::SECRET_NAME])
+                        ->getValue();
+                });
+                if ($decryptedContext !== null && isset($this->metadata['stackId']) && self::getTransStackId()) {
+                    $metadata['stackId'] = self::getTransStackId();
+                }
+            } catch (Throwable $e) {
+                if ($e instanceof ClientException && $e->getCode() === 404) {
+                    $doBackfill = true;
+                } else {
+                    throw new ApplicationException('Deciphering failed.', $e->getCode(), $e);
+                }
+            }
+        }
+
         try {
-            $decryptedContext = $this->getRetryProxy()->call(function () use ($encrypted) {
+            // retrieve only if not found at trans AKV
+            $decryptedContext ??= $this->getRetryProxy()->call(function () use ($encrypted) {
                 return $this->getClient()
                     ->getSecret($encrypted[self::SECRET_NAME])
                     ->getValue();
@@ -188,12 +227,43 @@ class GenericAKVWrapper implements CryptoWrapperInterface
         } catch (Throwable $e) {
             throw new ApplicationException('Deciphering failed.', $e->getCode(), $e);
         }
-        $this->verifyMetadata($decryptedContext[self::METADATA_INDEX], $this->metadata);
+        $this->verifyMetadata($decryptedContext[self::METADATA_INDEX], $metadata);
         try {
             $key = Key::loadFromAsciiSafeString($decryptedContext[self::KEY_INDEX]);
             return Crypto::decrypt($encrypted[self::PAYLOAD_INDEX], $key, true);
         } catch (Throwable $e) {
+            $doBackfill = false;
             throw new ApplicationException('Deciphering failed.', $e->getCode(), $e);
+        } finally {
+            if (!self::getTransStackId()) {
+                $doBackfill = false;
+                $this->logger?->error(sprintf('Env %s not set.', self::TRANS_STACK_ID_ENV));
+            }
+            if ($doBackfill) {
+                if (isset($this->metadata['stackId'])) {
+                    $decryptedContext[self::METADATA_INDEX]['stackId'] = self::getTransStackId();
+                }
+                try {
+                    $this->getRetryProxy()->call(function () use ($encrypted, $decryptedContext) {
+                        $context = $this->encode($decryptedContext);
+                        $this->getTransClient()?->setSecret(
+                            new SetSecretRequest($context, new SecretAttributes()),
+                            $encrypted[self::SECRET_NAME],
+                        );
+                    });
+                    $this->logger?->info('Secret "{secretName}" migrated in {stackId} AKV.', [
+                        'secretName' => $encrypted[self::SECRET_NAME],
+                        'stackId' => self::getTransStackId(),
+                    ]);
+                } catch (Throwable $e) {
+                    // intentionally suppress all errors to prevent decrypt() from failing
+                    $this->logger?->error('Migration of secret "{secretName}" in {stackId} AKV failed.', [
+                        'secretName' => $encrypted[self::SECRET_NAME],
+                        'stackId' => self::getTransStackId(),
+                        'exception' => $e,
+                    ]);
+                }
+            }
         }
     }
 
