@@ -235,7 +235,7 @@ class GenericAKVWrapper implements CryptoWrapperInterface
             $doBackfill = false;
             throw new ApplicationException('Deciphering failed.', $e->getCode(), $e);
         } finally {
-            if (!self::getTransStackId()) {
+            if ($doBackfill && !self::getTransStackId()) {
                 $doBackfill = false;
                 $this->logger?->error(sprintf('Env %s not set.', self::TRANS_STACK_ID_ENV));
             }
