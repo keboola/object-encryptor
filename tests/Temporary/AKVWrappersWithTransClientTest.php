@@ -582,7 +582,7 @@ class AKVWrappersWithTransClientTest extends TestCase
                     );
                     return true;
                 }),
-                self::stringStartsWith('gen-encryptor'),
+                self::matchesRegularExpression('#^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$#'),
             )
             ->willReturn(new SecretBundle([
                 'id' => 'https://test.vault.azure.net/secrets/secret-name/53af0dad94f248',
@@ -643,7 +643,7 @@ class AKVWrappersWithTransClientTest extends TestCase
             ->method('setSecret')
             ->with(
                 self::isInstanceOf(SetSecretRequest::class),
-                self::stringStartsWith('gen-encryptor'),
+                self::matchesRegularExpression('#^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$#'),
             );
 
         $mockTransClient = $this->createMock(TransClient::class);
