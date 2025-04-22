@@ -28,6 +28,7 @@
         "google/cloud-kms": "^1.20",
         "keboola/azure-key-vault-client": "^4.1",
         "keboola/common-exceptions": "^1.2",
+        "symfony/uid": "^7.2",
         "vkartaviy/retry": "^0.2"
     },
     "require-dev": {

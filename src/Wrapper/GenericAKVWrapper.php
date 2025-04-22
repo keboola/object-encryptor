@@ -25,6 +25,7 @@ use Retry\BackOff\ExponentialBackOffPolicy;
 use Retry\Policy\RetryPolicyInterface;
 use Retry\Policy\SimpleRetryPolicy;
 use Retry\RetryProxy;
+use Symfony\Component\Uid\Uuid;
 use Throwable;
 
 /**
@@ -167,7 +168,7 @@ class GenericAKVWrapper implements CryptoWrapperInterface
             $secret = $this->getRetryProxy()->call(function () use ($client, $context) {
                 return $client->setSecret(
                     new SetSecretRequest($context, new SecretAttributes()),
-                    uniqid('gen-encryptor'),
+                    Uuid::v4()->toRfc4122(),
                 );
             });
             /** @var SecretBundle $secret */
