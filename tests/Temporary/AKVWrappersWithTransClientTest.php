@@ -23,9 +23,10 @@ use Keboola\ObjectEncryptor\Wrapper\ConfigurationAKVWrapper;
 use Keboola\ObjectEncryptor\Wrapper\GenericAKVWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ProjectAKVWrapper;
 use Keboola\ObjectEncryptor\Wrapper\ProjectWideAKVWrapper;
+use Monolog\Handler\TestHandler;
+use Monolog\Logger;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Psr\Log\Test\TestLogger;
 use ReflectionClass;
 
 class AKVWrappersWithTransClientTest extends TestCase
@@ -264,7 +265,8 @@ class AKVWrappersWithTransClientTest extends TestCase
                 'secret-name',
             );
 
-        $logger = new TestLogger();
+        $logsHandler = new TestHandler();
+        $logger = new Logger('test', [$logsHandler]);
 
         /** @var GenericAKVWrapper|MockObject $mockWrapper */
         $mockWrapper = $this->getMockBuilder($wrapperClass)
@@ -296,13 +298,12 @@ class AKVWrappersWithTransClientTest extends TestCase
         $secret = $mockWrapper->decrypt($encryptedSecret);
 
         self::assertSame('something very secret', $secret);
-        self::assertTrue($logger->hasInfo([
-            'message' => 'Secret "{secretName}" migrated in {stackId} AKV.',
-            'context' => [
+        self::assertTrue($logsHandler->hasInfoThatPasses(fn($r) =>
+            $r['message'] === 'Secret "{secretName}" migrated in {stackId} AKV.' &&
+            $r['context'] === [
                 'secretName' => 'secret-name',
                 'stackId' => 'trans-stack',
-            ],
-        ]));
+            ]));
     }
 
     /**
@@ -427,7 +428,8 @@ class AKVWrappersWithTransClientTest extends TestCase
             ->method('setSecret')
             ->willThrowException($setSecretException);
 
-        $logger = new TestLogger();
+        $logsHandler = new TestHandler();
+        $logger = new Logger('test', [$logsHandler]);
 
         /** @var GenericAKVWrapper|MockObject $mockWrapper */
         $mockWrapper = $this->getMockBuilder(GenericAKVWrapper::class)
@@ -456,14 +458,13 @@ class AKVWrappersWithTransClientTest extends TestCase
         $secret = $mockWrapper->decrypt($encryptedSecret);
 
         self::assertSame('something very secret', $secret);
-        self::assertTrue($logger->hasError([
-            'message' => 'Migration of secret "{secretName}" in {stackId} AKV failed.',
-            'context' => [
+        self::assertTrue($logsHandler->hasErrorThatPasses(fn($r) =>
+            $r['message'] === 'Migration of secret "{secretName}" in {stackId} AKV failed.' &&
+            $r['context'] === [
                 'secretName' => 'secret-name',
                 'stackId' => 'trans-stack',
                 'exception' => $setSecretException,
-            ],
-        ]));
+            ]));
     }
 
     public function testSkipBackfillWhenTransStackIdEnvNotSet(): void
@@ -492,7 +493,8 @@ class AKVWrappersWithTransClientTest extends TestCase
             ->willThrowException(new ClientException('not found', 404));
         $mockTransClient->expects(self::never())->method('setSecret');
 
-        $logger = new TestLogger();
+        $logsHandler = new TestHandler();
+        $logger = new Logger('test', [$logsHandler]);
 
         /** @var GenericAKVWrapper|MockObject $mockWrapper */
         $mockWrapper = $this->getMockBuilder(GenericAKVWrapper::class)
@@ -521,12 +523,13 @@ class AKVWrappersWithTransClientTest extends TestCase
         $secret = $mockWrapper->decrypt($encryptedSecret);
 
         self::assertSame('something very secret', $secret);
-        self::assertTrue($logger->hasError('Env TRANS_ENCRYPTOR_STACK_ID not set.'));
+        self::assertTrue($logsHandler->hasErrorThatContains('Env TRANS_ENCRYPTOR_STACK_ID not set.'));
     }
 
     public function testObjectEncryptorFactoryInjectsLoggerInAKVWrappers(): void
     {
-        $logger = new TestLogger();
+        $logsHandler = new TestHandler();
+        $logger = new Logger('test', [$logsHandler]);
 
         $encryptor = ObjectEncryptorFactory::getEncryptor(
             new EncryptorOptions(
@@ -590,7 +593,8 @@ class AKVWrappersWithTransClientTest extends TestCase
                 'attributes' => [],
             ]));
 
-        $logger = new TestLogger();
+        $logsHandler = new TestHandler();
+        $logger = new Logger('test', [$logsHandler]);
 
         /** @var GenericAKVWrapper|MockObject $mockWrapper */
         $mockWrapper = $this->getMockBuilder($wrapperClass)
@@ -616,13 +620,12 @@ class AKVWrappersWithTransClientTest extends TestCase
         $encrypted = $mockWrapper->encrypt('My-V3ry-5ecret-P@ssword!');
 
         self::assertMatchesRegularExpression('/^[A-Za-z0-9+\/=]+$/', $encrypted);
-        self::assertTrue($logger->hasInfo([
-            'message' => 'Secret "{secretName}" stored in {stackId} AKV.',
-            'context' => [
+        self::assertTrue($logsHandler->hasInfoThatPasses(fn($r) =>
+            $r['message'] === 'Secret "{secretName}" stored in {stackId} AKV.' &&
+            $r['context'] === [
                 'secretName' => 'secret-name',
                 'stackId' => 'trans-stack',
-            ],
-        ]));
+            ]));
     }
 
     /**
@@ -649,7 +652,8 @@ class AKVWrappersWithTransClientTest extends TestCase
         $mockTransClient = $this->createMock(TransClient::class);
         $mockTransClient->expects(self::never())->method(self::anything());
 
-        $logger = new TestLogger();
+        $logsHandler = new TestHandler();
+        $logger = new Logger('test', [$logsHandler]);
 
         /** @var GenericAKVWrapper|MockObject $mockWrapper */
         $mockWrapper = $this->getMockBuilder($wrapperClass)
@@ -675,8 +679,8 @@ class AKVWrappersWithTransClientTest extends TestCase
         $encrypted = $mockWrapper->encrypt('My-V3ry-5ecret-P@ssword!');
 
         self::assertMatchesRegularExpression('/^[A-Za-z0-9+\/=]+$/', $encrypted);
-        self::assertTrue($logger->hasError('Env TRANS_ENCRYPTOR_STACK_ID not set.'));
-        self::assertFalse($logger->hasInfo('Secret "{secretName}" stored in {stackId} AKV.'));
+        self::assertTrue($logsHandler->hasErrorThatContains('Env TRANS_ENCRYPTOR_STACK_ID not set.'));
+        self::assertFalse($logsHandler->hasInfoThatContains('Secret "{secretName}" stored in {stackId} AKV.'));
     }
 
     private static function encode(mixed $data): string
