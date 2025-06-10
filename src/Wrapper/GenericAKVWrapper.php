@@ -19,7 +19,6 @@ use Keboola\ObjectEncryptor\Exception\UserException;
 use Keboola\ObjectEncryptor\Temporary\CallbackRetryPolicy;
 use Keboola\ObjectEncryptor\Temporary\TransClient;
 use Keboola\ObjectEncryptor\Temporary\TransClientNotAvailableException;
-use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Retry\BackOff\ExponentialBackOffPolicy;
 use Retry\Policy\RetryPolicyInterface;
@@ -46,7 +45,6 @@ class GenericAKVWrapper implements CryptoWrapperInterface
 
     private TransClient|false|null $transClient = null;
     private ?string $encryptorId = null;
-    public ?LoggerInterface $logger = null;
 
     public function __construct(EncryptorOptions $encryptorOptions)
     {
@@ -200,12 +198,12 @@ class GenericAKVWrapper implements CryptoWrapperInterface
                 if ($decryptedContext !== null && isset($this->metadata['stackId']) && self::getTransStackId()) {
                     $metadata['stackId'] = self::getTransStackId();
                 }
-            } catch (Throwable $e) {
-                if ($e instanceof ClientException && $e->getCode() === 404) {
+            } catch (ClientException $e) {
+                if ($e->getCode() === 404) {
                     $doBackfill = true;
-                } else {
-                    throw new ApplicationException('Deciphering failed.', $e->getCode(), $e);
                 }
+            } catch (Throwable) {
+                // intentionally suppress all errors to prevent decrypt() from failing
             }
         }
 
@@ -247,17 +245,8 @@ class GenericAKVWrapper implements CryptoWrapperInterface
                             $encrypted[self::SECRET_NAME],
                         );
                     });
-                    $this->logger?->info('Secret "{secretName}" migrated in {stackId} AKV.', [
-                        'secretName' => $encrypted[self::SECRET_NAME],
-                        'stackId' => self::getTransStackId() ?? 'trans',
-                    ]);
-                } catch (Throwable $e) {
+                } catch (Throwable) {
                     // intentionally suppress all errors to prevent decrypt() from failing
-                    $this->logger?->error('Migration of secret "{secretName}" in {stackId} AKV failed.', [
-                        'secretName' => $encrypted[self::SECRET_NAME],
-                        'stackId' => self::getTransStackId() ?? 'trans',
-                        'exception' => $e,
-                    ]);
                 }
             }
         }
