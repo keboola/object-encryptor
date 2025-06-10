@@ -20,7 +20,6 @@ class EncryptorOptionsTest extends TestCase
             akvUrl: 'akv-url',
             gkmsKeyId: 'gkms-key-id',
             backoffMaxTries: 1,
-            encryptorId: 'internal',
         );
         self::assertSame('my-stack', $options->getStackId());
         self::assertSame('my-kms-id', $options->getKmsKeyId());
@@ -29,7 +28,6 @@ class EncryptorOptionsTest extends TestCase
         self::assertSame('akv-url', $options->getAkvUrl());
         self::assertSame('gkms-key-id', $options->getGkmsKeyId());
         self::assertSame(1, $options->getBackoffMaxTries());
-        self::assertSame('internal', $options->getEncryptorId());
     }
 
     public function testConstructEmptyConfig(): void
