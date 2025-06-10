@@ -8,7 +8,6 @@ use Defuse\Crypto\Crypto;
 use Defuse\Crypto\Key;
 use Keboola\AzureKeyVaultClient\Authentication\AuthenticatorFactory;
 use Keboola\AzureKeyVaultClient\Client;
-use Keboola\AzureKeyVaultClient\Exception\ClientException;
 use Keboola\AzureKeyVaultClient\GuzzleClientFactory;
 use Keboola\AzureKeyVaultClient\Requests\SecretAttributes;
 use Keboola\AzureKeyVaultClient\Requests\SetSecretRequest;
@@ -16,12 +15,10 @@ use Keboola\AzureKeyVaultClient\Responses\SecretBundle;
 use Keboola\ObjectEncryptor\EncryptorOptions;
 use Keboola\ObjectEncryptor\Exception\ApplicationException;
 use Keboola\ObjectEncryptor\Exception\UserException;
-use Keboola\ObjectEncryptor\Temporary\CallbackRetryPolicy;
 use Keboola\ObjectEncryptor\Temporary\TransClient;
 use Keboola\ObjectEncryptor\Temporary\TransClientNotAvailableException;
 use Psr\Log\NullLogger;
 use Retry\BackOff\ExponentialBackOffPolicy;
-use Retry\Policy\RetryPolicyInterface;
 use Retry\Policy\SimpleRetryPolicy;
 use Retry\RetryProxy;
 use Symfony\Component\Uid\Uuid;
@@ -85,14 +82,9 @@ class GenericAKVWrapper implements CryptoWrapperInterface
         return $this->transClient ?: null;
     }
 
-    private static function getTransStackId(): ?string
+    private function getRetryProxy(): RetryProxy
     {
-        return (string) getenv('TRANS_ENCRYPTOR_STACK_ID') ?: null;
-    }
-
-    private function getRetryProxy(?RetryPolicyInterface $retryPolicy = null): RetryProxy
-    {
-        $retryPolicy ??= new SimpleRetryPolicy(3);
+        $retryPolicy = new SimpleRetryPolicy(3);
         $backOffPolicy = new ExponentialBackOffPolicy(1000);
         return new RetryProxy($retryPolicy, $backOffPolicy);
     }
@@ -180,36 +172,8 @@ class GenericAKVWrapper implements CryptoWrapperInterface
         ) {
             throw new UserException('Deciphering failed.');
         }
-
-        $metadata = $this->metadata;
-        $doBackfill = false;
-
-        // try retrieve secret from trans AKV
-        if ($this->getTransClient() !== null) {
-            // do not retry if trans AKV response is 404
-            $retryDecider = fn($e) => !$e instanceof ClientException || $e->getCode() !== 404;
-            $retryPolicy = new CallbackRetryPolicy($retryDecider);
-            try {
-                $decryptedContext = $this->getRetryProxy($retryPolicy)->call(function () use ($encrypted) {
-                    return $this->getTransClient()
-                        ?->getSecret($encrypted[self::SECRET_NAME])
-                        ->getValue();
-                });
-                if ($decryptedContext !== null && isset($this->metadata['stackId']) && self::getTransStackId()) {
-                    $metadata['stackId'] = self::getTransStackId();
-                }
-            } catch (ClientException $e) {
-                if ($e->getCode() === 404) {
-                    $doBackfill = true;
-                }
-            } catch (Throwable) {
-                // intentionally suppress all errors to prevent decrypt() from failing
-            }
-        }
-
         try {
-            // retrieve only if not found at trans AKV
-            $decryptedContext ??= $this->getRetryProxy()->call(function () use ($encrypted) {
+            $decryptedContext = $this->getRetryProxy()->call(function () use ($encrypted) {
                 return $this->getClient()
                     ->getSecret($encrypted[self::SECRET_NAME])
                     ->getValue();
@@ -225,30 +189,12 @@ class GenericAKVWrapper implements CryptoWrapperInterface
         } catch (Throwable $e) {
             throw new ApplicationException('Deciphering failed.', $e->getCode(), $e);
         }
-        $this->verifyMetadata($decryptedContext[self::METADATA_INDEX], $metadata);
+        $this->verifyMetadata($decryptedContext[self::METADATA_INDEX], $this->metadata);
         try {
             $key = Key::loadFromAsciiSafeString($decryptedContext[self::KEY_INDEX]);
             return Crypto::decrypt($encrypted[self::PAYLOAD_INDEX], $key, true);
         } catch (Throwable $e) {
-            $doBackfill = false;
             throw new ApplicationException('Deciphering failed.', $e->getCode(), $e);
-        } finally {
-            if ($doBackfill) {
-                if (isset($this->metadata['stackId']) && self::getTransStackId()) {
-                    $decryptedContext[self::METADATA_INDEX]['stackId'] = self::getTransStackId();
-                }
-                try {
-                    $this->getRetryProxy()->call(function () use ($encrypted, $decryptedContext) {
-                        $context = $this->encode($decryptedContext);
-                        $this->getTransClient()?->setSecret(
-                            new SetSecretRequest($context, new SecretAttributes()),
-                            $encrypted[self::SECRET_NAME],
-                        );
-                    });
-                } catch (Throwable) {
-                    // intentionally suppress all errors to prevent decrypt() from failing
-                }
-            }
         }
     }
 
