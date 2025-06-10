@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Keboola\ObjectEncryptor;
 
-use Psr\Log\LoggerInterface;
-
 class ObjectEncryptorFactory
 {
     /**
@@ -30,13 +28,10 @@ class ObjectEncryptorFactory
      * @param non-empty-string $keyVaultUrl
      * @return ObjectEncryptor
      */
-    public static function getAzureEncryptor(
-        string $stackId,
-        string $keyVaultUrl,
-        ?LoggerInterface $logger = null,
-    ): ObjectEncryptor {
+    public static function getAzureEncryptor(string $stackId, string $keyVaultUrl): ObjectEncryptor
+    {
         $encryptOptions = new EncryptorOptions($stackId, null, null, null, $keyVaultUrl);
-        return self::getEncryptor($encryptOptions, $logger);
+        return self::getEncryptor($encryptOptions);
     }
 
     /**
@@ -50,10 +45,8 @@ class ObjectEncryptorFactory
         return self::getEncryptor($encryptOptions);
     }
 
-    public static function getEncryptor(
-        EncryptorOptions $encryptorOptions,
-        ?LoggerInterface $logger = null,
-    ): ObjectEncryptor {
-        return new ObjectEncryptor($encryptorOptions, $logger);
+    public static function getEncryptor(EncryptorOptions $encryptorOptions): ObjectEncryptor
+    {
+        return new ObjectEncryptor($encryptorOptions);
     }
 }
