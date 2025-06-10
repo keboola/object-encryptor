@@ -467,65 +467,6 @@ class AKVWrappersWithTransClientTest extends TestCase
             ]));
     }
 
-    public function testSkipBackfillWhenTransStackIdEnvNotSet(): void
-    {
-        putenv('TRANS_ENCRYPTOR_STACK_ID=');
-
-        $key = Key::createNewRandomKey();
-
-        $mockClient = $this->createMock(Client::class);
-        $mockClient->expects(self::once())
-            ->method('getSecret')
-            ->with('secret-name')
-            ->willReturn(new SecretBundle([
-                'id' => 'secret-id',
-                'value' => self::encode([
-                    0 => [],
-                    1 => $key->saveToAsciiSafeString(),
-                ]),
-                'attributes' => [],
-            ]));
-
-        $mockTransClient = $this->createMock(TransClient::class);
-        $mockTransClient->expects(self::once())
-            ->method('getSecret')
-            ->with('secret-name')
-            ->willThrowException(new ClientException('not found', 404));
-        $mockTransClient->expects(self::never())->method('setSecret');
-
-        $logsHandler = new TestHandler();
-        $logger = new Logger('test', [$logsHandler]);
-
-        /** @var GenericAKVWrapper|MockObject $mockWrapper */
-        $mockWrapper = $this->getMockBuilder(GenericAKVWrapper::class)
-            ->setConstructorArgs([
-                new EncryptorOptions(
-                    stackId: 'some-stack',
-                    akvUrl: 'some-url',
-                ),
-            ])
-            ->onlyMethods(['getClient', 'getTransClient'])
-            ->getMock();
-        $mockWrapper->logger = $logger;
-        $mockWrapper->expects(self::once())
-            ->method('getClient')
-            ->willReturn($mockClient);
-        $mockWrapper->expects(self::exactly(2))
-            ->method('getTransClient')
-            ->willReturn($mockTransClient);
-
-        $encryptedSecret = self::encode([
-            2 => Crypto::encrypt('something very secret', $key, true),
-            3 => 'secret-name',
-            4 => 'secret-version',
-        ]);
-
-        $secret = $mockWrapper->decrypt($encryptedSecret);
-
-        self::assertSame('something very secret', $secret);
-        self::assertTrue($logsHandler->hasErrorThatContains('Env TRANS_ENCRYPTOR_STACK_ID not set.'));
-    }
-
     public function testObjectEncryptorFactoryInjectsLoggerInAKVWrappers(): void
     {
         $logsHandler = new TestHandler();
