@@ -142,42 +142,19 @@ class GenericAKVWrapper implements CryptoWrapperInterface
     public function encrypt(?string $data): string
     {
         $this->validateState();
-        $metadata = $this->metadata;
-
         try {
-            $client = $this->getClient();
-
-            // store secret in trans AKV if trans client is set
-            if ($this->getTransClient() !== null) {
-                if (!self::getTransStackId()) {
-                    // store in the default AKV as a fallback
-                    $this->logger?->error(sprintf('Env %s not set.', self::TRANS_STACK_ID_ENV));
-                } else {
-                    $client = $this->getTransClient();
-                    if (isset($metadata['stackId'])) {
-                        $metadata['stackId'] = self::getTransStackId();
-                    }
-                }
-            }
-
             $key = Key::createNewRandomKey();
             $context = $this->encode([
-                self::METADATA_INDEX => $metadata,
+                self::METADATA_INDEX => $this->metadata,
                 self::KEY_INDEX => $key->saveToAsciiSafeString(),
             ]);
-            $secret = $this->getRetryProxy()->call(function () use ($client, $context) {
-                return $client->setSecret(
+            $secret = $this->getRetryProxy()->call(function () use ($context) {
+                return $this->getClient()->setSecret(
                     new SetSecretRequest($context, new SecretAttributes()),
                     Uuid::v4()->toRfc4122(),
                 );
             });
             /** @var SecretBundle $secret */
-            if ($client === $this->getTransClient()) {
-                $this->logger?->info('Secret "{secretName}" stored in {stackId} AKV.', [
-                    'secretName' => $secret->getName(),
-                    'stackId' => self::getTransStackId(),
-                ]);
-            }
             return $this->encode([
                 self::PAYLOAD_INDEX => Crypto::encrypt((string) $data, $key, true),
                 self::SECRET_NAME => $secret->getName(),
