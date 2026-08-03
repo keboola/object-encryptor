@@ -16,11 +16,13 @@ trait UnserializeCanaryTrait
      */
     private function assertDecryptDoesNotInstantiateClasses(CryptoWrapperInterface $wrapper): void
     {
-        UnserializeCanary::reset();
-
         // Single-element array so the wrapper's element-count guard rejects it before any
         // cloud call is made - this keeps the test offline.
         $cipher = base64_encode((string) gzcompress(serialize([new UnserializeCanary()])));
+
+        // Reset only after the payload is built: the instance serialized above is released
+        // at the end of that statement, which fires its own __destruct().
+        UnserializeCanary::reset();
 
         try {
             $wrapper->decrypt($cipher);
@@ -29,9 +31,15 @@ trait UnserializeCanaryTrait
             Assert::assertSame('Deciphering failed.', $e->getMessage());
         }
 
+        // __destruct first: it is the method the reported gadget chains detonate from, and it
+        // runs even though the payload was rejected above.
+        Assert::assertFalse(
+            UnserializeCanary::$destructed,
+            'a class from the cipher payload was instantiated and released (__destruct ran).',
+        );
         Assert::assertFalse(
             UnserializeCanary::$wokenUp,
-            'unserialize() instantiated a class from the cipher payload.',
+            'unserialize() instantiated a class from the cipher payload (__wakeup ran).',
         );
     }
 }
