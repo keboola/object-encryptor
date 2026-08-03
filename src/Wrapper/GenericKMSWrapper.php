@@ -114,7 +114,10 @@ class GenericKMSWrapper implements CryptoWrapperInterface
     {
         $this->validateState();
         try {
-            $encrypted = @unserialize((string) gzuncompress(base64_decode($encryptedData)));
+            $encrypted = @unserialize(
+                (string) gzuncompress(base64_decode($encryptedData)),
+                ['allowed_classes' => false],
+            );
         } catch (Throwable $e) {
             throw new UserException('Deciphering failed.', 0, $e);
         }

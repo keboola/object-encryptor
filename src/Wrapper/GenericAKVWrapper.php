@@ -91,7 +91,10 @@ class GenericAKVWrapper implements CryptoWrapperInterface
     private function decode(string $data)
     {
         try {
-            return @unserialize((string) gzuncompress((string) base64_decode($data)));
+            return @unserialize(
+                (string) gzuncompress((string) base64_decode($data)),
+                ['allowed_classes' => false],
+            );
         } catch (Throwable $e) {
             throw new UserException('Deciphering failed.', 0, $e);
         }

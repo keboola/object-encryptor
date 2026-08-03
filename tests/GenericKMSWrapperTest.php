@@ -18,6 +18,7 @@ class GenericKMSWrapperTest extends AbstractTestCase
 {
     use DataProviderTrait;
     use TestEnvVarsTrait;
+    use UnserializeCanaryTrait;
 
     public function setUp(): void
     {
@@ -406,5 +407,10 @@ class GenericKMSWrapperTest extends AbstractTestCase
         $this->expectException(UserException::class);
         $this->expectExceptionMessage($message);
         $wrapper->decrypt($cipher);
+    }
+
+    public function testDecryptDoesNotInstantiateClassesFromCipher(): void
+    {
+        $this->assertDecryptDoesNotInstantiateClasses($this->getWrapper());
     }
 }
