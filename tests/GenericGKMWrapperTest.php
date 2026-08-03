@@ -19,6 +19,7 @@ class GenericGKMWrapperTest extends AbstractTestCase
 {
     use DataProviderTrait;
     use TestEnvVarsTrait;
+    use UnserializeCanaryTrait;
 
     public function setUp(): void
     {
@@ -276,5 +277,10 @@ class GenericGKMWrapperTest extends AbstractTestCase
         );
         $encrypted = $wrapper->encrypt('test');
         self::assertNotEquals('test', $encrypted);
+    }
+
+    public function testDecryptDoesNotInstantiateClassesFromCipher(): void
+    {
+        $this->assertDecryptDoesNotInstantiateClasses($this->getWrapper());
     }
 }

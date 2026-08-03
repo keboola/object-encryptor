@@ -21,6 +21,7 @@ use RuntimeException;
 class GenericAKVWrapperTest extends AbstractTestCase
 {
     use DataProviderTrait;
+    use UnserializeCanaryTrait;
 
     public function setUp(): void
     {
@@ -394,5 +395,10 @@ class GenericAKVWrapperTest extends AbstractTestCase
         self::expectException(ApplicationException::class);
         self::expectExceptionMessage('Ciphering failed: Failed to get authentication token');
         $wrapper->encrypt('test');
+    }
+
+    public function testDecryptDoesNotInstantiateClassesFromCipher(): void
+    {
+        $this->assertDecryptDoesNotInstantiateClasses($this->getWrapper());
     }
 }

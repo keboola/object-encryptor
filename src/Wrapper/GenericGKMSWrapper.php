@@ -64,7 +64,10 @@ class GenericGKMSWrapper implements CryptoWrapperInterface
     private function decode(string $data): array
     {
         try {
-            return (array) @unserialize((string) gzuncompress((string) base64_decode($data)));
+            return (array) @unserialize(
+                (string) gzuncompress((string) base64_decode($data)),
+                ['allowed_classes' => false],
+            );
         } catch (Throwable $e) {
             throw new UserException('Deciphering failed.', 0, $e);
         }
